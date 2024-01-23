@@ -1,4 +1,4 @@
-# Bayer Fact Finder
+# Fact Finder
 
 ## Getting Started
 
