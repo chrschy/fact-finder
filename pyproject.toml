@@ -6,7 +6,8 @@ description = "FactFinder"
 dependencies = [
     "chainlit",
     "langchain",
-    "langchain-openai"
+    "langchain-openai",
+    "pandas"
 ]
 
 [project.optional-dependencies]
