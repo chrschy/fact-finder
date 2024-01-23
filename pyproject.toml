@@ -4,7 +4,9 @@ version = "0.1.0"
 requires-python = ">=3.8,<3.12"
 description = "FactFinder"
 dependencies = [
-    # "torch>=2.0",
+    "chainlit",
+    "langchain",
+    "langchain-openai"
 ]
 
 [project.optional-dependencies]
