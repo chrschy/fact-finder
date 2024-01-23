@@ -24,7 +24,7 @@ def load_csv_file(filename: str) -> pd.DataFrame:
 
 def clean_data(primekg_data: pd.DataFrame) -> pd.DataFrame:
     type_columns = ["relation", "display_relation", "x_type", "y_type"]
-    primekg_data[type_columns] = primekg_data[type_columns].replace(" ", "_", regex=True)
+    primekg_data[type_columns] = primekg_data[type_columns].replace({" ": "_", "-": "_"}, regex=True)
     return primekg_data.replace({"/": "_or_"}, regex=True)
 
 
