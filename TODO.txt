@@ -1,6 +1,0 @@
-- csv in Neo4J -> Timm
-(- frontend mit streamlit chat --> von AA hackathon code hier rein kopieren)
-- relevanten Code von LLMS hier rein
-- try langchain implementation in main -> Max
-    - find it here: https://python.langchain.com/docs/use_cases/graph/graph_cypher_qa
-    - frontend with chainlit
