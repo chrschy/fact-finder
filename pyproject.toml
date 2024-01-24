@@ -1,0 +1,30 @@
+[project]
+name = "fact_finder"
+version = "0.1.0"
+requires-python = ">=3.8,<3.12"
+description = "FactFinder"
+dependencies = [
+    "chainlit",
+    "langchain",
+    "langchain-openai",
+    "pandas"
+]
+
+[project.optional-dependencies]
+linting = ["pre-commit"]
+tests = ["pytest"]
+
+[project.scripts]
+fact-finder = "fact_finder.__main__:main"
+
+[build-system]
+requires = ["setuptools >= 61.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+target-version = ["py310"]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120
