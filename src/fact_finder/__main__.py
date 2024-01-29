@@ -3,7 +3,7 @@ import os
 import chainlit as cl
 from langchain.chains import GraphCypherQAChain, LLMChain
 from langchain_community.graphs import Neo4jGraph
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI,AzureChatOpenAI
 from prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT, LLM_PROMPT
 from dotenv import load_dotenv
 from utils import concatenate_with_headers
@@ -16,12 +16,22 @@ NEO4J_PW = os.getenv("NEO4J_PW", "opensesame")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 assert OPENAI_API_KEY is not None
-
+azure_chat = False
+if os.getenv("AZURE_OPENAI_ENDPOINT") is not None:
+    azure_chat = True
+    endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+    deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
+    api_version="2023-05-15"
+    os.environ["AZURE_OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+    os.environ["AZURE_OPENAI_ENDPOINT"] = endpoint
 
 @cl.on_chat_start
 async def on_chat_start():
     graph = Neo4jGraph(url=NEO4J_URL, username=NEO4J_USER, password=NEO4J_PW)
-    model = ChatOpenAI(model="gpt-4", streaming=False, temperature=0, api_key=OPENAI_API_KEY)  # gpt-3.5-turbo-16k
+    if azure_chat:
+        model = AzureChatOpenAI(openai_api_version = api_version,azure_deployment=deployment_name)
+    else:
+        model = ChatOpenAI(model="gpt-4", streaming=False, temperature=0, api_key=OPENAI_API_KEY)  # gpt-3.5-turbo-16k
     neo4j_chain = GraphCypherQAChain.from_llm(
         model,
         graph=graph,
