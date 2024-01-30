@@ -48,7 +48,7 @@ class Neo4JLangchainQAService(QAService, Chain):
     """Optional cypher validation/preprocessing tools"""
 
     def search(self, user_query: str) -> str:
-        return self.invoke(input=user_query)["result"]
+        return self._call(inputs={self.input_key: user_query})["result"]
 
     @property
     def input_keys(self) -> List[str]:
@@ -143,9 +143,9 @@ class Neo4JLangchainQAService(QAService, Chain):
 
         intermediate_steps: List = []
 
-        generated_cypher = self.cypher_generation_chain.run(
+        generated_cypher = self.cypher_generation_chain(
             {"question": question, "schema": self.graph_schema}, callbacks=callbacks
-        )
+        )[self.cypher_generation_chain.output_key]
 
         # Extract Cypher code if it is wrapped in backticks
         generated_cypher = extract_cypher(generated_cypher)
