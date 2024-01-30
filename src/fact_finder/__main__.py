@@ -1,12 +1,16 @@
 import os
 
 import chainlit as cl
-from langchain.chains import GraphCypherQAChain, LLMChain
-from langchain_community.graphs import Neo4jGraph
-from langchain_openai import ChatOpenAI,AzureChatOpenAI
-from prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT, LLM_PROMPT
 from dotenv import load_dotenv
-from utils import concatenate_with_headers
+from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT, LLM_PROMPT
+from fact_finder.qa_service.cypher_preprocessors.lower_case_property_names import (
+    LowerCasePropertiesCypherQueryPreprocessor,
+)
+from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
+from fact_finder.utils import concatenate_with_headers
+from langchain.chains import LLMChain
+from langchain_community.graphs import Neo4jGraph
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 load_dotenv()
 
@@ -21,20 +25,23 @@ if os.getenv("AZURE_OPENAI_ENDPOINT") is not None:
     azure_chat = True
     endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     deployment_name = os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME")
-    api_version="2023-05-15"
+    api_version = "2023-05-15"
     os.environ["AZURE_OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
     os.environ["AZURE_OPENAI_ENDPOINT"] = endpoint
+
 
 @cl.on_chat_start
 async def on_chat_start():
     graph = Neo4jGraph(url=NEO4J_URL, username=NEO4J_USER, password=NEO4J_PW)
     if azure_chat:
-        model = AzureChatOpenAI(openai_api_version = api_version,azure_deployment=deployment_name)
+        model = AzureChatOpenAI(openai_api_version=api_version, azure_deployment=deployment_name)
     else:
         model = ChatOpenAI(model="gpt-4", streaming=False, temperature=0, api_key=OPENAI_API_KEY)  # gpt-3.5-turbo-16k
-    neo4j_chain = GraphCypherQAChain.from_llm(
+    cypher_preprocessors = [LowerCasePropertiesCypherQueryPreprocessor()]
+    neo4j_chain = Neo4JLangchainQAService.from_llm(
         model,
         graph=graph,
+        cypher_query_preprocessors=cypher_preprocessors,
         cypher_prompt=CYPHER_GENERATION_PROMPT,
         qa_prompt=CYPHER_QA_PROMPT,
         verbose=True,
