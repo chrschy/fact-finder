@@ -49,3 +49,19 @@ def test_producing_lower_case_with_special_characters_present():
     query2 = 'MATCH (e:exposure)-[:linked_to]->(d:disease {disease_name: "hick-_!?=/\\+#up"}) RETURN d.name'
     processed_query = preproc(query1)
     assert processed_query == query2
+
+
+def test_producing_lower_case_for_assignment_in_where_clause():
+    preproc = LowerCasePropertiesCypherQueryPreprocessor()
+    query1 = "MATCH (d:disease)-[:linked_to]-(e:exposure) WHERE e.name = 'Ethanol' RETURN d.name"
+    query2 = "MATCH (d:disease)-[:linked_to]-(e:exposure) WHERE e.name = 'ethanol' RETURN d.name"
+    processed_query = preproc(query1)
+    assert processed_query == query2
+
+
+def test_producing_lower_case_for_multiple_assignments_in_where_clause():
+    preproc = LowerCasePropertiesCypherQueryPreprocessor()
+    query1 = "MATCH (d:disease)-[:linked_to]-(e:exposure) WHERE e.name = 'Ethanol' AND d.name = 'HickUp' RETURN d.name"
+    query2 = "MATCH (d:disease)-[:linked_to]-(e:exposure) WHERE e.name = 'ethanol' AND d.name = 'hickup' RETURN d.name"
+    processed_query = preproc(query1)
+    assert processed_query == query2
