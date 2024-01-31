@@ -1,40 +1,43 @@
-import os
+from unittest.mock import MagicMock
 
 import pytest
 from dotenv import load_dotenv
 from langchain_community.graphs import Neo4jGraph
 
-from fact_finder.synonym_finder.synonym_finder import WikiDataSynonymFinder, WordNetSynonymFinder
 from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
+from fact_finder.synonym_finder.synonym_finder import WikiDataSynonymFinder, WordNetSynonymFinder
 
 load_dotenv()
 
 
 @pytest.fixture(scope="session")
 def graph():
-    return Neo4jGraph(url=os.getenv("NEO4J_URL"), username=os.getenv("NEO4J_USER"), password=os.getenv("NEO4J_PW"))
+    graph = MagicMock(spec=Neo4jGraph)
+    graph.query = MagicMock()
+    graph.query.return_value = [{"n": {"name": "ethanol"}}]
+    return graph
 
 
 @pytest.fixture()
-def wiki_synonym_selector(graph):
+def wiki_synonym_preprocessor(graph):
     return SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WikiDataSynonymFinder())
 
 
 @pytest.fixture()
-def wordnet_synonym_selector(graph):
+def wordnet_synonym_preprocessor(graph):
     return SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WordNetSynonymFinder())
 
 
-def test_wiki_synonym_selector(wiki_synonym_selector):
+def test_wiki_synonym_selector(wiki_synonym_preprocessor):
     query = 'MATCH (e:exposure {name: "alcohol"})-[:linked_to]->(d:disease) RETURN d.name'
-    selector_result = wiki_synonym_selector(query)
+    selector_result = wiki_synonym_preprocessor(query)
     assert selector_result == 'MATCH (e:exposure {name: "ethanol"})-[:linked_to]->(d:disease) RETURN d.name'
     query = 'MATCH (e:exposure {name: "ethanol"})-[:linked_to]->(d:disease) RETURN d.name'
-    selector_result = wiki_synonym_selector(query)
+    selector_result = wiki_synonym_preprocessor(query)
     assert selector_result == 'MATCH (e:exposure {name: "ethanol"})-[:linked_to]->(d:disease) RETURN d.name'
 
 
-def test_wordnet_synonym_selector(wordnet_synonym_selector):
+def test_wordnet_synonym_selector(wordnet_synonym_preprocessor):
     alcohol_query = 'MATCH (e:exposure {name: "alcohol"})-[:linked_to]->(d:disease) RETURN d.name'
-    selector_result = wordnet_synonym_selector(alcohol_query)
+    selector_result = wordnet_synonym_preprocessor(alcohol_query)
     assert selector_result == 'MATCH (e:exposure {name: "alcohol"})-[:linked_to]->(d:disease) RETURN d.name'

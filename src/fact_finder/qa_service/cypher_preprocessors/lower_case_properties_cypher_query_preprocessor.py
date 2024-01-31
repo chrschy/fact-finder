@@ -1,11 +1,7 @@
 import re
 from typing import List
 
-from langchain_community.graphs import Neo4jGraph
-
 from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
-from fact_finder.synonym_finder.synonym_finder import SynonymFinder
-from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 
 
 class LowerCasePropertiesCypherQueryPreprocessor(CypherQueryPreprocessor):

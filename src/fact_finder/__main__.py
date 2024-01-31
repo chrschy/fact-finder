@@ -2,6 +2,10 @@ import os
 
 import chainlit as cl
 from dotenv import load_dotenv
+from langchain.chains import LLMChain
+from langchain_community.graphs import Neo4jGraph
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
+
 from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT, LLM_PROMPT
 from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
@@ -10,9 +14,6 @@ from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocess
 from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
 from fact_finder.synonym_finder.synonym_finder import WikiDataSynonymFinder
 from fact_finder.utils import concatenate_with_headers
-from langchain.chains import LLMChain
-from langchain_community.graphs import Neo4jGraph
-from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 load_dotenv()
 

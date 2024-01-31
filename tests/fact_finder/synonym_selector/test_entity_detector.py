@@ -1,6 +1,7 @@
 import pytest
-from fact_finder.entity_detector.entity_detector import EntityDetector
 from dotenv import load_dotenv
+
+from fact_finder.entity_detector.entity_detector import EntityDetector
 
 load_dotenv()
 

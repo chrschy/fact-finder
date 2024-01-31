@@ -1,8 +1,9 @@
+import ssl
 from abc import ABC, abstractmethod
 from typing import List
+
 from nltk.corpus import wordnet as wn
-from SPARQLWrapper import SPARQLWrapper, JSON
-import ssl
+from SPARQLWrapper import JSON, SPARQLWrapper
 
 
 class SynonymFinder(ABC):

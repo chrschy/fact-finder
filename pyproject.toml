@@ -8,7 +8,6 @@ dependencies = [
     "langchain",
     "langchain-openai",
     "pandas",
-    "pytest>=8.0.0",
 ]
 
 [project.optional-dependencies]

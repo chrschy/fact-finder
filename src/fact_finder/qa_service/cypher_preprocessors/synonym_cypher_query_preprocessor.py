@@ -13,9 +13,10 @@ class SynonymCypherQueryPreprocessor(CypherQueryPreprocessor):
         self.__all_nodes = self.__get_all_nodes()
         self.__synonym_finder = synonym_finder
 
-    def __get_all_nodes(self) -> list[str]:
+    def __get_all_nodes(self) -> set:
         nodes = self.__graph.query(self.__cypher_query_to_get_all_nodes)
-        return [node["n"]["name"].lower() for node in nodes]
+        nodes = set([node["n"]["name"].lower() for node in nodes])
+        return nodes
 
     def __call__(self, cypher_query: str) -> str:
         node = self.__extract_node_from_cypher(cypher_query)
@@ -24,7 +25,7 @@ class SynonymCypherQueryPreprocessor(CypherQueryPreprocessor):
             for synonym in synonyms:
                 if self.__is_node_in_graph(synonym):
                     return cypher_query.replace(node, synonym)
-                return cypher_query
+            return cypher_query
         return cypher_query
 
     def __is_node_in_graph(self, node: str) -> bool:
