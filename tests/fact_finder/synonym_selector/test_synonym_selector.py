@@ -4,8 +4,8 @@ import pytest
 from dotenv import load_dotenv
 from langchain_community.graphs import Neo4jGraph
 
-from fact_finder.synonym_selector.synonym_finder import WikiDataSynonymFinder, WordNetSynonymFinder
-from fact_finder.synonym_selector.synonym_selector import SynonymSelector
+from fact_finder.synonym_finder.synonym_finder import WikiDataSynonymFinder, WordNetSynonymFinder
+from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 
 load_dotenv()
 
@@ -17,12 +17,12 @@ def graph():
 
 @pytest.fixture()
 def wiki_synonym_selector(graph):
-    return SynonymSelector(graph=graph, synonym_finder=WikiDataSynonymFinder())
+    return SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WikiDataSynonymFinder())
 
 
 @pytest.fixture()
 def wordnet_synonym_selector(graph):
-    return SynonymSelector(graph=graph, synonym_finder=WordNetSynonymFinder())
+    return SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WordNetSynonymFinder())
 
 
 def test_wiki_synonym_selector(wiki_synonym_selector):

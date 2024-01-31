@@ -44,6 +44,7 @@ class WikiDataSynonymFinder(SynonymFinder):
         return query
 
     def __generate_sparql_backwards_query(self, node: str) -> str:
+        # todo test and adjust the query such that it works when node="alcohol" -> "ethanol"
         query = """SELECT DISTINCT ?alt_label WHERE {
                 ?s skos:altLabel ?alt_label .
                 ?s rdfs:label "%s"@en .

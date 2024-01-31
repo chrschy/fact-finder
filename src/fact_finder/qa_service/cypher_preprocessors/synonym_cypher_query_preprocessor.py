@@ -1,9 +1,12 @@
-from langchain_community.graphs import Neo4jGraph
-from fact_finder.synonym_selector.synonym_finder import SynonymFinder
 import re
 
+from langchain_community.graphs import Neo4jGraph
 
-class SynonymSelector:
+from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.synonym_finder.synonym_finder import SynonymFinder
+
+
+class SynonymCypherQueryPreprocessor(CypherQueryPreprocessor):
     def __init__(self, graph: Neo4jGraph, synonym_finder: SynonymFinder):
         self.__graph = graph
         self.__cypher_query_to_get_all_nodes = "MATCH(n) RETURN n"
