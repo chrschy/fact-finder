@@ -29,6 +29,11 @@ def test_returned_result_matches_model_output(query, chain, system_answer):
     assert chain.invoke(query)["result"] == system_answer
 
 
+@pytest.mark.parametrize("cypher_query", ["SCHEMA_ERROR: This is not a cypher query!"], indirect=True)
+def test_invalid_cypher_query_is_returned_directly(query, chain, cypher_query):
+    assert chain.invoke(query)["result"] == cypher_query
+
+
 @pytest.fixture
 def query() -> str:
     return "<this is the user query>"
@@ -98,9 +103,9 @@ def cypher_prompt(cypher_prompt_template, schema, query) -> str:
     return cypher_prompt_template.format_prompt(schema=schema, question=query)
 
 
-@pytest.fixture
-def cypher_query() -> str:
-    return "<this is a cypher query>"
+@pytest.fixture(params=["<this is a cypher query>"])
+def cypher_query(request) -> str:
+    return request.param
 
 
 @pytest.fixture

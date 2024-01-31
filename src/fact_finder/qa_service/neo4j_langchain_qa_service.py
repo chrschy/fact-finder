@@ -46,6 +46,8 @@ class Neo4JLangchainQAService(QAService, Chain):
     """Whether or not to return the result of querying the graph directly."""
     cypher_query_preprocessors: List[Callable[[str], str]] = []
     """Optional cypher validation/preprocessing tools"""
+    schema_error_string: Optional[str] = "SCHEMA_ERROR"
+    """Optional string to be generated at the start of the cypher query to indicate an error."""
 
     def search(self, user_query: str) -> str:
         return self._call(inputs={self.input_key: user_query})["result"]
@@ -85,6 +87,7 @@ class Neo4JLangchainQAService(QAService, Chain):
         cypher_query_preprocessors: List[Callable[[str], str]] = [],
         qa_llm_kwargs: Optional[Dict[str, Any]] = None,
         cypher_llm_kwargs: Optional[Dict[str, Any]] = None,
+        schema_error_string: Optional[str] = "SCHEMA_ERROR",
         **kwargs: Any,
     ) -> Neo4JLangchainQAService:
         """Initialize from LLM."""
@@ -128,6 +131,7 @@ class Neo4JLangchainQAService(QAService, Chain):
             qa_chain=qa_chain,
             cypher_generation_chain=cypher_generation_chain,
             cypher_query_preprocessors=cypher_query_preprocessors,
+            schema_error_string=schema_error_string,
             **kwargs,
         )
 
@@ -149,6 +153,9 @@ class Neo4JLangchainQAService(QAService, Chain):
 
         # Extract Cypher code if it is wrapped in backticks
         generated_cypher = extract_cypher(generated_cypher)
+
+        if self.schema_error_string is not None and generated_cypher.startswith(self.schema_error_string):
+            return {self.output_key: generated_cypher}
 
         # Correct Cypher query if enabled
         for processor in self.cypher_query_preprocessors:
