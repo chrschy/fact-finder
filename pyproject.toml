@@ -7,7 +7,8 @@ dependencies = [
     "chainlit",
     "langchain",
     "langchain-openai",
-    "pandas"
+    "pandas",
+    "pytest>=8.0.0",
 ]
 
 [project.optional-dependencies]
