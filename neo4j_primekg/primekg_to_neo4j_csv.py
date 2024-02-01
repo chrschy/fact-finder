@@ -1,27 +1,48 @@
 import os
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+import sys
+from typing import Callable, Dict, Iterable, List, Optional, Set, Tuple, TypeVar
 
 import pandas as pd
 
 
 def extract_node_and_relationship_csvs(primekg_csv: str, target_dir: str, use_display_rel: bool) -> str:
     # fmt: off
-    primekg_data =  load_csv_file(primekg_csv)
-    primekg_data =  clean_data(primekg_data)
-    node_dfs     =  build_nodes_by_type_dfs(primekg_data)
-    rel_dfs      =  build_relationship_dfs(primekg_data, use_display_rel)
-    node_csvs    =  create_node_csvs(target_dir, node_dfs)
-    rel_csvs     =  create_relationship_csvs(target_dir, rel_dfs)
-    node_flags   =  build_node_flags(node_csvs)
-    rel_flags    =  build_rel_flags(rel_csvs)
-    return          build_import_command(node_flags, rel_flags)
+    primekg_data =  load_csv_file(filename=primekg_csv)
+    primekg_data =  clean_data(primekg_data=primekg_data)
+    node_dfs     =  build_nodes_by_type_dfs(primekg_data=primekg_data)
+    rel_dfs      =  build_relationship_dfs(primekg_data=primekg_data, use_display_rel=use_display_rel)
+    node_csvs    =  create_node_csvs(directory=target_dir, node_dfs=node_dfs)
+    rel_csvs     =  create_relationship_csvs(directory=target_dir, rel_dfs=rel_dfs)
+    node_flags   =  build_node_flags(node_csvs=node_csvs)
+    rel_flags    =  build_rel_flags(rel_csvs=rel_csvs)
+    return          build_import_command(node_flags=node_flags, rel_flags=rel_flags)
     # fmt: on
 
 
+T = TypeVar("T")
+# P = ParamSpec("P")
+
+
+def log_it(fnct: Callable[..., T]) -> Callable[..., T]:
+    name = fnct.__name__.replace("_", " ")
+
+    def _fnct_with_log(*args: "P.args", **kwargs: "P.kwargs") -> T:
+        print(f'Executing step "{name}"', file=sys.stderr, flush=True)
+        for k, v in kwargs.items():
+            if isinstance(v, str):
+                print(f'    Argument "{k}" has value: {v}', file=sys.stderr, flush=True)
+
+        return fnct(*args, **kwargs)
+
+    return _fnct_with_log
+
+
+@log_it
 def load_csv_file(filename: str) -> pd.DataFrame:
     return pd.read_csv(filename, low_memory=False)
 
 
+@log_it
 def clean_data(primekg_data: pd.DataFrame) -> pd.DataFrame:
     primekg_data = primekg_data.apply(lambda x: x.str.lower() if x.dtype == "object" else x)
     type_columns = ["relation", "display_relation", "x_type", "y_type"]
@@ -29,6 +50,7 @@ def clean_data(primekg_data: pd.DataFrame) -> pd.DataFrame:
     return primekg_data.replace({"/": "_or_"}, regex=True)
 
 
+@log_it
 def build_nodes_by_type_dfs(primekg_data: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     primekg_x = primekg_data[["x_index", "x_id", "x_type", "x_name", "x_source"]].drop_duplicates()
     primekg_x = primekg_x.rename(lambda l: l.lstrip("x_"), axis="columns")
@@ -44,6 +66,7 @@ def _extract_node_df_for_type(df: pd.DataFrame, type: str) -> pd.DataFrame:
     return df
 
 
+@log_it
 def build_relationship_dfs(primekg_data: pd.DataFrame, use_display_rel: bool) -> Dict[str, List[pd.DataFrame]]:
     rel_key = "display_relation" if use_display_rel else "relation"
     return dict(_build_relationship_dfs(primekg_data, rel_key))
@@ -71,11 +94,13 @@ def _extract_relationship_df_for_type_pair(df: pd.DataFrame, type1: str, type2: 
     return df
 
 
+@log_it
 def create_node_csvs(directory: str, node_dfs: Dict[str, pd.DataFrame]) -> Iterable[Tuple[str, str]]:
     for node_type, node_data in node_dfs.items():
         yield node_type, _create_csv_from_df(directory, node_type, node_data, "node")
 
 
+@log_it
 def create_relationship_csvs(directory: str, rel_dfs: Dict[str, List[pd.DataFrame]]) -> Iterable[Tuple[str, List[str]]]:
     for rel_type, rdl in rel_dfs.items():
         fns = [_create_csv_from_df(directory, rel_type, rel_data, "rel", i + 1) for i, rel_data in enumerate(rdl)]
@@ -96,17 +121,20 @@ def _create_csv_from_df(
     return fn
 
 
+@log_it
 def build_node_flags(node_csvs: Iterable[Tuple[str, str]]) -> Iterable[str]:
     for node_type, csv_file in node_csvs:
         yield f'--nodes={node_type.replace(" ", "_")}={csv_file}'
 
 
+@log_it
 def build_rel_flags(rel_csvs: Iterable[Tuple[str, List[str]]]) -> Iterable[str]:
     for rel_type, csv_files in rel_csvs:
         for csv_file in csv_files:
             yield f'--relationships={rel_type.replace(" ", "_")}="{csv_file}"'
 
 
+@log_it
 def build_import_command(node_flags: Iterable[str], rel_flags: Iterable[str], db_name: str = "neo4j") -> str:
     sep = " \\\n"
     return (
@@ -127,5 +155,7 @@ if __name__ == "__main__":
     assert primekg_csv is not None and target_dir is not None
     use_display_rel = True
 
+    print(f"Starting graph extraction from csv file.", file=sys.stderr, flush=True)
     cmd = extract_node_and_relationship_csvs(primekg_csv, target_dir, use_display_rel)
+    print(f"Finished graph extraction from csv file.", file=sys.stderr, flush=True)
     print(cmd)
