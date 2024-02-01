@@ -24,6 +24,18 @@ Test via Cypher shell:
 docker exec -it <CONTAINER_ID> cypher-shell -u neo4j -p opensesame
 ```
 ```
-MATCH (disease1:disease {name: "psoriasis"})-[:disease_disease]->(disease2:disease {name: "scalp_disease"})
+MATCH (disease1:disease {name: "psoriasis"})-[:parent_child]->(disease2:disease {name: "scalp disease"})
 RETURN disease1, disease2;
+```
+
+Alternative start-up using an already downloaded csv file:
+```
+docker run -d --restart=always \
+    --publish=7474:7474 --publish=7687:7687 \
+    --volume <abs/path/to/prime/kg.csv>:/primekg_data/kg.csv:ro \
+    --env DELETE_PRIMEKG_CSV=false \
+    --env NEO4J_AUTH=neo4j/opensesame \
+    --env NEO4J_PLUGINS=\[\"apoc\"\] \
+    --name neo4j_primekg_service \
+    neo4j_primekg:latest
 ```
