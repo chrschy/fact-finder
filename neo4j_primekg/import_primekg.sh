@@ -3,7 +3,7 @@
 function import_primekg
 {
     echo ">>> Downloading PrimeKG csv file..."
-    wget -O $PRIMEKG_CSV https://dataverse.harvard.edu/api/access/datafile/6180620
+    wget --no-clobber -O $PRIMEKG_CSV https://dataverse.harvard.edu/api/access/datafile/6180620
 
     echo ">>> Processing PrimeKG csv file..."
     IMPORT_CMD=$(python3 $IMPORT_DIR/primekg_to_neo4j_csv.py)
@@ -22,8 +22,10 @@ function import_primekg
         exit 1
     fi
 
-    echo ">>> Cleaning up..."
-    rm -r /$IMPORT_DIR
+    if [ "${DELETE_PRIMEKG_CSV}" == "true" ]; then
+        echo ">>> Cleaning up..."
+        rm -r /$IMPORT_DIR
+    fi
 }
 
 SETUP_DONE_MARKER="/data/prime_kg_is_imported_to_neo4j"
