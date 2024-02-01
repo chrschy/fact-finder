@@ -20,12 +20,18 @@ def graph():
 
 @pytest.fixture()
 def wiki_synonym_preprocessor(graph):
-    return SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WikiDataSynonymFinder())
+    synonym_finder = MagicMock(spec=WikiDataSynonymFinder)
+    synonym_finder.find = MagicMock()
+    synonym_finder.find.return_value = ["ethanol", "alcohols", "alcohol by volume"]
+    return SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=synonym_finder)
 
 
 @pytest.fixture()
 def wordnet_synonym_preprocessor(graph):
-    return SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WordNetSynonymFinder())
+    synonym_finder = MagicMock(spec=WikiDataSynonymFinder)
+    synonym_finder.find = MagicMock()
+    synonym_finder.find.return_value = ["alcoholic_beverage", "alcoholic_drink", "inebriant", "intoxicant"]
+    return SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=synonym_finder)
 
 
 def test_wiki_synonym_selector(wiki_synonym_preprocessor):
