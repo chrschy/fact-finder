@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, List, Optional
 
-from fact_finder.qa_service.qa_service import QAService
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain.chains.graph_qa.prompts import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
@@ -12,6 +11,8 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
+
+from fact_finder.qa_service.qa_service import QAService
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
 

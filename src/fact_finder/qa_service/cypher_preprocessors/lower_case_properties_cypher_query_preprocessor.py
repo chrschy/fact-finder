@@ -1,8 +1,10 @@
 import re
 from typing import List
 
+from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 
-class LowerCasePropertiesCypherQueryPreprocessor:
+
+class LowerCasePropertiesCypherQueryPreprocessor(CypherQueryPreprocessor):
     def __init__(self, property_names: List[str] = [r"[^{:\s]+"]) -> None:
         self._property_names = property_names
 

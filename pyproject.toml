@@ -7,7 +7,7 @@ dependencies = [
     "chainlit",
     "langchain",
     "langchain-openai",
-    "pandas"
+    "pandas",
 ]
 
 [project.optional-dependencies]

@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Dict, List
 
 
 def concatenate_with_headers(answers: List[Dict[str, str]]) -> str:
