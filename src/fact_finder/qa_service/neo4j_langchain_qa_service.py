@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
+from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.qa_service.qa_service import QAService
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain.chains.graph_qa.prompts import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
@@ -11,8 +13,6 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
-
-from fact_finder.qa_service.qa_service import QAService
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
 
@@ -45,7 +45,7 @@ class Neo4JLangchainQAService(QAService, Chain):
     """Whether or not to return the intermediate steps along with the final answer."""
     return_direct: bool = False
     """Whether or not to return the result of querying the graph directly."""
-    cypher_query_preprocessors: List[Callable[[str], str]] = []
+    cypher_query_preprocessors: List[CypherQueryPreprocessor] = []
     """Optional cypher validation/preprocessing tools"""
     schema_error_string: Optional[str] = "SCHEMA_ERROR"
     """Optional string to be generated at the start of the cypher query to indicate an error."""
@@ -85,7 +85,7 @@ class Neo4JLangchainQAService(QAService, Chain):
         qa_llm: Optional[BaseLanguageModel] = None,
         exclude_types: List[str] = [],
         include_types: List[str] = [],
-        cypher_query_preprocessors: List[Callable[[str], str]] = [],
+        cypher_query_preprocessors: List[CypherQueryPreprocessor] = [],
         qa_llm_kwargs: Optional[Dict[str, Any]] = None,
         cypher_llm_kwargs: Optional[Dict[str, Any]] = None,
         schema_error_string: Optional[str] = "SCHEMA_ERROR",
