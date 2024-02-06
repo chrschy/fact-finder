@@ -8,6 +8,8 @@ dependencies = [
     "langchain",
     "langchain-openai",
     "pandas",
+    "nltk",
+    "SPARQLWrapper",
 ]
 
 [project.optional-dependencies]
