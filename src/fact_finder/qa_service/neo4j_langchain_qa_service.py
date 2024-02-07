@@ -1,18 +1,29 @@
 from __future__ import annotations
 
+import logging
+import os
 from typing import Any, Callable, Dict, List, Optional
 
+from dotenv import load_dotenv
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain.chains.graph_qa.prompts import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
 from langchain.chains.llm import LLMChain
+from langchain_community.graphs import Neo4jGraph
 from langchain_community.graphs.graph_store import GraphStore
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
+from langchain_openai import ChatOpenAI
 
+from fact_finder.qa_service.cypher_preprocessors.extract_subgraph_preprocessor import ExtractSubgraphPreprocessor
+from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
+    LowerCasePropertiesCypherQueryPreprocessor,
+)
+from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 from fact_finder.qa_service.qa_service import QAService
+from fact_finder.synonym_finder.synonym_finder import WikiDataSynonymFinder
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
 
@@ -146,6 +157,8 @@ class Neo4JLangchainQAService(QAService, Chain):
         callbacks = _run_manager.get_child()
         question = inputs[self.input_key]
 
+        logging.info("started")
+
         intermediate_steps: List = []
 
         generated_cypher = self.cypher_generation_chain(
@@ -179,17 +192,15 @@ class Neo4JLangchainQAService(QAService, Chain):
         else:
             _run_manager.on_text("Full Context:", end="\n", verbose=self.verbose)
             _run_manager.on_text(str(context), color="green", end="\n", verbose=self.verbose)
-
             intermediate_steps.append({"context": context})
-
             result = self.qa_chain(
                 {"question": question, "context": context},
                 callbacks=callbacks,
             )
             final_result = result[self.qa_chain.output_key]
-
         chain_result: Dict[str, Any] = {self.output_key: final_result}
         if self.return_intermediate_steps:
             chain_result[INTERMEDIATE_STEPS_KEY] = intermediate_steps
-
+        extract_subgraph_preprocessor = ExtractSubgraphPreprocessor()
+        chain_result["sub_graph"] = self.graph.query(extract_subgraph_preprocessor(generated_cypher))
         return chain_result

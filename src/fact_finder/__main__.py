@@ -1,6 +1,7 @@
 import os
 
 import chainlit as cl
+import click
 from dotenv import load_dotenv
 from langchain.chains import LLMChain
 from langchain_community.graphs import Neo4jGraph
@@ -20,7 +21,6 @@ load_dotenv()
 NEO4J_URL = os.getenv("NEO4J_URL", "bolt://localhost:7687")
 NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
 NEO4J_PW = os.getenv("NEO4J_PW", "opensesame")
-
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 assert OPENAI_API_KEY is not None
 azure_chat = False
@@ -52,18 +52,20 @@ async def on_chat_start():
         verbose=True,
         return_intermediate_steps=True,
     )
-    llm_chain = LLMChain(llm=model, prompt=LLM_PROMPT, verbose=True)
+    # llm_chain = LLMChain(llm=model, prompt=LLM_PROMPT, verbose=True)
     cl.user_session.set("neo4j_chain", neo4j_chain)
-    cl.user_session.set("llm_chain", llm_chain)
+    # cl.user_session.set("llm_chain", llm_chain)
 
 
 @cl.on_message
 async def main(message: cl.Message):
-    llm_chain = cl.user_session.get("llm_chain")
-    llm_chain_res = await llm_chain.ainvoke(input=message.content, callbacks=[cl.LangchainCallbackHandler()])
+    # llm_chain = cl.user_session.get("llm_chain")
+    # llm_chain_res = await llm_chain.ainvoke(input=message.content, callbacks=[cl.LangchainCallbackHandler()])
     neo4j_chain = cl.user_session.get("neo4j_chain")
     neo4j_chain_res = await neo4j_chain.ainvoke(input=message.content, callbacks=[cl.LangchainCallbackHandler()])
-    concatenated_answer = concatenate_with_headers(
-        [{"LLM:": llm_chain_res["text"]}, {"Graph:": neo4j_chain_res["result"]}]
-    )
-    await cl.Message(content=concatenated_answer).send()
+
+    # answer = concatenate_with_headers(
+    #     [{"LLM:": llm_chain_res["text"]}, {"Graph:": neo4j_chain_res["result"]}]
+    # )
+    answer = neo4j_chain_res["result"]
+    await cl.Message(content=answer).send()
