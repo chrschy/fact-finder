@@ -8,6 +8,11 @@ dependencies = [
     "langchain",
     "langchain-openai",
     "pandas",
+    "pyvis",
+    "streamlit",
+    "nltk",
+    "SPARQLWrapper",
+    "neo4j"
 ]
 
 [project.optional-dependencies]
