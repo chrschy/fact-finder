@@ -11,5 +11,5 @@ pip install -e .
 Run UI:
 
 ```
-chainlit run src/fact_finder/__main__.py -w
+streamlit run src/fact_finder/app.py 
 ```
