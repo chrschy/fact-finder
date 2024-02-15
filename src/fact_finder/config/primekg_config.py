@@ -2,6 +2,7 @@ from typing import List, Tuple
 
 from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
 from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.qa_service.cypher_preprocessors.format_preprocessor import FormatPreprocessor
 from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
 )
@@ -31,9 +32,10 @@ def build_chain(model: BaseLanguageModel) -> Chain:
 
 
 def _build_preprocessors(graph: Neo4jGraph) -> List[CypherQueryPreprocessor]:
+    cypher_query_formatting_preprocessor = FormatPreprocessor()
     lower_case_preprocessor = LowerCasePropertiesCypherQueryPreprocessor()
     synonym_preprocessor = SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WikiDataSynonymFinder())
-    return [lower_case_preprocessor, synonym_preprocessor]
+    return [cypher_query_formatting_preprocessor, lower_case_preprocessor, synonym_preprocessor]
 
 
 def _get_graph_prompt_templates() -> Tuple[PromptTemplate, PromptTemplate]:
