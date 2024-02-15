@@ -119,18 +119,3 @@ def test_escaped_double_quotes_become_escaped_single_quotes():
     )
     preprocessor = FormatPreprocessor()
     assert preprocessor(query) == formated_query
-
-
-# def test_double_quotes_to_single_quotes():
-#     query = (
-#         'MATCH (disease1:disease {name: "psoriasis"})-[:linked_to]->(exposure:exposure)-[:linked_to]->(disease2:disease {name: "scalp disease"})\n'
-#         'WHERE p.name = "phenotype"\n'
-#         "RETURN disease1, exposure, disease2"
-#     )
-#     formated_query = (
-#         "MATCH (disease1:disease {name: 'psoriasis'})-[:linked_to]->(exposure:exposure)-[:linked_to]->(disease2:disease {name: 'scalp disease'})\n"
-#         "WHERE p.name = 'phenotype'\n"
-#         "RETURN disease1, exposure, disease2"
-#     )
-#     preprocessor = FormatPreprocessor()
-#     assert preprocessor(query) == formated_query
