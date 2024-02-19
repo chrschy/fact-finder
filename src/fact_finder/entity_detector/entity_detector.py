@@ -32,4 +32,7 @@ class EntityDetector:
         payload = json.dumps({"public_dic": filenames_as_single_string, "text": search_text})
         headers = {"x-api-key": self.__api_key, "Accept": "application/json", "Content-Type": "application/json"}
         response = requests.request("POST", self.__url, headers=headers, data=payload)
-        return json.loads(response.text)["annotations"]
+        if response.status_code == 200:
+            return json.loads(response.text)["annotations"]
+        else:
+            response.raise_for_status()

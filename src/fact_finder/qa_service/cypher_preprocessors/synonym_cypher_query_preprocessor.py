@@ -1,4 +1,5 @@
 import re
+from typing import Optional, Set
 
 from langchain_community.graphs import Neo4jGraph
 
@@ -13,15 +14,16 @@ class SynonymCypherQueryPreprocessor(CypherQueryPreprocessor):
         self.__all_nodes = self.__get_all_nodes()
         self.__synonym_finder = synonym_finder
 
-    def __get_all_nodes(self) -> set:
+    def __get_all_nodes(self) -> Set[str]:
         nodes = self.__graph.query(self.__cypher_query_to_get_all_nodes)
-        nodes = set([node["n"]["name"].lower() for node in nodes])
-        return nodes
+        return set(node["n"]["name"].lower() for node in nodes)
 
     def __call__(self, cypher_query: str) -> str:
         node = self.__extract_node_from_cypher(cypher_query)
+        if node is None:
+            return cypher_query
         if not self.__is_node_in_graph(node):
-            synonyms = self.__get_synonyms(node)
+            synonyms = self.__synonym_finder(node)
             for synonym in synonyms:
                 if self.__is_node_in_graph(synonym):
                     return cypher_query.replace(node, synonym)
@@ -31,10 +33,10 @@ class SynonymCypherQueryPreprocessor(CypherQueryPreprocessor):
     def __is_node_in_graph(self, node: str) -> bool:
         return node.lower() in self.__all_nodes
 
-    def __get_synonyms(self, node: str) -> list[str]:
-        return self.__synonym_finder.find(node)
-
-    def __extract_node_from_cypher(self, cypher_query: str) -> str:
-        regex = r"{name: ['\"]([^'\"]+)['\"]}"
+    def __extract_node_from_cypher(self, cypher_query: str) -> Optional[str]:
+        regex = r"{name: ['\"]([^}]+)['\"]}"
         matches = re.findall(regex, cypher_query, re.MULTILINE)
-        return matches[0]
+        if len(matches):
+            return matches[0]
+        else:
+            return None
