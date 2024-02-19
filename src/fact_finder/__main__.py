@@ -20,9 +20,8 @@ async def main(message: cl.Message):
     llm_chain_res = await llm_chain.ainvoke(input=message.content, callbacks=[cl.LangchainCallbackHandler()])
     neo4j_chain = cl.user_session.get("neo4j_chain")
     neo4j_chain_res = await neo4j_chain.ainvoke(input=message.content, callbacks=[cl.LangchainCallbackHandler()])
-
-    answer = concatenate_with_headers(
+    concatenated_answer = concatenate_with_headers(
         [{"LLM:": llm_chain_res["text"]}, {"Graph:": neo4j_chain_res["result"]}]
     )
-    answer = neo4j_chain_res["result"]
-    await cl.Message(content=answer).send()
+    await cl.Message(content=concatenated_answer).send()
+
