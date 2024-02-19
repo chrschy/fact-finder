@@ -44,7 +44,7 @@ class Neo4JLangchainQAService(QAService, Chain):
     graph_schema: str
     input_key: str = "query"  #: :meta private:
     output_key: str = "result"  #: :meta private:
-    top_k: int = 10
+    top_k: int = 1000
     """Number of results to return from the query"""
     return_intermediate_steps: bool = False
     """Whether or not to return the intermediate steps along with the final answer."""
