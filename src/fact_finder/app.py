@@ -28,7 +28,8 @@ load_dotenv()
 ############################################################
 PLACEHOLDER_QUERY = "Please insert your query"
 
-EXAMPLE_1 = "Which biomarkers are associated with a diagnosis of atopic dermatitis?"
+# EXAMPLE_1 = "Which biomarkers are associated with a diagnosis of atopic dermatitis?"
+EXAMPLE_1 = "What are the phenotypes associated with cardioacrofacial dysplasia?"
 EXAMPLE_2 = "What are the genes responsible for psoriasis?"
 EXAMPLE_3 = "Which diseases involve PINK1?"
 EXAMPLE_4 = "Which drugs could be promising candidates to treat Parkinson?"
@@ -151,10 +152,20 @@ def get_html(html: str, legend=False):
     html = html.replace("\n", " ")
     return WRAPPER.format(html)
 
+async def call_neo4j(message):
+    return st.session_state.neo4j_chain(message)
+
+async def call_llm(message):
+    return st.session_state.llm_chain(message)
 
 async def call_chains(message):
-    results = await asyncio.gather(st.session_state.neo4j_chain.ainvoke(message), st.session_state.llm_chain.ainvoke(message))
+    results = await asyncio.gather(call_neo4j(message), call_llm(message))
+    print(results)
     return results
+
+# async def call_chains(message):
+#     results = await asyncio.gather(st.session_state.neo4j_chain.ainvoke(message), st.session_state.llm_chain.ainvoke(message))
+#     return results
 
 
 def convert_subgraph(graph: [], result: str):
@@ -162,6 +173,7 @@ def convert_subgraph(graph: [], result: str):
     result_ents = []
     for res in result:
         result_ents += res.values()
+    # result_ents = [res_val for res in result for res_val in res.values()]
     idx_rel = 0
     for triplet in graph:
         trip = [value for key, value in triplet.items() if type(value) is tuple][0]
