@@ -11,5 +11,5 @@ pip install -e .
 Run UI:
 
 ```
-streamlit run src/fact_finder/app.py 
+streamlit run src/fact_finder/app.py --browser.serverAddress localhost
 ```
