@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from typing import Any, Dict, List, Optional
 import logging
-import os
-from typing import Any, Callable, Dict, List, Optional
 
-from dotenv import load_dotenv
+from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.qa_service.qa_service import QAService
+from fact_finder.qa_service.cypher_preprocessors.extract_subgraph_preprocessor import ExtractSubgraphPreprocessor
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain.chains.graph_qa.prompts import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
@@ -17,13 +18,6 @@ from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
 from langchain_openai import ChatOpenAI
 
-from fact_finder.qa_service.cypher_preprocessors.extract_subgraph_preprocessor import ExtractSubgraphPreprocessor
-from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
-    LowerCasePropertiesCypherQueryPreprocessor,
-)
-from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
-from fact_finder.qa_service.qa_service import QAService
-from fact_finder.synonym_finder.synonym_finder import WikiDataSynonymFinder
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
 
@@ -56,7 +50,7 @@ class Neo4JLangchainQAService(QAService, Chain):
     """Whether or not to return the intermediate steps along with the final answer."""
     return_direct: bool = False
     """Whether or not to return the result of querying the graph directly."""
-    cypher_query_preprocessors: List[Callable[[str], str]] = []
+    cypher_query_preprocessors: List[CypherQueryPreprocessor] = []
     """Optional cypher validation/preprocessing tools"""
     schema_error_string: Optional[str] = "SCHEMA_ERROR"
     """Optional string to be generated at the start of the cypher query to indicate an error."""
@@ -96,7 +90,7 @@ class Neo4JLangchainQAService(QAService, Chain):
         qa_llm: Optional[BaseLanguageModel] = None,
         exclude_types: List[str] = [],
         include_types: List[str] = [],
-        cypher_query_preprocessors: List[Callable[[str], str]] = [],
+        cypher_query_preprocessors: List[CypherQueryPreprocessor] = [],
         qa_llm_kwargs: Optional[Dict[str, Any]] = None,
         cypher_llm_kwargs: Optional[Dict[str, Any]] = None,
         schema_error_string: Optional[str] = "SCHEMA_ERROR",

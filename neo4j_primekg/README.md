@@ -15,6 +15,7 @@ docker run -d --restart=always \
     --publish=7474:7474 --publish=7687:7687 \
     --env NEO4J_AUTH=neo4j/opensesame \
     --env NEO4J_PLUGINS=\[\"apoc\"\] \
+    --env NEO4J_server_databases_default__to__read__only=true \
     --name neo4j_primekg_service \
     neo4j_primekg:latest
 ```
@@ -36,6 +37,7 @@ docker run -d --restart=always \
     --env DELETE_PRIMEKG_CSV=false \
     --env NEO4J_AUTH=neo4j/opensesame \
     --env NEO4J_PLUGINS=\[\"apoc\"\] \
+    --env NEO4J_server_databases_default__to__read__only=true \
     --name neo4j_primekg_service \
     neo4j_primekg:latest
 ```

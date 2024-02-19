@@ -1,7 +1,6 @@
-from abc import ABC, abstractmethod
+from typing import Protocol, runtime_checkable
 
 
-class CypherQueryPreprocessor(ABC):
-    @abstractmethod
-    def __call__(self, cypher_query: str) -> str:
-        pass
+@runtime_checkable
+class CypherQueryPreprocessor(Protocol):
+    def __call__(self, cypher_query: str) -> str: ...
