@@ -4,6 +4,7 @@ ENV IMPORT_DIR=primekg_data
 ENV PRIMEKG_CSV=/$IMPORT_DIR/kg.csv
 ENV PRIMEKG_CSVS_FOR_NEO4J=/$IMPORT_DIR/preprocessed_for_neo4j
 ENV DELETE_PRIMEKG_CSV=true
+ENV NEO4J_PLUGINS='["apoc"]'
 
 COPY import_primekg.sh /startup/import_primekg.sh
 COPY primekg_to_neo4j_csv.py $IMPORT_DIR/primekg_to_neo4j_csv.py

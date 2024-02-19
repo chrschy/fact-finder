@@ -24,3 +24,4 @@ async def main(message: cl.Message):
         [{"LLM:": llm_chain_res["text"]}, {"Graph:": neo4j_chain_res["result"]}]
     )
     await cl.Message(content=concatenated_answer).send()
+
