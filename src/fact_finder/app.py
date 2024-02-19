@@ -92,12 +92,14 @@ with col2:
         st.header(" ")
         st.header("Fact Finder", divider='grey')
 
+
 ############################################################
 ## initialize pipeline
 ############################################################
 if "counter" not in st.session_state:
     st.session_state.counter = 0
     with st.spinner('Initializing Chains...'):
+        chat_model = load_chat_model()
         st.session_state.neo4j_chain = graph_config.build_chain(chat_model)
         st.session_state.llm_chain = llm_config.build_chain(chat_model)
 
@@ -132,10 +134,8 @@ async def call_chains(message):
 
 def convert_subgraph(graph: [], result: str):
     graph_converted = {"entities": [], "relations": []}
-    result_ents = []
-    for res in result:
-        result_ents += res.values()
-    # result_ents = [res_val for res in result for res_val in res.values()]
+    result_ents = [res_val for res in result for res_val in res.values()]
+
     idx_rel = 0
     for triplet in graph:
         trip = [value for key, value in triplet.items() if type(value) is tuple][0]
@@ -149,7 +149,6 @@ def convert_subgraph(graph: [], result: str):
         idx_rel += 1
 
     return graph_converted
-
 
 
 def request_pipeline(text_data):
