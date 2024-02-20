@@ -3,7 +3,7 @@ import re
 import string
 
 
-class ExtractSubgraphPreprocessor(CypherQueryPreprocessor):
+class ReturnSubgraphWithRegexPreprocessor(CypherQueryPreprocessor):
 
     def __init__(self):
         self.__extract_group_regex = r"(\(.*\))[-|<|>]+(\[.*\])[-|<|>]+(\(.*\))"

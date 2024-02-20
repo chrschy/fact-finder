@@ -6,6 +6,9 @@ from fact_finder.qa_service.cypher_preprocessors.format_preprocessor import Form
 from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
 )
+from fact_finder.qa_service.cypher_preprocessors.extract_subgraph_with_llm_preprocessor import (
+    ReturnSubgraphWithLLMPreprocessor,
+)
 from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
 from fact_finder.synonym_finder.synonym_finder import WikiDataSynonymFinder
@@ -18,7 +21,7 @@ from langchain_core.prompts.prompt import PromptTemplate
 
 def build_chain(model: BaseLanguageModel) -> Chain:
     graph = build_neo4j_graph()
-    cypher_preprocessors = _build_preprocessors(graph)
+    cypher_preprocessors = _build_preprocessors(graph, model)
     cypher_prompt, qa_prompt = _get_graph_prompt_templates()
     return Neo4JLangchainQAService.from_llm(
         model,
@@ -31,11 +34,17 @@ def build_chain(model: BaseLanguageModel) -> Chain:
     )
 
 
-def _build_preprocessors(graph: Neo4jGraph) -> List[CypherQueryPreprocessor]:
+def _build_preprocessors(graph: Neo4jGraph, model: BaseLanguageModel) -> List[CypherQueryPreprocessor]:
     cypher_query_formatting_preprocessor = FormatPreprocessor()
     lower_case_preprocessor = LowerCasePropertiesCypherQueryPreprocessor()
     synonym_preprocessor = SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WikiDataSynonymFinder())
-    return [cypher_query_formatting_preprocessor, lower_case_preprocessor, synonym_preprocessor]
+    return_all_nodes_preprocessor = ReturnSubgraphWithLLMPreprocessor(model=model)
+    return [
+        cypher_query_formatting_preprocessor,
+        lower_case_preprocessor,
+        synonym_preprocessor,
+        return_all_nodes_preprocessor,
+    ]
 
 
 def _get_graph_prompt_templates() -> Tuple[PromptTemplate, PromptTemplate]:
