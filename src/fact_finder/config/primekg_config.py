@@ -6,12 +6,10 @@ from fact_finder.qa_service.cypher_preprocessors.format_preprocessor import Form
 from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
 )
-from fact_finder.qa_service.cypher_preprocessors.extract_subgraph_with_llm_preprocessor import (
-    ReturnSubgraphWithLLMPreprocessor,
-)
+from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
-from fact_finder.synonym_finder.synonym_finder import WikiDataSynonymFinder
+from fact_finder.tools.synonym_finder import WikiDataSynonymFinder
 from fact_finder.utils import build_neo4j_graph
 from langchain.chains.base import Chain
 from langchain_community.graphs import Neo4jGraph
@@ -38,12 +36,10 @@ def _build_preprocessors(graph: Neo4jGraph, model: BaseLanguageModel) -> List[Cy
     cypher_query_formatting_preprocessor = FormatPreprocessor()
     lower_case_preprocessor = LowerCasePropertiesCypherQueryPreprocessor()
     synonym_preprocessor = SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WikiDataSynonymFinder())
-    return_all_nodes_preprocessor = ReturnSubgraphWithLLMPreprocessor(model=model)
     return [
         cypher_query_formatting_preprocessor,
         lower_case_preprocessor,
         synonym_preprocessor,
-        return_all_nodes_preprocessor,
     ]
 
 
