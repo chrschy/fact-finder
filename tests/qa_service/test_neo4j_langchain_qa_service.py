@@ -1,4 +1,3 @@
-import os
 from typing import Any, Dict, List
 from unittest.mock import ANY, MagicMock
 
@@ -9,15 +8,10 @@ from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.outputs import Generation, LLMResult
 from langchain_core.prompts.prompt import PromptTemplate
-from langchain_openai import ChatOpenAI
 
-from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
-from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
-    LowerCasePropertiesCypherQueryPreprocessor,
-)
-from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
-from fact_finder.synonym_finder.synonym_finder import WikiDataSynonymFinder
+
+load_dotenv()
 
 
 def test_cypher_generation_is_called_with_expected_arguments(query, chain, cypher_llm, cypher_prompt):
@@ -25,14 +19,16 @@ def test_cypher_generation_is_called_with_expected_arguments(query, chain, cyphe
     cypher_llm.generate_prompt.assert_called_once_with([cypher_prompt], None, callbacks=ANY)
 
 
-def test_graph_is_called_with_expected_caypher_query(query, chain, graph, cypher_query):
+def test_graph_is_called_with_expected_cypher_query(query, chain, graph, cypher_query):
     chain.invoke(query)
-    graph.query.assert_called_once_with(cypher_query)
+    all_params = [p.args[0] for p in graph.query.mock_calls]
+    assert cypher_query in all_params
 
 
 def test_qa_is_called_with_expected_arguments(query, chain, qa_llm, qa_prompt):
     chain.invoke(query)
-    qa_llm.generate_prompt.assert_called_once_with([qa_prompt], None, callbacks=ANY)
+    all_params = [p.args[0][0] for p in qa_llm.generate_prompt.mock_calls]
+    assert qa_prompt in all_params
 
 
 def test_returned_result_matches_model_output(query, chain, system_answer):
@@ -164,30 +160,3 @@ def build_llm_mock(output: str) -> BaseLanguageModel:
     llm.generate_prompt = MagicMock()
     llm.generate_prompt.return_value = LLMResult(generations=[[Generation(text=output)]])
     return llm
-
-
-def test_e2e_wip():
-    # todo refactor
-    load_dotenv()
-    NEO4J_URL = os.getenv("NEO4J_URL", "bolt://localhost:7687")
-    NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
-    NEO4J_PW = os.getenv("NEO4J_PW", "opensesame")
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-    graph = Neo4jGraph(url=NEO4J_URL, username=NEO4J_USER, password=NEO4J_PW)
-    model = ChatOpenAI(model="gpt-4", streaming=False, temperature=0, api_key=OPENAI_API_KEY)  # gpt-3.5-turbo-16k
-    lower_case_preprocessor = LowerCasePropertiesCypherQueryPreprocessor()
-    synonym_preprocessor = SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WikiDataSynonymFinder())
-    cypher_preprocessors = [lower_case_preprocessor, synonym_preprocessor]
-    neo4j_chain = Neo4JLangchainQAService.from_llm(
-        model,
-        graph=graph,
-        cypher_query_preprocessors=cypher_preprocessors,
-        cypher_prompt=CYPHER_GENERATION_PROMPT,
-        qa_prompt=CYPHER_QA_PROMPT,
-        verbose=True,
-        return_intermediate_steps=True,
-    )
-    message = {"query": "drugs associated with epilepsy"}
-    result = neo4j_chain._call(inputs=message)
-    assert len(result) == 3
-    assert "sub_graph" in result.keys()

@@ -15,7 +15,6 @@ Do not include any text except the generated Cypher statement.
 
 The question is:
 {question}"""
-
 CYPHER_GENERATION_PROMPT = PromptTemplate(input_variables=["schema", "question"], template=CYPHER_GENERATION_TEMPLATE)
 
 CYPHER_QA_TEMPLATE: str = """You are an assistant that helps to form nice and human understandable answers.
@@ -29,7 +28,6 @@ Information:
 
 Question: {question}
 Helpful Answer:"""
-
 CYPHER_QA_PROMPT = PromptTemplate(input_variables=["context", "question"], template=CYPHER_QA_TEMPLATE)
 
 LLM_PROMPT_TEMPLATE: str = """You are a friendly and engaging conversationalist.
@@ -39,5 +37,17 @@ You are always ready for a casual conversation and enjoy interacting with custom
 Human: {question}
 AI:
 """
-
 LLM_PROMPT = PromptTemplate(input_variables=["question"], template=LLM_PROMPT_TEMPLATE)
+
+SUBGRAPH_PREPROCESSOR_PROMPT_TEMPLATE: str = """
+Task: Modify a given Cypher query. The new Cypher query returns all relationship properties used in the query instead of the answer to the question. It also returns all nodes.
+Instructions:
+If there is no sensible Cypher statement for the given query, state so and prepend CYPHER_ERROR to your answer.
+Only return the modified cypher query, nothing else.
+ 
+The Cypher query is:
+{cypher_query}
+"""
+SUBGRAPH_PREPROCESSOR_PROMPT = PromptTemplate(
+    input_variables=["cypher_query"], template=SUBGRAPH_PREPROCESSOR_PROMPT_TEMPLATE
+)

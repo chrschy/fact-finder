@@ -1,23 +1,21 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
 import logging
+from typing import Any, Dict, List, Optional
 
-from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
-from fact_finder.qa_service.qa_service import QAService
-from fact_finder.qa_service.cypher_preprocessors.extract_subgraph_preprocessor import ExtractSubgraphPreprocessor
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain.chains.graph_qa.prompts import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
 from langchain.chains.llm import LLMChain
-from langchain_community.graphs import Neo4jGraph
 from langchain_community.graphs.graph_store import GraphStore
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
-from langchain_openai import ChatOpenAI
 
+from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
+from fact_finder.qa_service.qa_service import QAService
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
 
@@ -44,7 +42,8 @@ class Neo4JLangchainQAService(QAService, Chain):
     graph_schema: str
     input_key: str = "query"  #: :meta private:
     output_key: str = "result"  #: :meta private:
-    top_k: int = 1000
+    top_k: int = 100
+    llm_subgraph_extractor: LLMSubGraphExtractor
     """Number of results to return from the query"""
     return_intermediate_steps: bool = False
     """Whether or not to return the intermediate steps along with the final answer."""
@@ -132,12 +131,15 @@ class Neo4JLangchainQAService(QAService, Chain):
 
         graph_schema = construct_schema(kwargs["graph"].get_structured_schema, include_types, exclude_types)
 
+        llm_subgraph_extractor = LLMSubGraphExtractor(model=qa_llm or llm)
+
         return cls(
             graph_schema=graph_schema,
             qa_chain=qa_chain,
             cypher_generation_chain=cypher_generation_chain,
             cypher_query_preprocessors=cypher_query_preprocessors,
             schema_error_string=schema_error_string,
+            llm_subgraph_extractor=llm_subgraph_extractor,
             **kwargs,
         )
 
@@ -195,6 +197,12 @@ class Neo4JLangchainQAService(QAService, Chain):
         chain_result: Dict[str, Any] = {self.output_key: final_result}
         if self.return_intermediate_steps:
             chain_result[INTERMEDIATE_STEPS_KEY] = intermediate_steps
-        extract_subgraph_preprocessor = ExtractSubgraphPreprocessor()
-        chain_result["sub_graph"] = self.graph.query(extract_subgraph_preprocessor(generated_cypher))
+
+        subgraph_cypher = self.llm_subgraph_extractor(generated_cypher)
+        try:
+            chain_result["sub_graph"] = self.graph.query(subgraph_cypher)
+        except Exception as e:
+            chain_result["sub_graph"] = []
+            print(f"Sub Graph could not be extracted due to {e}")
+
         return chain_result
