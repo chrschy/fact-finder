@@ -9,17 +9,19 @@ from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_qu
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
-from fact_finder.tools.synonym_finder import WikiDataSynonymFinder
+from fact_finder.tools.synonym_finder.entity_detector_synonym_finder import EntityDetectorSynonymFinder
+from fact_finder.tools.synonym_finder.synonym_finder import WikiDataSynonymFinder
 from fact_finder.utils import build_neo4j_graph
 from langchain.chains.base import Chain
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts.prompt import PromptTemplate
 
+_USING_SYNONYMIZED_GRAPH = False
 
 def build_chain(model: BaseLanguageModel) -> Chain:
     graph = build_neo4j_graph()
-    cypher_preprocessors = _build_preprocessors(graph, model)
+    cypher_preprocessors = _build_preprocessors(graph)
     cypher_prompt, qa_prompt = _get_graph_prompt_templates()
     return Neo4JLangchainQAService.from_llm(
         model,
@@ -32,15 +34,28 @@ def build_chain(model: BaseLanguageModel) -> Chain:
     )
 
 
-def _build_preprocessors(graph: Neo4jGraph, model: BaseLanguageModel) -> List[CypherQueryPreprocessor]:
-    cypher_query_formatting_preprocessor = FormatPreprocessor()
-    lower_case_preprocessor = LowerCasePropertiesCypherQueryPreprocessor()
-    synonym_preprocessor = SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=WikiDataSynonymFinder())
-    return [
-        cypher_query_formatting_preprocessor,
-        lower_case_preprocessor,
-        synonym_preprocessor,
-    ]
+def _build_preprocessors(graph: Neo4jGraph) -> List[CypherQueryPreprocessor]:
+    preprocs: List[CypherQueryPreprocessor] = []
+    preprocs.append(FormatPreprocessor())
+    preprocs.append(LowerCasePropertiesCypherQueryPreprocessor())
+    wikidata = WikiDataSynonymFinder()
+    preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=wikidata, node_types="exposure"))
+    if _USING_SYNONYMIZED_GRAPH:
+        preprocs += _get_synonymized_graph_preprocessors(graph)
+    return preprocs
+
+
+def _get_synonymized_graph_preprocessors(graph: Neo4jGraph) -> List[CypherQueryPreprocessor]:
+    preprocs: List[CypherQueryPreprocessor] = []
+    gene_ent = EntityDetectorSynonymFinder(["gene"])
+    preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=gene_ent, node_types="gene_protein"))
+    drug_ent = EntityDetectorSynonymFinder(["drug"])
+    preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=drug_ent, node_types="drug"))
+    disease_ent = EntityDetectorSynonymFinder(["disease"])
+    preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=disease_ent, node_types="disease"))
+    anatomy_ent = EntityDetectorSynonymFinder(["Organs"])
+    preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=anatomy_ent, node_types="anatomy"))
+    return preprocs
 
 
 def _get_graph_prompt_templates() -> Tuple[PromptTemplate, PromptTemplate]:
