@@ -1,6 +1,6 @@
 import json
 import os
-from typing import List
+from typing import Any, Dict, List
 
 import requests
 from dotenv import load_dotenv
@@ -25,14 +25,15 @@ class EntityDetector:
         self.__possible_filenames = filenames
         self.__url = "https://api2.linguist.skgt.int.bayer.com/linnaeusannotate"
         self.__api_key = os.getenv("SYNONYM_API_KEY")
-        assert self.__api_key is not None, "For using EntityDetector, the env variable SYNONYM_API_KEY must be set."
+        if self.__api_key is None:
+            raise ValueError("For using EntityDetector, the env variable SYNONYM_API_KEY must be set.")
 
-    def __call__(self, search_text: str) -> dict:
+    def __call__(self, search_text: str) -> List[Dict[str, Any]]:
         filenames_as_single_string = ", ".join(self.__possible_filenames)
         payload = json.dumps({"public_dic": filenames_as_single_string, "text": search_text})
         headers = {"x-api-key": self.__api_key, "Accept": "application/json", "Content-Type": "application/json"}
         response = requests.request("POST", self.__url, headers=headers, data=payload)
         if response.status_code == 200:
             return json.loads(response.text)["annotations"]
-        else:
-            response.raise_for_status()
+        response.raise_for_status()
+        return {}
