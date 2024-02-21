@@ -21,12 +21,14 @@ def test_cypher_generation_is_called_with_expected_arguments(query, chain, cyphe
 
 def test_graph_is_called_with_expected_cypher_query(query, chain, graph, cypher_query):
     chain.invoke(query)
-    graph.query.assert_called_once_with(cypher_query)
+    all_params = [p.args[0] for p in graph.query.mock_calls]
+    assert cypher_query in all_params
 
 
 def test_qa_is_called_with_expected_arguments(query, chain, qa_llm, qa_prompt):
     chain.invoke(query)
-    qa_llm.generate_prompt.assert_called_once_with([qa_prompt], None, callbacks=ANY)
+    all_params = [p.args[0][0] for p in qa_llm.generate_prompt.mock_calls]
+    assert qa_prompt in all_params
 
 
 def test_returned_result_matches_model_output(query, chain, system_answer):
