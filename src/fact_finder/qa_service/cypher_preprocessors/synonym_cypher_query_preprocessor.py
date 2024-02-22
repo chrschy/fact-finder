@@ -25,7 +25,7 @@ class SynonymCypherQueryPreprocessor(CypherQueryPreprocessor):
         self.__replacement_property_name = (
             replacement_property_name if replacement_property_name else self.__search_property_name
         )
-        self.__exisitng_node_properties = dict(self.__get_all_nodes())
+        self.__existing_node_properties = dict(self.__get_all_nodes())
 
     def __call__(self, cypher_query: str) -> str:
         for node_type in self.__node_types:
@@ -84,4 +84,4 @@ class SynonymCypherQueryPreprocessor(CypherQueryPreprocessor):
         return None
 
     def __exists_in_graph(self, node_type: str, property_value: str) -> bool:
-        return property_value.lower() in self.__exisitng_node_properties[node_type]
+        return property_value.lower() in self.__existing_node_properties[node_type]
