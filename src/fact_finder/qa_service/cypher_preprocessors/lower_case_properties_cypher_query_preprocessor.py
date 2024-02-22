@@ -11,12 +11,12 @@ class LowerCasePropertiesCypherQueryPreprocessor(CypherQueryPreprocessor):
     def __call__(self, cypher_query: str) -> str:
         for name in self._property_names:
             cypher_query = re.sub(
-                r"{" + name + ": ['\"]([^'\"]+)['\"]}",
+                r"{" + name + r': "([^}]+)"}',
                 _replace_match_with_lower_case,
                 cypher_query,
             )
             cypher_query = re.sub(
-                r"[^\s]+\." + name + " = ['\"]([^'\"]+)['\"]",
+                r"[^\s=]+\." + name + r'\s*=\s*"([^"]+)"(\s|$)',
                 _replace_match_with_lower_case,
                 cypher_query,
             )

@@ -11,7 +11,7 @@ COPY primekg_to_neo4j_csv.py $IMPORT_DIR/primekg_to_neo4j_csv.py
 
 RUN apt-get update && \
     apt-get install -y python3-pip && \
-    pip install pandas && \
+    pip install pandas pyarrow && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p $PRIMEKG_CSVS_FOR_NEO4J && \
     chmod 777 /startup/import_primekg.sh

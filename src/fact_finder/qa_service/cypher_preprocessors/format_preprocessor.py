@@ -22,7 +22,7 @@ class FormatPreprocessor(CypherQueryPreprocessor):
             return cypher_query
 
     def _try_formatting(self, cypher_query: str) -> str:
-        cypher_query = self._only_use_single_quotes(cypher_query)
+        cypher_query = self._only_use_double_quotes(cypher_query)
         cypher_query = self._keywords_to_upper_case(cypher_query)
         cypher_query = self._null_and_boolean_literals_to_lower_case(cypher_query)
         cypher_query = self._ensure_main_keywords_on_newline(cypher_query)
@@ -37,13 +37,13 @@ class FormatPreprocessor(CypherQueryPreprocessor):
 
         return cypher_query.strip()
 
-    def _only_use_single_quotes(self, cypher_query: str) -> str:
+    def _only_use_double_quotes(self, cypher_query: str) -> str:
         # Escape all single quotes in double quote strings.
         cypher_query = re.sub(
-            r'"([^{}\(\)\[\]]*?)"', lambda matches: matches.group(0).replace("'", r"\'"), cypher_query
+            r'"([^{}\(\)\[\]=]*?)"', lambda matches: matches.group(0).replace("'", r"\'"), cypher_query
         )
-        # Replace all double quotes with single quotes.
-        cypher_query = cypher_query.replace('"', "'")
+        # Replace all not escaped single quotes.
+        cypher_query = re.sub(r"(?<!\\)'", lambda m: m.group(0)[:-1] + '"', cypher_query)
         return cypher_query
 
     def _keywords_to_upper_case(self, cypher_query: str) -> str:
@@ -96,7 +96,7 @@ class FormatPreprocessor(CypherQueryPreprocessor):
         cypher_query = re.sub(r"\s+(\)|}|\])", lambda matches: matches.group(1), cypher_query)
         cypher_query = re.sub(r"\s*(:|-|>|<)\s*", lambda matches: matches.group(1), cypher_query)
         # Retain spaces before property names
-        cypher_query = re.sub(r":\s*'", ": '", cypher_query)
+        cypher_query = re.sub(r':\s*"', ': "', cypher_query)
         # Also around equal signs
         cypher_query = re.sub(r"\s*=\s*", " = ", cypher_query)
         return cypher_query
@@ -120,15 +120,3 @@ def _main_keywords_on_newline(matches: re.Match[str]) -> str:
 def _indent_on_create_and_on_match(matches: re.Match[str]) -> str:
     assert len(matches.groups())
     return matches.group(0).replace(matches.group(1), "\n  " + matches.group(1).upper().lstrip() + " ")
-
-
-def _indent_blocks(matches: re.Match[str]) -> str:
-    assert len(matches.groups())
-    block = matches.group(1).strip()  # .strip()[1:-1].strip()
-    block = re.sub(r"(\r\n|\n|\r)", "\n  ", block, flags=re.MULTILINE)
-    return "{\n  " + block + "\n}"
-    return matches.group(0).replace(matches.group(1), "{\n  " + block + "\n}")
-    # query = query.replace(/ {([\S\s]*?)}/g, function(match) {
-    #     let block = match.trim().substring(1, match.trim().length - 1).trim();
-    #     return ' {\n  ' + block.replace(/(\r\n|\n|\r)/gm, '\n  ') + '\n}';
-    # });

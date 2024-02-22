@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 from dotenv import load_dotenv
 
-from fact_finder.entity_detector.entity_detector import EntityDetector
+from fact_finder.tools.entity_detector import EntityDetector
 
 load_dotenv()
 
