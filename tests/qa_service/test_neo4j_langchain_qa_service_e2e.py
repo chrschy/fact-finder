@@ -12,7 +12,7 @@ from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_qu
 from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
-from fact_finder.tools.synonym_finder.synonym_finder import WikiDataSynonymFinder
+from fact_finder.tools.synonym_finder.wiki_data_synonym_finder import WikiDataSynonymFinder
 
 
 @pytest.fixture(scope="module")

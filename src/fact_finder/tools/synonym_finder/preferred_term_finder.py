@@ -4,9 +4,9 @@ from fact_finder.tools.entity_detector import EntityDetector
 from fact_finder.tools.synonym_finder.synonym_finder import SynonymFinder
 
 
-class EntityDetectorSynonymFinder(SynonymFinder):
+class PreferredTermFinder(SynonymFinder):
     """Searches and returns preferred names using the EntityDetector.
-    Returns only prefered names of entities from the allow categories (semantic types).
+    Returns only preferred names of entities from the allowed categories (semantic types).
     """
 
     def __init__(self, allowed_categories: Iterable[str]) -> None:
@@ -17,10 +17,10 @@ class EntityDetectorSynonymFinder(SynonymFinder):
         return [r["pref_term"] for r in self._detector(name) if r["sem_type"].lower() in self._allowed_categories]
 
 
-class IdEntityDetectorSynonymFinder(SynonymFinder):
+class PreferredTermIdFinder(SynonymFinder):
     """Searches preferred names using the EntityDetector.
     Returns the corresponding ids.
-    Returns only ids of entities from the allow categories (semantic types).
+    Returns only ids of entities from the allowed categories (semantic types).
     """
 
     def __init__(self, allowed_categories: Iterable[str]) -> None:

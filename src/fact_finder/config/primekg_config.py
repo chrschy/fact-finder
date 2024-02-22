@@ -9,8 +9,8 @@ from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_qu
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
-from fact_finder.tools.synonym_finder.entity_detector_synonym_finder import EntityDetectorSynonymFinder
-from fact_finder.tools.synonym_finder.synonym_finder import WikiDataSynonymFinder
+from fact_finder.tools.synonym_finder.preferred_term_finder import PreferredTermFinder
+from fact_finder.tools.synonym_finder.wiki_data_synonym_finder import WikiDataSynonymFinder
 from fact_finder.utils import build_neo4j_graph
 from langchain.chains.base import Chain
 from langchain_community.graphs import Neo4jGraph
@@ -47,13 +47,13 @@ def _build_preprocessors(graph: Neo4jGraph) -> List[CypherQueryPreprocessor]:
 
 def _get_synonymized_graph_preprocessors(graph: Neo4jGraph) -> List[CypherQueryPreprocessor]:
     preprocs: List[CypherQueryPreprocessor] = []
-    gene_ent = EntityDetectorSynonymFinder(["gene"])
+    gene_ent = PreferredTermFinder(["gene"])
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=gene_ent, node_types="gene_protein"))
-    drug_ent = EntityDetectorSynonymFinder(["drug"])
+    drug_ent = PreferredTermFinder(["drug"])
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=drug_ent, node_types="drug"))
-    disease_ent = EntityDetectorSynonymFinder(["disease"])
+    disease_ent = PreferredTermFinder(["disease"])
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=disease_ent, node_types="disease"))
-    anatomy_ent = EntityDetectorSynonymFinder(["Organs"])
+    anatomy_ent = PreferredTermFinder(["Organs"])
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=anatomy_ent, node_types="anatomy"))
     return preprocs
 
