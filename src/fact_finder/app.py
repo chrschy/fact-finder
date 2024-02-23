@@ -1,7 +1,6 @@
 import asyncio
-import json
-import os
-from typing import Dict, List, Optional
+import sys
+from typing import List
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -12,7 +11,7 @@ from pyvis.network import Network
 
 import fact_finder.config.primekg_config as graph_config
 import fact_finder.config.simple_config as llm_config
-from fact_finder.utils import concatenate_with_headers, load_chat_model
+from fact_finder.utils import load_chat_model
 
 load_dotenv()
 
@@ -111,8 +110,8 @@ if "counter" not in st.session_state:
     st.session_state.counter = 0
     with st.spinner("Initializing Chains..."):
         chat_model = load_chat_model()
-        st.session_state.neo4j_chain = graph_config.build_chain(chat_model)
-        st.session_state.llm_chain = llm_config.build_chain(chat_model)
+        st.session_state.neo4j_chain = graph_config.build_chain(chat_model, sys.argv)
+        st.session_state.llm_chain = llm_config.build_chain(chat_model, sys.argv)
 
 
 ############################################################

@@ -8,6 +8,37 @@ import pandas as pd
 from tqdm import tqdm
 
 
+def primekg_main(args: List[str]):
+    from fact_finder.tools.entity_detector import EntityDetector
+
+    if len(args) != 2:
+        print(f"Usage: python {args[0]} <prime/kg.csv>")
+        exit(1)
+
+    graph = pd.read_csv(args[1], low_memory=False)
+    detector = EntityDetector()
+    extractor = PreferredTermDataExtractor(graph=graph, api_tool=detector)
+
+    graph_types = [
+        "gene/protein",
+        "drug",
+        "effect/phenotype",
+        "disease",
+        "biological_process",
+        "molecular_function",
+        "cellular_component",
+        "exposure",
+        "pathway",
+        "anatomy",
+    ]
+
+    for graph_type in graph_types:
+        print("---" * 20)
+        print(f"PROCESSING {graph_type}")
+        extractor.process(graph_type)
+        print("---" * 20)
+
+
 class PreferredTermMapping(dict):
     def __init__(self, data: Iterable[Tuple[str, List[Tuple[str, str, str]]]]):
         super().__init__(data)
@@ -97,37 +128,6 @@ class PreferredTermDataExtractor:
                 unique_categories = set(entries[2] for entries in v)
                 if len(v) != len(unique_categories):
                     print(f">>>> Error for drug '{k}': Entries are {v}")
-
-
-def primekg_main(args: List[str]):
-    from fact_finder.tools.entity_detector import EntityDetector
-
-    if len(args) != 2:
-        print(f"Usage: python {args[0]} <prime/kg.csv>")
-        exit(1)
-
-    graph = pd.read_csv(args[1], low_memory=False)
-    detector = EntityDetector()
-    extractor = PreferredTermDataExtractor(graph=graph, api_tool=detector)
-
-    graph_types = [
-        "gene/protein",
-        "drug",
-        "effect/phenotype",
-        "disease",
-        "biological_process",
-        "molecular_function",
-        "cellular_component",
-        "exposure",
-        "pathway",
-        "anatomy",
-    ]
-
-    for graph_type in graph_types:
-        print("---" * 20)
-        print(f"PROCESSING {graph_type}")
-        extractor.process(graph_type)
-        print("---" * 20)
 
 
 if __name__ == "__main__":
