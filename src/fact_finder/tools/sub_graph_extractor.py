@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from langchain.chains import LLMChain
 from langchain_core.language_models import BaseLanguageModel
 
-from fact_finder.prompt_templates import SUBGRAPH_PREPROCESSOR_PROMPT
+from fact_finder.prompt_templates import SUBGRAPH_EXTRACTOR_PROMPT
 
 
 class SubGraphExtractor(ABC):
@@ -16,7 +16,7 @@ class SubGraphExtractor(ABC):
 class LLMSubGraphExtractor(SubGraphExtractor):
 
     def __init__(self, model: BaseLanguageModel):
-        self.llm_chain = LLMChain(llm=model, prompt=SUBGRAPH_PREPROCESSOR_PROMPT)
+        self.llm_chain = LLMChain(llm=model, prompt=SUBGRAPH_EXTRACTOR_PROMPT)
 
     def __call__(self, cypher_query: str) -> str:
         result = self.llm_chain(cypher_query)

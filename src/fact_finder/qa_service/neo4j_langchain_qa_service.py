@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
+import pandas as pd
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain.chains.graph_qa.prompts import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
@@ -53,6 +54,8 @@ class Neo4JLangchainQAService(QAService, Chain):
     """Optional cypher validation/preprocessing tools"""
     schema_error_string: Optional[str] = "SCHEMA_ERROR"
     """Optional string to be generated at the start of the cypher query to indicate an error."""
+    n_predicate_descriptions: int = 20
+    """How many relationship descriptions to include into the cypher generation prompt."""
 
     def search(self, user_query: str) -> str:
         return self._call(inputs={self.input_key: user_query})["result"]
@@ -157,8 +160,11 @@ class Neo4JLangchainQAService(QAService, Chain):
 
         intermediate_steps: List = []
 
+        predicate_descriptions = self._construct_predicate_descriptions(how_many=self.n_predicate_descriptions)
+
         generated_cypher = self.cypher_generation_chain(
-            {"question": question, "schema": self.graph_schema}, callbacks=callbacks
+            {"question": question, "schema": self.graph_schema, "predicate_descriptions": predicate_descriptions},
+            callbacks=callbacks,
         )[self.cypher_generation_chain.output_key]
 
         # Extract Cypher code if it is wrapped in backticks
@@ -206,3 +212,16 @@ class Neo4JLangchainQAService(QAService, Chain):
             print(f"Sub Graph could not be extracted due to {e}")
 
         return chain_result
+
+    def _construct_predicate_descriptions(self, how_many: int) -> str:
+        if how_many == 0:
+            return ""
+        df = pd.read_csv("../../data/predicate_descriptions.csv", sep=";")
+        result = ["Here are some descriptions to the most common relationships:"]
+        for index, row in df.iterrows():
+            if index == how_many - 1:
+                break
+            row_as_text = f"({row['subject']})-[{row['predicate']}]->({row['object']}): {row['definition']}"
+            result.append(row_as_text)
+        result = "\n".join(result)
+        return result
