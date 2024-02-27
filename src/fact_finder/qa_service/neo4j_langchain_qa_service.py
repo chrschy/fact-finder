@@ -55,7 +55,7 @@ class Neo4JLangchainQAService(QAService, Chain):
     """Optional cypher validation/preprocessing tools"""
     schema_error_string: Optional[str] = "SCHEMA_ERROR"
     """Optional string to be generated at the start of the cypher query to indicate an error."""
-    n_predicate_descriptions: int = 20
+    n_predicate_descriptions: int = 0
     """How many relationship descriptions to include into the cypher generation prompt."""
 
     def search(self, user_query: str) -> str:
