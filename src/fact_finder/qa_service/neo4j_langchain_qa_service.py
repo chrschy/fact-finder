@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import logging
-import os
 from typing import Any, Dict, List, Optional
 
-import pandas as pd
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain.chains.graph_qa.prompts import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
@@ -15,9 +13,10 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
 
+from fact_finder.predicate_descriptions import PREDICATE_DESCRIPTIONS
 from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
-from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 from fact_finder.qa_service.qa_service import QAService
+from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
 
@@ -215,17 +214,12 @@ class Neo4JLangchainQAService(QAService, Chain):
         return chain_result
 
     def _construct_predicate_descriptions(self, how_many: int) -> str:
-        if how_many == 0:
+        if how_many > 0:
+            result = ["Here are some descriptions to the most common relationships:"]
+            for item in PREDICATE_DESCRIPTIONS[:how_many]:
+                item_as_text = f"({item['subject']})-[{item['predicate']}]->({item['object']}): {item['definition']}"
+                result.append(item_as_text)
+            result = "\n".join(result)
+            return result
+        else:
             return ""
-        path = os.path.abspath(__file__)
-        path = os.path.dirname(path)
-        path += "/../../../data/predicate_descriptions.csv"
-        df = pd.read_csv(path, sep=";")
-        result = ["Here are some descriptions to the most common relationships:"]
-        for index, row in df.iterrows():
-            if index == how_many - 1:
-                break
-            row_as_text = f"({row['subject']})-[{row['predicate']}]->({row['object']}): {row['definition']}"
-            result.append(row_as_text)
-        result = "\n".join(result)
-        return result
