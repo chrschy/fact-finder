@@ -13,6 +13,7 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
 
+from fact_finder.custom_llm_chain.custom_llm_chain import CustomLLMChain
 from fact_finder.predicate_descriptions import PREDICATE_DESCRIPTIONS
 from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 from fact_finder.qa_service.qa_service import QAService
@@ -38,8 +39,8 @@ class Neo4JLangchainQAService(QAService, Chain):
     """
 
     graph: GraphStore = Field(exclude=True)
-    cypher_generation_chain: LLMChain
-    qa_chain: LLMChain
+    cypher_generation_chain: CustomLLMChain
+    qa_chain: CustomLLMChain
     graph_schema: str
     input_key: str = "query"  #: :meta private:
     output_key: str = "result"  #: :meta private:
