@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -216,7 +217,10 @@ class Neo4JLangchainQAService(QAService, Chain):
     def _construct_predicate_descriptions(self, how_many: int) -> str:
         if how_many == 0:
             return ""
-        df = pd.read_csv("../../data/predicate_descriptions.csv", sep=";")
+        path = os.path.abspath(__file__)
+        path = os.path.dirname(path)
+        path += "/../../../data/predicate_descriptions.csv"
+        df = pd.read_csv(path, sep=";")
         result = ["Here are some descriptions to the most common relationships:"]
         for index, row in df.iterrows():
             if index == how_many - 1:
