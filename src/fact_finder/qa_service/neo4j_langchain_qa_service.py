@@ -13,9 +13,10 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
 
+from fact_finder.predicate_descriptions import PREDICATE_DESCRIPTIONS
 from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
-from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 from fact_finder.qa_service.qa_service import QAService
+from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
 
@@ -53,6 +54,8 @@ class Neo4JLangchainQAService(QAService, Chain):
     """Optional cypher validation/preprocessing tools"""
     schema_error_string: Optional[str] = "SCHEMA_ERROR"
     """Optional string to be generated at the start of the cypher query to indicate an error."""
+    n_predicate_descriptions: int = 0
+    """How many relationship descriptions to include into the cypher generation prompt."""
 
     def search(self, user_query: str) -> str:
         return self._call(inputs={self.input_key: user_query})["result"]
@@ -157,8 +160,11 @@ class Neo4JLangchainQAService(QAService, Chain):
 
         intermediate_steps: List = []
 
+        predicate_descriptions = self._construct_predicate_descriptions(how_many=self.n_predicate_descriptions)
+
         generated_cypher = self.cypher_generation_chain(
-            {"question": question, "schema": self.graph_schema}, callbacks=callbacks
+            {"question": question, "schema": self.graph_schema, "predicate_descriptions": predicate_descriptions},
+            callbacks=callbacks,
         )[self.cypher_generation_chain.output_key]
 
         # Extract Cypher code if it is wrapped in backticks
@@ -206,3 +212,14 @@ class Neo4JLangchainQAService(QAService, Chain):
             print(f"Sub Graph could not be extracted due to {e}")
 
         return chain_result
+
+    def _construct_predicate_descriptions(self, how_many: int) -> str:
+        if how_many > 0:
+            result = ["Here are some descriptions to the most common relationships:"]
+            for item in PREDICATE_DESCRIPTIONS[:how_many]:
+                item_as_text = f"({item['subject']})-[{item['predicate']}]->({item['object']}): {item['definition']}"
+                result.append(item_as_text)
+            result = "\n".join(result)
+            return result
+        else:
+            return ""

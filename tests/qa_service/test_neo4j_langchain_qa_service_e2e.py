@@ -1,6 +1,7 @@
-import pytest
 import os
 
+import pytest
+from dotenv import load_dotenv
 from langchain_community.graphs import Neo4jGraph
 from langchain_openai import ChatOpenAI
 
@@ -9,10 +10,10 @@ from fact_finder.qa_service.cypher_preprocessors.format_preprocessor import Form
 from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
 )
-from fact_finder.qa_service.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
-from fact_finder.tools.synonym_finder.wiki_data_synonym_finder import WikiDataSynonymFinder
+
+load_dotenv()
 
 
 @pytest.fixture(scope="module")
@@ -48,12 +49,10 @@ def model_e2e(open_ai_key):
 @pytest.fixture(scope="module")
 def preprocessors_e2e(graph_e2e, model_e2e):
     lower_case_preprocessor = LowerCasePropertiesCypherQueryPreprocessor()
-    synonym_preprocessor = SynonymCypherQueryPreprocessor(graph=graph_e2e, synonym_finder=WikiDataSynonymFinder())
     cypher_query_formatting_preprocessor = FormatPreprocessor()
     return_all_nodes_preprocessor = LLMSubGraphExtractor(model=model_e2e)
     return [
         lower_case_preprocessor,
-        synonym_preprocessor,
         cypher_query_formatting_preprocessor,
         return_all_nodes_preprocessor,
     ]

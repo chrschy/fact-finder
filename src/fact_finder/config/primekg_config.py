@@ -1,6 +1,11 @@
 import argparse
 from typing import List, Tuple
 
+from langchain.chains.base import Chain
+from langchain_community.graphs import Neo4jGraph
+from langchain_core.language_models import BaseLanguageModel
+from langchain_core.prompts.prompt import PromptTemplate
+
 from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
 from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 from fact_finder.qa_service.cypher_preprocessors.format_preprocessor import FormatPreprocessor
@@ -12,10 +17,6 @@ from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQASe
 from fact_finder.tools.synonym_finder.preferred_term_finder import PreferredTermFinder
 from fact_finder.tools.synonym_finder.wiki_data_synonym_finder import WikiDataSynonymFinder
 from fact_finder.utils import build_neo4j_graph
-from langchain.chains.base import Chain
-from langchain_community.graphs import Neo4jGraph
-from langchain_core.language_models import BaseLanguageModel
-from langchain_core.prompts.prompt import PromptTemplate
 
 
 def build_chain(model: BaseLanguageModel, args: List[str] = []) -> Chain:
