@@ -198,11 +198,11 @@ def request_pipeline(text_data: str):
         results = asyncio.run(call_chains(text_data))
         return {
             "status": "success",
-            "query": results[0]["intermediate_steps"][0]["query"],
-            "response": results[0]["intermediate_steps"][1]["context"],
+            "query": results[0]["intermediate_steps"][0]["pre_processed_cypher_query"],
+            "response": results[0]["intermediate_steps"][1]["graph_result"],
             "answer_graph": results[0]["result"],
             "answer_llm": results[1]["text"],
-            "graph": convert_subgraph(results[0]["sub_graph"], results[0]["intermediate_steps"][1]["context"]),
+            "graph": convert_subgraph(results[0]["sub_graph"], results[0]["intermediate_steps"][1]["graph_result"]),
             "graph_neo4j": results[0]["sub_graph"],
         }
     except Exception as e:

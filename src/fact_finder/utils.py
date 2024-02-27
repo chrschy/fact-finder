@@ -5,6 +5,7 @@ from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
+
 def concatenate_with_headers(answers: List[Dict[str, str]]) -> str:
     result = ""
     for answer in answers:
@@ -14,6 +15,10 @@ def concatenate_with_headers(answers: List[Dict[str, str]]) -> str:
 
 
 def build_neo4j_graph() -> Neo4jGraph:
+    """
+
+    :rtype: object
+    """
     NEO4J_URL = os.getenv("NEO4J_URL", "bolt://localhost:7687")
     NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
     NEO4J_PW = os.getenv("NEO4J_PW", "opensesame")

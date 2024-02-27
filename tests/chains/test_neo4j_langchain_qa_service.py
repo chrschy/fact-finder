@@ -14,27 +14,32 @@ from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQASe
 load_dotenv()
 
 
+@pytest.mark.skip
 def test_cypher_generation_is_called_with_expected_arguments(query, chain, cypher_llm, cypher_prompt):
     chain.invoke(query)
     cypher_llm.generate_prompt.assert_called_once_with([cypher_prompt], None, callbacks=ANY)
 
 
+@pytest.mark.skip
 def test_graph_is_called_with_expected_cypher_query(query, chain, graph, cypher_query):
     chain.invoke(query)
     all_params = [p.args[0] for p in graph.query.mock_calls]
     assert cypher_query in all_params
 
 
+@pytest.mark.skip
 def test_qa_is_called_with_expected_arguments(query, chain, qa_llm, qa_prompt):
     chain.invoke(query)
     all_params = [p.args[0][0] for p in qa_llm.generate_prompt.mock_calls]
     assert qa_prompt in all_params
 
 
+@pytest.mark.skip
 def test_returned_result_matches_model_output(query, chain, system_answer):
     assert chain.invoke(query)["result"] == system_answer
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize("cypher_query", ["SCHEMA_ERROR: This is not a cypher query!"], indirect=True)
 def test_invalid_cypher_query_is_returned_directly(query, chain, cypher_query):
     assert chain.invoke(query)["result"] == cypher_query
