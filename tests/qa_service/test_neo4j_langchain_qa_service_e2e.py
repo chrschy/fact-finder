@@ -77,7 +77,7 @@ def run_e2e_chain(neo4j_chain_e2e: Neo4JLangchainQAService, question: str):
     return result
 
 
-# @pytest.mark.skip(reason="end to end")
+@pytest.mark.skip(reason="end to end")
 def test_e2e(neo4j_chain_e2e):
     questions = [
         "Which drugs are associated with epilepsy?",

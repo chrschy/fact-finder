@@ -2,10 +2,9 @@ import re
 import string
 from abc import ABC, abstractmethod
 
-from langchain.chains import LLMChain
+from fact_finder.custom_llm_chain.custom_llm_chain import CustomLLMChain
 from langchain_core.language_models import BaseLanguageModel
 
-from fact_finder.language_model_service.custom_llm_chain import CustomLLMChain
 from fact_finder.prompt_templates import SUBGRAPH_EXTRACTOR_PROMPT
 
 
