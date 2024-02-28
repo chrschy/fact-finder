@@ -41,6 +41,7 @@ class CypherQueryPreprocessorsChain(Chain):
         return [self.output_key]
 
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
+        _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
         generated_cypher = inputs[self.input_key]
         intermediate_steps = inputs[self.intermediate_steps_key]
         preprocessed_cypher = self._run_preprocessors(run_manager, generated_cypher, intermediate_steps)
@@ -68,5 +69,5 @@ class CypherQueryPreprocessorsChain(Chain):
         intermediate_steps[-1][name_of_preprocessor] = generated_cypher
 
     def _log_it(self, _run_manager: CallbackManagerForChainRun, generated_cypher: str, intermediate_steps: List):
-        _run_manager.on_text("Pre-processed Cypher:", end="\n", verbose=self.verbose)
+        _run_manager.on_text("Preprocessed Cypher:", end="\n", verbose=self.verbose)
         _run_manager.on_text(generated_cypher, color="green", end="\n", verbose=self.verbose)
