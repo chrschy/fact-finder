@@ -9,7 +9,7 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.outputs import Generation, LLMResult
 from langchain_core.prompts.prompt import PromptTemplate
 
-from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
+from fact_finder.chains.neo4j_langchain_qa_service import Neo4JLangchainQAService
 
 load_dotenv()
 

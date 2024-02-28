@@ -6,11 +6,11 @@ from langchain_community.graphs import Neo4jGraph
 from langchain_openai import ChatOpenAI
 
 from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
-from fact_finder.qa_service.cypher_preprocessors.format_preprocessor import FormatPreprocessor
-from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
+from fact_finder.chains.cypher_preprocessors.format_preprocessor import FormatPreprocessor
+from fact_finder.chains.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
 )
-from fact_finder.qa_service.neo4j_langchain_qa_service import Neo4JLangchainQAService
+from fact_finder.chains.neo4j_langchain_qa_service import Neo4JLangchainQAService
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 
 load_dotenv()
@@ -77,7 +77,7 @@ def run_e2e_chain(neo4j_chain_e2e: Neo4JLangchainQAService, question: str):
     return result
 
 
-# @pytest.mark.skip(reason="end to end")
+@pytest.mark.skip(reason="end to end")
 def test_e2e(neo4j_chain_e2e):
     questions = [
         "Which drugs are associated with epilepsy?",

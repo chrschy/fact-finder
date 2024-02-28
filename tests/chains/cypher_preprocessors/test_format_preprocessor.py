@@ -1,4 +1,4 @@
-from fact_finder.qa_service.cypher_preprocessors.format_preprocessor import FormatPreprocessor
+from fact_finder.chains.cypher_preprocessors.format_preprocessor import FormatPreprocessor
 
 
 def test_on_empty_string():

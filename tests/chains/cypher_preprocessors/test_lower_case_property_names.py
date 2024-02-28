@@ -1,4 +1,4 @@
-from fact_finder.qa_service.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
+from fact_finder.chains.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
 )
 
