@@ -228,7 +228,7 @@ def structured_schema():
     }
 
 
-@pytest.mark.skip
+# @pytest.mark.skip
 def test_e2e(llm_e2e, graph_e2e):
     chain = CypherQueryGenerationChain(llm=llm_e2e, graph=graph_e2e, cypher_prompt=CYPHER_GENERATION_PROMPT)
     result = chain("Which drugs are associated with epilepsy?")

@@ -61,7 +61,7 @@ class CypherQueryGenerationChain(Chain):
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
 
-    def _generate_cypher(self, callbacks, question, run_manager):
+    def _generate_cypher(self, callbacks, question: str, run_manager: CallbackManagerForChainRun):
         predicate_descriptions = self._construct_predicate_descriptions(how_many=self.n_predicate_descriptions)
         generated_cypher = self.cypher_generation_chain(
             {"question": question, "schema": self.graph_schema, "predicate_descriptions": predicate_descriptions},
@@ -71,7 +71,7 @@ class CypherQueryGenerationChain(Chain):
         self._log_it(generated_cypher, run_manager)
         return generated_cypher
 
-    def _log_it(self, generated_cypher, run_manager):
+    def _log_it(self, generated_cypher: str, run_manager: CallbackManagerForChainRun):
         run_manager.on_text("Generated Cypher:", end="\n", verbose=self.verbose)
         run_manager.on_text(generated_cypher, color="green", end="\n", verbose=self.verbose)
 
