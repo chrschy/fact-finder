@@ -1,25 +1,17 @@
-import os
 from typing import List, Dict, Any, Optional
-from unittest import mock
 from unittest.mock import MagicMock, PropertyMock, patch
-from uuid import UUID
 
 import pytest
 from dotenv import load_dotenv
-from langchain.chains import LLMChain
-from langchain.chains.graph_qa.cypher import extract_cypher, construct_schema
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.callbacks import CallbackManagerForChainRun
-from langchain_core.language_models import BaseLanguageModel, BaseChatModel
+from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
-from langchain_core.outputs import LLMResult, ChatGeneration, RunInfo
-from langchain_core.prompts import BasePromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_core.outputs import LLMResult, ChatGeneration
 
 from fact_finder.chains.custom_llm_chain import CustomLLMChain
-from fact_finder.predicate_descriptions import PREDICATE_DESCRIPTIONS
 from fact_finder.chains.cypher_query_generation_chain import CypherQueryGenerationChain
-from fact_finder.prompt_templates import CYPHER_QA_PROMPT, CYPHER_GENERATION_PROMPT
+from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT
 from fact_finder.utils import build_neo4j_graph, load_chat_model
 
 load_dotenv()
@@ -50,102 +42,63 @@ class MockedCustomLLMChain(CustomLLMChain):
         )
 
 
-"""
-# Mock classes for testing
-class MockLanguageModel(BaseLanguageModel):
-    pass
-
-
-class MockPromptTemplate(BasePromptTemplate):
-    pass
-
-
-class MockGraph(Neo4jGraph):
-    def get_structured_schema(self):
-        return {}
-
-
-@pytest.fixture
-def cypher_query_generation_chain():
-    llm = MockLanguageModel()
-    cypher_prompt = MockPromptTemplate()
-    graph = MockGraph()
-    return CypherQueryGenerationChain(llm, cypher_prompt, graph)
-
-
-def test_cypher_query_generation_chain_initialization(cypher_query_generation_chain):
-    assert isinstance(cypher_query_generation_chain.cypher_generation_chain, LLMChain)
-    assert cypher_query_generation_chain.graph_schema == ""
-    assert isinstance(cypher_query_generation_chain.graph, MockGraph)
-    assert cypher_query_generation_chain.return_intermediate_steps is True
-    assert cypher_query_generation_chain.input_key == "question"
-    assert cypher_query_generation_chain.output_key == "cypher_query"
-    assert cypher_query_generation_chain.intermediate_steps_key == "intermediate_steps"
-
-
-def test_cypher_query_generation_chain_call(cypher_query_generation_chain):
-    inputs = {"question": "What is the answer?"}
-    result = cypher_query_generation_chain._call(inputs)
-    assert isinstance(result, dict)
-    assert "cypher_query" in result
-
-
-def test_cypher_query_generation_chain_generate_cypher(cypher_query_generation_chain):
-    callbacks = None
-    question = "What is the answer?"
-    run_manager = None
-    generated_cypher = cypher_query_generation_chain._generate_cypher(callbacks, question, run_manager)
-    assert isinstance(generated_cypher, str)
-    assert extract_cypher(generated_cypher) == generated_cypher
-
-
-def test_cypher_query_generation_chain_construct_predicate_descriptions(cypher_query_generation_chain):
+def test_cypher_query_generation_chain_construct_predicate_descriptions(cypher_chain):
     how_many = 3
-    predicate_descriptions = cypher_query_generation_chain._construct_predicate_descriptions(how_many)
+    predicate_descriptions = cypher_chain._construct_predicate_descriptions(how_many)
     assert isinstance(predicate_descriptions, str)
+    predicate_descriptions_as_list = predicate_descriptions.split("\n")
+    assert predicate_descriptions_as_list[0] == "Here are some descriptions to the most common relationships:"
+    assert len(predicate_descriptions_as_list) - 1 == how_many
 
     how_many = 0
-    predicate_descriptions = cypher_query_generation_chain._construct_predicate_descriptions(how_many)
+    predicate_descriptions = cypher_chain._construct_predicate_descriptions(how_many)
     assert isinstance(predicate_descriptions, str)
-"""
+    assert predicate_descriptions == ""
 
 
-def test_mocked(llm, structured_schema):
+@pytest.fixture()
+def cypher_chain(llm_mocked, graph_mocked):
+    chain = CypherQueryGenerationChain(llm=llm_mocked, graph=graph_mocked, cypher_prompt=CYPHER_GENERATION_PROMPT)
+    return chain
+
+
+@pytest.fixture()
+def llm_mocked():
+    return MagicMock(spec=BaseChatModel)
+
+
+@pytest.fixture()
+def graph_mocked():
+    graph = MagicMock(spec=Neo4jGraph)
+    return graph
+
+
+def test_mocked(llm_mocked, llm_chain_mocked, structured_schema, question):
     with patch(
         "langchain_community.graphs.Neo4jGraph.get_structured_schema", new_callable=PropertyMock
     ) as mock_get_structured_schema:
         mock_get_structured_schema.return_value = structured_schema
         graph = build_neo4j_graph()
-        chain = CypherQueryGenerationChain(llm=llm, graph=graph, cypher_prompt=CYPHER_GENERATION_PROMPT)
-        chain.cypher_generation_chain = MockedCustomLLMChain(llm=llm, prompt=CYPHER_GENERATION_PROMPT)
-        result = chain("Which drugs are associated with epilepsy?")
-        # todo continue with the assertions here
-        breakpoint()
+        chain = CypherQueryGenerationChain(llm=llm_mocked, graph=graph, cypher_prompt=CYPHER_GENERATION_PROMPT)
+        chain.cypher_generation_chain = llm_chain_mocked
+        result = chain(question)
+        assert result["intermediate_steps"] == []
+        assert result["question"] == question
+        assert (
+            result["cypher_query"]
+            == "MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d.name"
+        )
+        assert len(result) == 3
 
 
 @pytest.fixture()
-def llm(generation_result):
-    return MagicMock(spec=BaseChatModel)
+def llm_chain_mocked(llm_mocked):
+    return MockedCustomLLMChain(llm=llm_mocked, prompt=CYPHER_GENERATION_PROMPT)
 
 
-# @pytest.mark.skip
-def test_e2e(llm_e2e, graph_e2e):
-    chain = CypherQueryGenerationChain(llm=llm_e2e, graph=graph_e2e, cypher_prompt=CYPHER_GENERATION_PROMPT)
-    result = chain("Which drugs are associated with epilepsy?")
-    assert (
-        result["cypher_query"]
-        == "MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d.name"
-    )
-
-
-@pytest.fixture(scope="session")
-def llm_e2e():
-    return load_chat_model()
-
-
-@pytest.fixture(scope="session")
-def graph_e2e():
-    return build_neo4j_graph()
+@pytest.fixture()
+def question():
+    return "Which drugs are associated with epilepsy?"
 
 
 @pytest.fixture
@@ -273,3 +226,23 @@ def structured_schema():
             {"start": "biological_process", "type": "parent_child", "end": "biological_process"},
         ],
     }
+
+
+@pytest.mark.skip
+def test_e2e(llm_e2e, graph_e2e):
+    chain = CypherQueryGenerationChain(llm=llm_e2e, graph=graph_e2e, cypher_prompt=CYPHER_GENERATION_PROMPT)
+    result = chain("Which drugs are associated with epilepsy?")
+    assert (
+        result["cypher_query"]
+        == "MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d.name"
+    )
+
+
+@pytest.fixture(scope="session")
+def llm_e2e():
+    return load_chat_model()
+
+
+@pytest.fixture(scope="session")
+def graph_e2e():
+    return build_neo4j_graph()
