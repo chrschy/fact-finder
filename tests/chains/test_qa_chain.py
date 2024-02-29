@@ -39,7 +39,7 @@ class MockedCustomLLMChain(CustomLLMChain):
 
 def test_qa_chain(output_from_graph_chain, expected_answer, qa_chain):
     result = qa_chain(inputs=output_from_graph_chain)
-    assert result["answer"] == expected_answer
+    assert result[qa_chain.output_key] == expected_answer
     assert qa_chain.output_key in result.keys()
     assert len(result[qa_chain.intermediate_steps_key]) == 4
 
