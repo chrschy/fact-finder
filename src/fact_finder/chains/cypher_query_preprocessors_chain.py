@@ -8,7 +8,7 @@ from fact_finder.chains.cypher_preprocessors.cypher_query_preprocessor import Cy
 
 class CypherQueryPreprocessorsChain(Chain):
     cypher_query_preprocessors: List[CypherQueryPreprocessor]
-    return_intermediate_steps: bool
+    return_intermediate_steps: bool = True
     input_key: str = "cypher_query"  #: :meta private:
     output_key: str = "preprocessed_cypher_query"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"

@@ -66,13 +66,10 @@ class SubgraphExtractorChain(Chain):
 
     def _query_graph(self, subgraph_cypher):
         result = []
-        for _ in range(5):
-            try:
-                result = self.graph.query(subgraph_cypher)
-            except Exception as e:
-                print(f"Sub Graph could not be extracted due to {e}")
-            if result:
-                return result
+        try:
+            result = self.graph.query(subgraph_cypher)
+        except Exception as e:
+            print(f"Sub Graph for {subgraph_cypher} could not be extracted due to {e}")
         return result
 
     def _log_it(self, text: str, _run_manager: CallbackManagerForChainRun, subgraph_cypher: str):

@@ -10,6 +10,7 @@ from langchain_core.outputs import LLMResult, ChatGeneration
 from fact_finder.chains.custom_llm_chain import CustomLLMChain
 from fact_finder.chains.qa_chain import QAChain
 from fact_finder.prompt_templates import CYPHER_QA_PROMPT
+from fact_finder.utils import load_chat_model
 
 
 class MockedCustomLLMChain(CustomLLMChain):
@@ -39,32 +40,26 @@ class MockedCustomLLMChain(CustomLLMChain):
 
 def test_qa_chain(output_from_graph_chain, expected_answer, qa_chain):
     result = qa_chain(inputs=output_from_graph_chain)
-    assert result[qa_chain.output_key] == expected_answer
     assert qa_chain.output_key in result.keys()
     assert len(result[qa_chain.intermediate_steps_key]) == 4
+    assert result[qa_chain.output_key] == expected_answer
 
 
 @pytest.fixture
-def qa_chain(llm_mocked, return_intermediate_steps):
-    return QAChain(
-        llm_chain=MockedCustomLLMChain(llm=llm_mocked, prompt=CYPHER_QA_PROMPT),
-        return_intermediate_steps=return_intermediate_steps,
-    )
+def qa_chain(llm):
+    # todo mock the custom_llm_chain
+    return QAChain(llm=llm)
 
 
 @pytest.fixture
-def llm_mocked():
-    return MagicMock(spec=BaseChatModel)
-
-
-@pytest.fixture
-def return_intermediate_steps():
-    return True
+def llm():
+    # todo mock the llm
+    return load_chat_model()
 
 
 @pytest.fixture
 def expected_answer():
-    return "The drugs associated with epilepsy are phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam."
+    return "The drugs associated with epilepsy include phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam."
 
 
 @pytest.fixture
