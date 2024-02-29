@@ -13,7 +13,8 @@ from fact_finder.chains.cypher_query_preprocessors_chain import CypherQueryPrepr
 def test_preprocessor_chain(cypher_query_generation_chain_result, preprocessors):
     chain = CypherQueryPreprocessorsChain(return_intermediate_steps=True, cypher_query_preprocessors=preprocessors)
     result = chain(cypher_query_generation_chain_result)
-    assert len(result["intermediate_steps"][0]) == len(preprocessors)
+    assert chain.output_key in result.keys()
+    assert len(result["intermediate_steps"][1]) == len(preprocessors)
     assert (
         result["preprocessed_cypher_query"]
         == 'MATCH (d:drug)-[:indication]->(dis:disease)\nWHERE dis.name = "epilepsy"\nRETURN d.name'
@@ -25,7 +26,7 @@ def test_preprocessor_chain(cypher_query_generation_chain_result, preprocessors)
 def cypher_query_generation_chain_result():
     return {
         "cypher_query": "MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d.name",
-        "intermediate_steps": [],
+        "intermediate_steps": [{"question": "Which drugs are associated with epilepsy?"}],
     }
 
 

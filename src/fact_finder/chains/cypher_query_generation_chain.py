@@ -1,4 +1,5 @@
-from langchain.chains import LLMChain
+from typing import List, Optional, Dict, Any
+
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import extract_cypher, construct_schema
 from langchain_community.graphs import Neo4jGraph
@@ -8,7 +9,6 @@ from langchain_core.prompts import BasePromptTemplate
 
 from fact_finder.chains.custom_llm_chain import CustomLLMChain
 from fact_finder.predicate_descriptions import PREDICATE_DESCRIPTIONS
-from typing import List, Optional, Dict, Any
 
 
 class CypherQueryGenerationChain(Chain):
@@ -52,7 +52,7 @@ class CypherQueryGenerationChain(Chain):
         callbacks = _run_manager.get_child()
 
         question = inputs[self.input_key]
-        intermediate_steps: List = []
+        intermediate_steps: List = [{"question": question}]
         generated_cypher = self._generate_cypher(callbacks, question, _run_manager)
         chain_result = {
             self.output_key: generated_cypher,

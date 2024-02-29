@@ -82,7 +82,8 @@ def test_mocked(llm_mocked, llm_chain_mocked, structured_schema, question):
         chain = CypherQueryGenerationChain(llm=llm_mocked, graph=graph, cypher_prompt=CYPHER_GENERATION_PROMPT)
         chain.cypher_generation_chain = llm_chain_mocked
         result = chain(question)
-        assert result["intermediate_steps"] == []
+        assert chain.output_key in result.keys()
+        assert result["intermediate_steps"] == [{"question": question}]
         assert result["question"] == question
         assert (
             result["cypher_query"]
