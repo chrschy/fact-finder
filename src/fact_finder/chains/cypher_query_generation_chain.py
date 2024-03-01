@@ -20,6 +20,7 @@ class CypherQueryGenerationChain(Chain):
     input_key: str = "question"  #: :meta private:
     output_key: str = "cypher_query"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
+    filled_prompt_template_key: str = "cypher_query_generation_filled_prompt_template"
 
     def __init__(
         self,
@@ -52,12 +53,16 @@ class CypherQueryGenerationChain(Chain):
         callbacks = _run_manager.get_child()
 
         question = inputs[self.input_key]
-        intermediate_steps: List = [{"question": question}]
+
         generated_cypher = self._generate_cypher(callbacks, question, _run_manager)
         chain_result = {
             self.output_key: generated_cypher,
         }
         if self.return_intermediate_steps:
+            intermediate_steps = [
+                {"question": question},
+                {self.filled_prompt_template_key: self.cypher_generation_chain.filled_prompt_template},
+            ]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
 

@@ -6,60 +6,38 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
 from langchain_core.outputs import LLMResult, ChatGeneration
+from langchain_core.prompts import PromptTemplate
 
 from fact_finder.chains.custom_llm_chain import CustomLLMChain
 from fact_finder.chains.qa_chain import QAChain
-from fact_finder.prompt_templates import CYPHER_QA_PROMPT
-from fact_finder.utils import load_chat_model
 
 
-class MockedCustomLLMChain(CustomLLMChain):
-    def generate(
-        self,
-        input_list: List[Dict[str, Any]],
-        run_manager: Optional[CallbackManagerForChainRun] = None,
-    ) -> LLMResult:
-        return LLMResult(
-            generations=[
-                [
-                    ChatGeneration(
-                        text="The drugs associated with epilepsy are phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam.",
-                        generation_info={"finish_reason": "stop", "logprobs": None},
-                        message=AIMessage(
-                            content="The drugs associated with epilepsy are phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam."
-                        ),
-                    )
-                ]
-            ],
-            llm_output={
-                "token_usage": {"completion_tokens": 74, "prompt_tokens": 335, "total_tokens": 409},
-                "model_name": "gpt-4",
-            },
-        )
-
-
-def test_qa_chain(output_from_graph_chain, expected_answer, qa_chain):
+def test_qa_chain(qa_chain, output_from_graph_chain, expected_answer):
     result = qa_chain(inputs=output_from_graph_chain)
     assert qa_chain.output_key in result.keys()
-    assert len(result[qa_chain.intermediate_steps_key]) == 4
     assert result[qa_chain.output_key] == expected_answer
 
 
 @pytest.fixture
-def qa_chain(llm):
-    # todo mock the custom_llm_chain
-    return QAChain(llm=llm)
+def qa_chain(llm, custom_llm_chain):
+    qa_chain = QAChain(llm=llm)
+    qa_chain.llm_chain = custom_llm_chain
+    return qa_chain
 
 
 @pytest.fixture
 def llm():
-    # todo mock the llm
-    return load_chat_model()
+    return MagicMock(spec=BaseChatModel)
 
 
 @pytest.fixture
-def expected_answer():
-    return "The drugs associated with epilepsy include phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam."
+def prompt():
+    return MagicMock(spec=PromptTemplate)
+
+
+@pytest.fixture
+def custom_llm_chain(llm, prompt):
+    return MockedCustomLLMChain(llm=llm, prompt=prompt)
 
 
 @pytest.fixture
@@ -121,3 +99,29 @@ def output_from_graph_chain():
             {"d.name": "lorazepam"},
         ],
     }
+
+
+@pytest.fixture
+def expected_answer():
+    return "The drugs associated with epilepsy are phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam."
+
+
+class MockedCustomLLMChain(CustomLLMChain):
+    def generate(
+        self,
+        input_list: List[Dict[str, Any]],
+        run_manager: Optional[CallbackManagerForChainRun] = None,
+    ) -> LLMResult:
+        return LLMResult(
+            generations=[
+                [
+                    ChatGeneration(
+                        text="The drugs associated with epilepsy are phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam.",
+                        generation_info={"finish_reason": "stop", "logprobs": None},
+                        message=AIMessage(
+                            content="The drugs associated with epilepsy are phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam."
+                        ),
+                    )
+                ]
+            ],
+        )

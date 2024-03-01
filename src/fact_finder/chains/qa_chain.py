@@ -18,6 +18,7 @@ class QAChain(Chain):
     output_key: str = "answer"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
     question_key: str = "question"
+    filled_prompt_template_key: str = "qa_filled_prompt_template"
 
     def __init__(
         self,
@@ -52,12 +53,14 @@ class QAChain(Chain):
 
         self._log_it(_run_manager, answer)
 
-        intermediate_steps = inputs[self.intermediate_steps_key]
-        intermediate_steps.append({self.output_key: answer})
         chain_result = {
             self.output_key: answer,
         }
+
         if self.return_intermediate_steps:
+            intermediate_steps = inputs[self.intermediate_steps_key]
+            intermediate_steps.append({self.output_key: answer})
+            intermediate_steps.append({self.filled_prompt_template_key: self.llm_chain.filled_prompt_template})
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
 

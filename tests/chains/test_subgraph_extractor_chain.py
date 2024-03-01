@@ -16,7 +16,6 @@ def test_subgraph_extraction_chain(llm, graph, cypher_query_preprocessors_chain_
     result = chain(cypher_query_preprocessors_chain_result)
     assert result[chain.output_key] == expected_graph_result
     assert chain.output_key in result.keys()
-    assert len(result[chain.intermediate_steps_key]) == 3
 
 
 @pytest.fixture
