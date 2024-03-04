@@ -1,7 +1,7 @@
 import re
 import sys
 
-from fact_finder.chains.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 
 
 class FormatPreprocessor(CypherQueryPreprocessor):
