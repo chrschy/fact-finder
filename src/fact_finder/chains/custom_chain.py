@@ -16,7 +16,6 @@ from fact_finder.utils import load_chat_model, build_neo4j_graph
 
 
 class CustomChain:
-    load_dotenv()
 
     def __init__(self, llm=load_chat_model(), graph=build_neo4j_graph()):
         cypher_query_generation_chain = CypherQueryGenerationChain(
@@ -43,6 +42,7 @@ class CustomChain:
 
 
 if __name__ == "__main__":
+    load_dotenv()
     custom_chain = CustomChain()
     questions = [
         "Which drugs are associated with epilepsy?",
