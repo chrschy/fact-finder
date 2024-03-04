@@ -3,7 +3,7 @@ from typing import Dict, Any, Optional, List
 from langchain.chains.base import Chain
 from langchain_core.callbacks import CallbackManagerForChainRun
 
-from fact_finder.chains.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 
 
 class CypherQueryPreprocessorsChain(Chain):
@@ -46,12 +46,7 @@ class CypherQueryPreprocessorsChain(Chain):
         generated_cypher = inputs[self.input_key]
         intermediate_steps = inputs[self.intermediate_steps_key]
         preprocessed_cypher = self._run_preprocessors(_run_manager, generated_cypher, intermediate_steps)
-        chain_result = {
-            self.output_key: preprocessed_cypher,
-        }
-        if self.return_intermediate_steps:
-            chain_result[self.intermediate_steps_key] = intermediate_steps
-        return chain_result
+        return self._prepare_chain_result(preprocessed_cypher, intermediate_steps)
 
     def _run_preprocessors(
         self, _run_manager: CallbackManagerForChainRun, generated_cypher: str, intermediate_steps: List
@@ -72,3 +67,11 @@ class CypherQueryPreprocessorsChain(Chain):
     def _log_it(self, _run_manager: CallbackManagerForChainRun, generated_cypher: str, intermediate_steps: List):
         _run_manager.on_text("Preprocessed Cypher:", end="\n", verbose=self.verbose)
         _run_manager.on_text(generated_cypher, color="green", end="\n", verbose=self.verbose)
+
+    def _prepare_chain_result(self, preprocessed_cypher: str, intermediate_steps: List[str]):
+        chain_result = {
+            self.output_key: preprocessed_cypher,
+        }
+        if self.return_intermediate_steps:
+            chain_result[self.intermediate_steps_key] = intermediate_steps
+        return chain_result

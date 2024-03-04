@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 from langchain_community.graphs import Neo4jGraph
 
-from fact_finder.chains.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
+from fact_finder.tools.cypher_preprocessors.synonym_cypher_query_preprocessor import SynonymCypherQueryPreprocessor
 from fact_finder.tools.synonym_finder.synonym_finder import SynonymFinder
 
 
