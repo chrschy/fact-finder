@@ -45,7 +45,7 @@ class CypherQueryPreprocessorsChain(Chain):
 
         generated_cypher = inputs[self.input_key]
         intermediate_steps = inputs[self.intermediate_steps_key]
-        preprocessed_cypher = self._run_preprocessors(run_manager, generated_cypher, intermediate_steps)
+        preprocessed_cypher = self._run_preprocessors(_run_manager, generated_cypher, intermediate_steps)
         chain_result = {
             self.output_key: preprocessed_cypher,
         }
