@@ -2,13 +2,13 @@ from typing import List, Dict, Any, Optional
 from unittest.mock import MagicMock
 
 import pytest
+from langchain.chains import LLMChain
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
 from langchain_core.outputs import LLMResult, ChatGeneration
 from langchain_core.prompts import PromptTemplate
 
-from fact_finder.chains.custom_llm_chain import CustomLLMChain
 from fact_finder.chains.qa_chain import QAChain
 
 
@@ -37,7 +37,7 @@ def prompt():
 
 @pytest.fixture
 def custom_llm_chain(llm, prompt):
-    return MockedCustomLLMChain(llm=llm, prompt=prompt)
+    return MockedLLMChain(llm=llm, prompt=prompt)
 
 
 @pytest.fixture
@@ -106,7 +106,7 @@ def expected_answer():
     return "The drugs associated with epilepsy are phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam."
 
 
-class MockedCustomLLMChain(CustomLLMChain):
+class MockedLLMChain(LLMChain):
     def generate(
         self,
         input_list: List[Dict[str, Any]],

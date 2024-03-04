@@ -1,18 +1,18 @@
 from typing import Dict, Any, Optional, List
 
 from dotenv import load_dotenv
+from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 
-from fact_finder.chains.custom_llm_chain import CustomLLMChain
 from fact_finder.prompt_templates import CYPHER_QA_PROMPT
 
 load_dotenv()
 
 
 class QAChain(Chain):
-    llm_chain: CustomLLMChain
+    llm_chain: LLMChain
     return_intermediate_steps: bool = True
     input_key: str = "graph_result"  #: :meta private:
     output_key: str = "answer"  #: :meta private:
@@ -26,7 +26,7 @@ class QAChain(Chain):
         exclude_types: List[str] = [],
         include_types: List[str] = [],
     ):
-        llm_chain = CustomLLMChain(llm=llm, prompt=CYPHER_QA_PROMPT)
+        llm_chain = LLMChain(llm=llm, prompt=CYPHER_QA_PROMPT)
         if exclude_types and include_types:
             raise ValueError("Either `exclude_types` or `include_types` " "can be provided, but not both")
         super().__init__(
@@ -60,7 +60,6 @@ class QAChain(Chain):
         if self.return_intermediate_steps:
             intermediate_steps = inputs[self.intermediate_steps_key]
             intermediate_steps.append({self.output_key: answer})
-            intermediate_steps.append({self.filled_prompt_template_key: self.llm_chain.filled_prompt_template})
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
 

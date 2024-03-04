@@ -1,5 +1,6 @@
 from typing import List, Optional, Dict, Any
 
+from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import extract_cypher, construct_schema
 from langchain_community.graphs import Neo4jGraph
@@ -7,12 +8,11 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 
-from fact_finder.chains.custom_llm_chain import CustomLLMChain
 from fact_finder.predicate_descriptions import PREDICATE_DESCRIPTIONS
 
 
 class CypherQueryGenerationChain(Chain):
-    cypher_generation_chain: CustomLLMChain
+    cypher_generation_chain: LLMChain
     graph_schema: str
     graph: Neo4jGraph
     return_intermediate_steps: bool
@@ -20,7 +20,6 @@ class CypherQueryGenerationChain(Chain):
     input_key: str = "question"  #: :meta private:
     output_key: str = "cypher_query"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
-    filled_prompt_template_key: str = "cypher_query_generation_filled_prompt_template"
 
     def __init__(
         self,
@@ -32,7 +31,7 @@ class CypherQueryGenerationChain(Chain):
         include_types: List[str] = [],
         n_predicate_descriptions: int = 0,
     ):
-        cypher_generation_chain = CustomLLMChain(llm=llm, prompt=cypher_prompt)
+        cypher_generation_chain = LLMChain(llm=llm, prompt=cypher_prompt)
         if exclude_types and include_types:
             raise ValueError("Either `exclude_types` or `include_types` " "can be provided, but not both")
         graph_schema = construct_schema(graph.get_structured_schema, include_types, exclude_types)
@@ -59,10 +58,7 @@ class CypherQueryGenerationChain(Chain):
             self.output_key: generated_cypher,
         }
         if self.return_intermediate_steps:
-            intermediate_steps = [
-                {"question": question},
-                {self.filled_prompt_template_key: self.cypher_generation_chain.filled_prompt_template},
-            ]
+            intermediate_steps = [{"question": question}]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
 

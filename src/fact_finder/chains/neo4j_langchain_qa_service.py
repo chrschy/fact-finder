@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain.chains.llm import LLMChain
@@ -11,7 +12,6 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
 
-from fact_finder.chains.custom_llm_chain import CustomLLMChain
 from fact_finder.chains.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 
@@ -35,8 +35,8 @@ class Neo4JLangchainQAService(Chain):
     """
 
     graph: GraphStore = Field(exclude=True)
-    cypher_generation_chain: CustomLLMChain
-    qa_chain: CustomLLMChain
+    cypher_generation_chain: LLMChain
+    qa_chain: LLMChain
     graph_schema: str
     input_key: str = "query"  #: :meta private:
     output_key: str = "result"  #: :meta private:
