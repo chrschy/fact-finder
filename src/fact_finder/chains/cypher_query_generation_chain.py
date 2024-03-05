@@ -3,7 +3,6 @@ from typing import Any, Dict, List, Optional
 from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
-from langchain_community.graphs import Neo4jGraph
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
@@ -14,7 +13,6 @@ from fact_finder.predicate_descriptions import PREDICATE_DESCRIPTIONS
 class CypherQueryGenerationChain(Chain):
     cypher_generation_chain: LLMChain
     graph_schema: str
-    graph: Neo4jGraph
     n_predicate_descriptions: int
     return_intermediate_steps: bool
     input_key: str = "question"  #: :meta private:
@@ -25,7 +23,7 @@ class CypherQueryGenerationChain(Chain):
         self,
         llm: BaseLanguageModel,
         prompt_template: BasePromptTemplate,
-        graph: Neo4jGraph,
+        graph_structured_schema: Dict[str, Any],
         n_predicate_descriptions: int = 0,
         return_intermediate_steps: bool = True,
         exclude_types: List[str] = [],
@@ -34,11 +32,10 @@ class CypherQueryGenerationChain(Chain):
         cypher_generation_chain = LLMChain(llm=llm, prompt=prompt_template)
         if exclude_types and include_types:
             raise ValueError("Either `exclude_types` or `include_types` " "can be provided, but not both")
-        graph_schema = construct_schema(graph.get_structured_schema, include_types, exclude_types)
+        graph_schema = construct_schema(graph_structured_schema, include_types, exclude_types)
         super().__init__(
             cypher_generation_chain=cypher_generation_chain,
             graph_schema=graph_schema,
-            graph=graph,
             n_predicate_descriptions=n_predicate_descriptions,
             return_intermediate_steps=return_intermediate_steps,
         )

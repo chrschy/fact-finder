@@ -51,7 +51,10 @@ class GraphQAChain(Chain):
         return_intermediate_steps: bool = True,
     ):
         cypher_query_generation_chain = CypherQueryGenerationChain(
-            llm=llm, graph=graph, prompt_template=cypher_prompt, return_intermediate_steps=return_intermediate_steps
+            llm=llm,
+            graph_structured_schema=graph.get_structured_schema,
+            prompt_template=cypher_prompt,
+            return_intermediate_steps=return_intermediate_steps,
         )
         cypher_query_preprocessors_chain = CypherQueryPreprocessorsChain(
             cypher_query_preprocessors=cypher_query_preprocessors, return_intermediate_steps=return_intermediate_steps
