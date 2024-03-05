@@ -15,8 +15,8 @@ class CypherQueryGenerationChain(Chain):
     cypher_generation_chain: LLMChain
     graph_schema: str
     graph: Neo4jGraph
-    return_intermediate_steps: bool
     n_predicate_descriptions: int
+    return_intermediate_steps: bool
     input_key: str = "question"  #: :meta private:
     output_key: str = "cypher_query"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
@@ -24,14 +24,14 @@ class CypherQueryGenerationChain(Chain):
     def __init__(
         self,
         llm: BaseLanguageModel,
-        cypher_prompt: BasePromptTemplate,
+        prompt_template: BasePromptTemplate,
         graph: Neo4jGraph,
+        n_predicate_descriptions: int = 0,
         return_intermediate_steps: bool = True,
         exclude_types: List[str] = [],
         include_types: List[str] = [],
-        n_predicate_descriptions: int = 0,
     ):
-        cypher_generation_chain = LLMChain(llm=llm, prompt=cypher_prompt)
+        cypher_generation_chain = LLMChain(llm=llm, prompt=prompt_template)
         if exclude_types and include_types:
             raise ValueError("Either `exclude_types` or `include_types` " "can be provided, but not both")
         graph_schema = construct_schema(graph.get_structured_schema, include_types, exclude_types)
@@ -39,8 +39,8 @@ class CypherQueryGenerationChain(Chain):
             cypher_generation_chain=cypher_generation_chain,
             graph_schema=graph_schema,
             graph=graph,
-            return_intermediate_steps=return_intermediate_steps,
             n_predicate_descriptions=n_predicate_descriptions,
+            return_intermediate_steps=return_intermediate_steps,
         )
 
     @property
@@ -88,11 +88,9 @@ class CypherQueryGenerationChain(Chain):
         run_manager.on_text(generated_cypher, color="green", end="\n", verbose=self.verbose)
 
     def _prepare_chain_result(self, inputs: Dict[str, Any], generated_cypher: str) -> Dict[str, Any]:
-        chain_result = {
-            self.output_key: generated_cypher,
-        }
+        chain_result = {self.output_key: generated_cypher}
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
-            intermediate_steps += [{"question": inputs[self.input_key]}]
+            intermediate_steps += [{"question": inputs[self.input_key]}, {self.output_key: generated_cypher}]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result

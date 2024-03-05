@@ -4,8 +4,7 @@ from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
-
-from fact_finder.prompt_templates import CYPHER_QA_PROMPT
+from langchain_core.prompts import BasePromptTemplate
 
 
 class AnswerGenerationChain(Chain):
@@ -17,8 +16,10 @@ class AnswerGenerationChain(Chain):
     intermediate_steps_key: str = "intermediate_steps"
     filled_prompt_template_key: str = "qa_filled_prompt_template"
 
-    def __init__(self, llm: BaseLanguageModel, return_intermediate_steps: bool = True):
-        llm_chain = LLMChain(llm=llm, prompt=CYPHER_QA_PROMPT)
+    def __init__(
+        self, llm: BaseLanguageModel, prompt_template: BasePromptTemplate, return_intermediate_steps: bool = True
+    ):
+        llm_chain = LLMChain(llm=llm, prompt=prompt_template)
         super().__init__(llm_chain=llm_chain, return_intermediate_steps=return_intermediate_steps)
 
     @property
@@ -57,7 +58,6 @@ class AnswerGenerationChain(Chain):
             self.output_key: answer,
         }
         if self.return_intermediate_steps:
-            # FIXME not an intermediate result?
-            intermediate_steps = inputs[self.intermediate_steps_key] + [{self.output_key: answer}]
+            intermediate_steps = inputs.get(self.intermediate_steps_key, []) + [{self.output_key: answer}]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result

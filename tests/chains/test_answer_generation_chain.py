@@ -10,39 +10,43 @@ from langchain_core.outputs import LLMResult, ChatGeneration
 from langchain_core.prompts import PromptTemplate
 
 from fact_finder.chains.answer_generation_chain import AnswerGenerationChain
+from fact_finder.prompt_templates import CYPHER_QA_PROMPT
 
 
-def test_qa_chain(qa_chain, output_from_graph_chain, expected_answer):
-    result = qa_chain(inputs=output_from_graph_chain)
-    assert qa_chain.output_key in result.keys()
-    assert result[qa_chain.output_key] == expected_answer
-
-
-@pytest.fixture
-def qa_chain(llm, custom_llm_chain):
-    qa_chain = AnswerGenerationChain(llm=llm)
-    qa_chain.llm_chain = custom_llm_chain
-    return qa_chain
+def test_qa_chain(
+    answer_generation_chain: AnswerGenerationChain, output_from_graph_chain: Dict[str, Any], expected_answer
+):
+    result = answer_generation_chain.invoke(input=output_from_graph_chain)
+    assert answer_generation_chain.output_key in result.keys()
+    assert result[answer_generation_chain.output_key] == expected_answer
 
 
 @pytest.fixture
-def llm():
+def answer_generation_chain(llm: BaseChatModel, llm_chain: LLMChain) -> AnswerGenerationChain:
+    answer_generation_chain = AnswerGenerationChain(llm=llm, prompt_template=CYPHER_QA_PROMPT)
+    answer_generation_chain.llm_chain = llm_chain
+    return answer_generation_chain
+
+
+@pytest.fixture
+def llm() -> BaseChatModel:
     return MagicMock(spec=BaseChatModel)
 
 
 @pytest.fixture
-def prompt():
+def prompt() -> PromptTemplate:
     return MagicMock(spec=PromptTemplate)
 
 
 @pytest.fixture
-def custom_llm_chain(llm, prompt):
+def llm_chain(llm: BaseChatModel, prompt: PromptTemplate) -> LLMChain:
     return MockedLLMChain(llm=llm, prompt=prompt)
 
 
 @pytest.fixture
-def output_from_graph_chain():
+def output_from_graph_chain() -> Dict[str, Any]:
     return {
+        "question": "Which drugs are associated with epilepsy?",
         "cypher_query": "MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d.name",
         "intermediate_steps": [
             {"question": "Which drugs are associated with epilepsy?"},

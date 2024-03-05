@@ -64,6 +64,6 @@ class SubgraphExtractorChain(Chain):
             self.output_key: extracted_nodes,
         }
         if self.return_intermediate_steps:
-            intermediate_steps = inputs[self.intermediate_steps_key] + [{"subgraph_cypher": subgraph_cypher}]
+            intermediate_steps = inputs.get(self.intermediate_steps_key, []) + [{"subgraph_cypher": subgraph_cypher}]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result

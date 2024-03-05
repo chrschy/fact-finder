@@ -44,7 +44,6 @@ class GraphChain(Chain):
             self.output_key: graph_result,
         }
         if self.return_intermediate_steps:
-            # FIXME not an intermediate step?
-            intermediate_steps = inputs[self.intermediate_steps_key] + [{self.output_key: graph_result}]
+            intermediate_steps = inputs.get(self.intermediate_steps_key, []) + [{self.output_key: graph_result}]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result

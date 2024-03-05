@@ -56,7 +56,7 @@ def llm_chain(chat_model, llm_chain_result) -> LLMChain:
 
 @pytest.fixture
 def cypher_chain(llm_chain, graph):
-    chain = CypherQueryGenerationChain(llm=llm_chain, graph=graph, cypher_prompt=CYPHER_GENERATION_PROMPT)
+    chain = CypherQueryGenerationChain(llm=llm_chain, graph=graph, prompt_template=CYPHER_GENERATION_PROMPT)
     return chain
 
 
@@ -86,7 +86,7 @@ def test_mocked(chat_model: BaseChatModel, llm_chain: LLMChain, graph: Neo4jGrap
     ) as mock_get_structured_schema:
         mock_get_structured_schema.return_value = structured_schema
         graph = graph
-        chain = CypherQueryGenerationChain(llm=chat_model, graph=graph, cypher_prompt=CYPHER_GENERATION_PROMPT)
+        chain = CypherQueryGenerationChain(llm=chat_model, graph=graph, prompt_template=CYPHER_GENERATION_PROMPT)
         chain.cypher_generation_chain = llm_chain
         result = chain(question)
 
@@ -234,7 +234,7 @@ def structured_schema():
 
 @pytest.mark.skip
 def test_e2e(llm_e2e, graph_e2e):
-    chain = CypherQueryGenerationChain(llm=llm_e2e, graph=graph_e2e, cypher_prompt=CYPHER_GENERATION_PROMPT)
+    chain = CypherQueryGenerationChain(llm=llm_e2e, graph=graph_e2e, prompt_template=CYPHER_GENERATION_PROMPT)
     result = chain("Which drugs are associated with epilepsy?")
     assert (
         result["cypher_query"]
