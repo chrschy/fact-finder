@@ -5,12 +5,12 @@ from dotenv import load_dotenv
 from langchain_community.graphs import Neo4jGraph
 from langchain_openai import ChatOpenAI
 
-from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
-from fact_finder.chains.cypher_preprocessors.format_preprocessor import FormatPreprocessor
-from fact_finder.chains.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
+from fact_finder.tools.cypher_preprocessors.format_preprocessor import FormatPreprocessor
+from fact_finder.tools.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
 )
 from fact_finder.chains.neo4j_langchain_qa_service import Neo4JLangchainQAService
+from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 
 load_dotenv()

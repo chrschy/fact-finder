@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 from unittest.mock import MagicMock
 
 import pytest
@@ -6,7 +6,7 @@ from langchain.chains import LLMChain
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage
-from langchain_core.outputs import LLMResult, ChatGeneration
+from langchain_core.outputs import ChatGeneration, LLMResult
 from langchain_core.prompts import PromptTemplate
 
 from fact_finder.chains.answer_generation_chain import AnswerGenerationChain

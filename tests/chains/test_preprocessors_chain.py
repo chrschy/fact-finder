@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 import pytest
 from langchain_community.graphs import Neo4jGraph
 
-from fact_finder.chains.cypher_preprocessors.format_preprocessor import FormatPreprocessor
-from fact_finder.chains.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
+from fact_finder.tools.cypher_preprocessors.format_preprocessor import FormatPreprocessor
+from fact_finder.tools.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
 )
 from fact_finder.chains.cypher_query_preprocessors_chain import CypherQueryPreprocessorsChain

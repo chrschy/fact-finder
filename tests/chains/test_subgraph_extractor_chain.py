@@ -3,10 +3,8 @@ from unittest.mock import MagicMock
 import pytest
 from dotenv import load_dotenv
 from langchain_community.graphs import Neo4jGraph
-from langchain_core.language_models import BaseLanguageModel
-
 from fact_finder.chains.subgraph_extractor_chain import SubgraphExtractorChain
-from fact_finder.utils import load_chat_model, build_neo4j_graph
+from fact_finder.utils import load_chat_model
 
 load_dotenv()
 
