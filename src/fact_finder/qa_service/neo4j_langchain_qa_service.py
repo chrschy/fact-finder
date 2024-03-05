@@ -12,14 +12,39 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
+from pydantic import BaseModel
 
 from fact_finder.custom_llm_chain.custom_llm_chain import CustomLLMChain
 from fact_finder.predicate_descriptions import PREDICATE_DESCRIPTIONS
+from fact_finder.prompt_templates import SUBGRAPH_SUMMARY_PROMPT
 from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 from fact_finder.qa_service.qa_service import QAService
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
+
+
+class Node(BaseModel):
+    id: int
+    type: str
+    name: str
+    in_query: bool
+    in_answer: bool
+
+
+class Edge(BaseModel):
+    id: int
+    type: str
+    name: str
+    source: int
+    target: int
+    in_query: bool
+    in_answer: bool
+
+
+class Subgraph(BaseModel):
+    nodes: List[Node]
+    edges: List[Edge]
 
 
 class Neo4JLangchainQAService(QAService, Chain):
@@ -41,6 +66,7 @@ class Neo4JLangchainQAService(QAService, Chain):
     graph: GraphStore = Field(exclude=True)
     cypher_generation_chain: CustomLLMChain
     qa_chain: CustomLLMChain
+    subgraph_summary_chain: CustomLLMChain
     graph_schema: str
     input_key: str = "query"  #: :meta private:
     output_key: str = "result"  #: :meta private:
@@ -89,6 +115,7 @@ class Neo4JLangchainQAService(QAService, Chain):
         *,
         qa_prompt: Optional[BasePromptTemplate] = None,
         cypher_prompt: Optional[BasePromptTemplate] = None,
+        summary_prompt: Optional[BasePromptTemplate] = None,
         cypher_llm: Optional[BaseLanguageModel] = None,
         qa_llm: Optional[BaseLanguageModel] = None,
         exclude_types: List[str] = [],
@@ -96,6 +123,7 @@ class Neo4JLangchainQAService(QAService, Chain):
         cypher_query_preprocessors: List[CypherQueryPreprocessor] = [],
         qa_llm_kwargs: Optional[Dict[str, Any]] = None,
         cypher_llm_kwargs: Optional[Dict[str, Any]] = None,
+        summary_llm_kwargs: Optional[Dict[str, Any]] = None,
         schema_error_string: Optional[str] = "SCHEMA_ERROR",
         **kwargs: Any,
     ) -> Neo4JLangchainQAService:
@@ -119,16 +147,26 @@ class Neo4JLangchainQAService(QAService, Chain):
                 "Specifying qa_prompt and qa_llm_kwargs together is"
                 " not allowed. Please pass prompt via qa_llm_kwargs."
             )
+        if summary_prompt and summary_llm_kwargs:
+            raise ValueError(
+                "Specifying summary_prompt and summary_llm_kwargs together is"
+                " not allowed. Please pass prompt via summary_llm_kwargs."
+            )
         use_qa_llm_kwargs = qa_llm_kwargs if qa_llm_kwargs is not None else {}
         use_cypher_llm_kwargs = cypher_llm_kwargs if cypher_llm_kwargs is not None else {}
+        use_summary_llm_kwargs = summary_llm_kwargs if summary_llm_kwargs is not None else {}
         if "prompt" not in use_qa_llm_kwargs:
             use_qa_llm_kwargs["prompt"] = qa_prompt if qa_prompt is not None else CYPHER_QA_PROMPT
         if "prompt" not in use_cypher_llm_kwargs:
             use_cypher_llm_kwargs["prompt"] = cypher_prompt if cypher_prompt is not None else CYPHER_GENERATION_PROMPT
+        if "prompt" not in use_summary_llm_kwargs:
+            use_summary_llm_kwargs["prompt"] = summary_prompt if summary_prompt is not None else SUBGRAPH_SUMMARY_PROMPT
 
         qa_chain = LLMChain(llm=qa_llm or llm, **use_qa_llm_kwargs)
 
         cypher_generation_chain = LLMChain(llm=cypher_llm or llm, **use_cypher_llm_kwargs)
+
+        subgraph_summary_chain = LLMChain(llm=qa_llm or llm, **use_summary_llm_kwargs)
 
         if exclude_types and include_types:
             raise ValueError("Either `exclude_types` or `include_types` " "can be provided, but not both")
@@ -141,6 +179,7 @@ class Neo4JLangchainQAService(QAService, Chain):
             graph_schema=graph_schema,
             qa_chain=qa_chain,
             cypher_generation_chain=cypher_generation_chain,
+            subgraph_summary_chain=subgraph_summary_chain,
             cypher_query_preprocessors=cypher_query_preprocessors,
             schema_error_string=schema_error_string,
             llm_subgraph_extractor=llm_subgraph_extractor,
@@ -207,10 +246,18 @@ class Neo4JLangchainQAService(QAService, Chain):
 
         subgraph_cypher = self.llm_subgraph_extractor(generated_cypher)
         try:
-            chain_result["sub_graph"] = self.graph.query(subgraph_cypher)
+            chain_result["sub_graph_neo4j"] = self.graph.query(subgraph_cypher)
         except Exception as e:
-            chain_result["sub_graph"] = []
+            chain_result["sub_graph_neo4j"] = []
             print(f"Sub Graph could not be extracted due to {e}")
+
+        chain_result["sub_graph"], graph_triplets = self._construct_subgraph(
+            chain_result["sub_graph_neo4j"], chain_result[INTERMEDIATE_STEPS_KEY][1]["context"]
+        )
+        print(graph_triplets)
+        chain_result["sub_graph_summary"] = self.subgraph_summary_chain(
+            {"sub_graph": graph_triplets}, callbacks=callbacks
+        )[self.subgraph_summary_chain.output_key]
 
         return chain_result
 
@@ -224,3 +271,66 @@ class Neo4JLangchainQAService(QAService, Chain):
             return result
         else:
             return ""
+
+    def _construct_subgraph(self, graph: [], result: str) -> (Subgraph, str):
+        graph_converted = Subgraph(nodes=[], edges=[])
+        graph_triplets = ""
+
+        try:
+            result_ents = []
+            for res in result:
+                result_ents += res.values()
+
+            idx_rel = 0
+            for triplet in graph:
+                trip = [value for key, value in triplet.items() if type(value) is tuple][0]
+                head_type = [key for key, value in triplet.items() if value == trip[0]]
+                tail_type = [key for key, value in triplet.items() if value == trip[2]]
+                head_type = head_type[0] if len(head_type) > 0 else ""
+                tail_type = tail_type[0] if len(tail_type) > 0 else ""
+                node_head = trip[0] if "index" in trip[0] else list(triplet.values())[0]
+                node_tail = trip[2] if "index" in trip[2] else list(triplet.values())[2]
+
+                if "index" in node_head and node_head["index"] not in [node.id for node in graph_converted.nodes]:
+                    graph_converted.nodes.append(
+                        Node(
+                            id=node_head["index"],
+                            type=head_type,
+                            name=node_head["name"],
+                            in_query=False,
+                            in_answer=node_head["name"] in result_ents,
+                        )
+                    )
+                if "index" in node_tail and node_tail["index"] not in [node.id for node in graph_converted.nodes]:
+                    graph_converted.nodes.append(
+                        Node(
+                            id=node_tail["index"],
+                            type=tail_type,
+                            name=node_tail["name"],
+                            in_query=False,
+                            in_answer=node_tail["name"] in result_ents,
+                        )
+                    )
+                if "index" in node_head and "index" in node_tail:
+                    graph_converted.edges.append(
+                        Edge(
+                            id=idx_rel,
+                            type=trip[1],
+                            name=trip[1],
+                            source=node_head["index"],
+                            target=node_tail["index"],
+                            in_query=False,
+                            in_answer=node_tail["name"] in result_ents,
+                        )
+                    )
+                    idx_rel += 1
+
+                try:
+                    graph_triplets += f'("{node_head["name"]}", "{trip[1]}", "{node_tail["name"]}"), '
+                except Exception as e:
+                    print(e)
+
+        except Exception as e:
+            print(e)
+
+        return graph_converted, graph_triplets

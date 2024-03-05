@@ -49,6 +49,7 @@ def query() -> str:
 def chain(
     cypher_prompt_template,
     qa_prompt_template,
+    summary_prompt_template,
     cypher_llm,
     qa_llm,
     graph,
@@ -60,8 +61,9 @@ def chain(
         qa_llm=qa_llm,
         cypher_prompt=cypher_prompt_template,
         qa_prompt=qa_prompt_template,
+        summary_prompt=summary_prompt_template,
         verbose=False,
-        return_intermediate_steps=False,
+        return_intermediate_steps=True,
     )
 
 
@@ -120,6 +122,11 @@ def query_response() -> List[str]:
 
 
 @pytest.fixture
+def sub_graph() -> str:
+    return ["(node, connected to, node)"]
+
+
+@pytest.fixture
 def qa_prompt_template() -> PromptTemplate:
     return PromptTemplate(
         input_variables=["context", "question"], template="Generate an answer to {question} using {context}:"
@@ -129,6 +136,18 @@ def qa_prompt_template() -> PromptTemplate:
 @pytest.fixture
 def qa_prompt(qa_prompt_template, query_response, query) -> str:
     return qa_prompt_template.format_prompt(context=query_response, question=query)
+
+
+@pytest.fixture
+def summary_prompt_template() -> PromptTemplate:
+    return PromptTemplate(
+        input_variables=["sub_graph"], template="Generate verbalization of the triplets {sub_graph}"
+    )
+
+
+@pytest.fixture
+def summary_prompt(summary_prompt_template, sub_graph) -> str:
+    return summary_prompt_template.format_prompt(sub_graph=sub_graph)
 
 
 @pytest.fixture

@@ -58,3 +58,14 @@ The Cypher query is:
 SUBGRAPH_EXTRACTOR_PROMPT = PromptTemplate(
     input_variables=["cypher_query"], template=SUBGRAPH_EXTRACTOR_PROMPT_TEMPLATE
 )
+
+
+SUBGRAPH_SUMMARY_PROMPT_TEMPLATE: str = """
+Verbalize the given triplets of a subgraph to natural text. Use all triplets for the verbalization.
+ 
+Triplets of the subgraph:
+{sub_graph}
+"""
+SUBGRAPH_SUMMARY_PROMPT = PromptTemplate(
+    input_variables=["sub_graph"], template=SUBGRAPH_SUMMARY_PROMPT_TEMPLATE
+)
