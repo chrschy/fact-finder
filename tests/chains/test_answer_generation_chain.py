@@ -9,7 +9,7 @@ from langchain_core.messages import AIMessage
 from langchain_core.outputs import LLMResult, ChatGeneration
 from langchain_core.prompts import PromptTemplate
 
-from fact_finder.chains.qa_chain import QAChain
+from fact_finder.chains.answer_generation_chain import AnswerGenerationChain
 
 
 def test_qa_chain(qa_chain, output_from_graph_chain, expected_answer):
@@ -20,7 +20,7 @@ def test_qa_chain(qa_chain, output_from_graph_chain, expected_answer):
 
 @pytest.fixture
 def qa_chain(llm, custom_llm_chain):
-    qa_chain = QAChain(llm=llm)
+    qa_chain = AnswerGenerationChain(llm=llm)
     qa_chain.llm_chain = custom_llm_chain
     return qa_chain
 

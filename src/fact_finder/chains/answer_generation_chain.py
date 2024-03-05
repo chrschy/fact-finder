@@ -8,20 +8,18 @@ from langchain_core.language_models import BaseLanguageModel
 from fact_finder.prompt_templates import CYPHER_QA_PROMPT
 
 
-class QAChain(Chain):
+class AnswerGenerationChain(Chain):
     llm_chain: LLMChain
-    return_intermediate_steps: bool = True
+    return_intermediate_steps: bool
     question_key: str = "question"  #: :meta private:
     graph_result_key: str = "graph_result"  #: :meta private:
     output_key: str = "answer"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
     filled_prompt_template_key: str = "qa_filled_prompt_template"
 
-    def __init__(self, llm: BaseLanguageModel):
+    def __init__(self, llm: BaseLanguageModel, return_intermediate_steps: bool = True):
         llm_chain = LLMChain(llm=llm, prompt=CYPHER_QA_PROMPT)
-        super().__init__(
-            llm_chain=llm_chain,
-        )
+        super().__init__(llm_chain=llm_chain, return_intermediate_steps=return_intermediate_steps)
 
     @property
     def input_keys(self) -> List[str]:

@@ -1,4 +1,4 @@
 from .cypher_query_generation_chain import CypherQueryGenerationChain
 from .cypher_query_preprocessors_chain import CypherQueryPreprocessorsChain
 from .graph_chain import GraphChain
-from .qa_chain import QAChain
+from .answer_generation_chain import AnswerGenerationChain
