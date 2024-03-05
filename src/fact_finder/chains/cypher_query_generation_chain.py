@@ -43,50 +43,6 @@ class CypherQueryGenerationChain(Chain):
             n_predicate_descriptions=n_predicate_descriptions,
         )
 
-    def _call(
-        self,
-        inputs: Dict[str, Any],
-        run_manager: Optional[CallbackManagerForChainRun] = None,
-    ) -> Dict[str, Any]:
-        _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
-        callbacks = _run_manager.get_child()
-
-        question = inputs[self.input_key]
-
-        generated_cypher = self._generate_cypher(callbacks, question, _run_manager)
-        chain_result = {
-            self.output_key: generated_cypher,
-        }
-        if self.return_intermediate_steps:
-            intermediate_steps = [{"question": question}]
-            chain_result[self.intermediate_steps_key] = intermediate_steps
-        return chain_result
-
-    def _generate_cypher(self, callbacks, question: str, run_manager: CallbackManagerForChainRun):
-        predicate_descriptions = self._construct_predicate_descriptions(how_many=self.n_predicate_descriptions)
-        generated_cypher = self.cypher_generation_chain(
-            {"question": question, "schema": self.graph_schema, "predicate_descriptions": predicate_descriptions},
-            callbacks=callbacks,
-        )[self.cypher_generation_chain.output_key]
-        generated_cypher = extract_cypher(generated_cypher)
-        self._log_it(generated_cypher, run_manager)
-        return generated_cypher
-
-    def _log_it(self, generated_cypher: str, run_manager: CallbackManagerForChainRun):
-        run_manager.on_text("Generated Cypher:", end="\n", verbose=self.verbose)
-        run_manager.on_text(generated_cypher, color="green", end="\n", verbose=self.verbose)
-
-    def _construct_predicate_descriptions(self, how_many: int) -> str:
-        if how_many > 0:
-            result = ["Here are some descriptions to the most common relationships:"]
-            for item in PREDICATE_DESCRIPTIONS[:how_many]:
-                item_as_text = f"({item['subject']})-[{item['predicate']}]->({item['object']}): {item['definition']}"
-                result.append(item_as_text)
-            result = "\n".join(result)
-            return result
-        else:
-            return ""
-
     @property
     def input_keys(self) -> List[str]:
         """Return the input keys."""
@@ -96,3 +52,47 @@ class CypherQueryGenerationChain(Chain):
     def output_keys(self) -> List[str]:
         """Return the output keys."""
         return [self.output_key]
+
+    def _call(
+        self,
+        inputs: Dict[str, Any],
+        run_manager: Optional[CallbackManagerForChainRun] = None,
+    ) -> Dict[str, Any]:
+        _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
+        question = inputs[self.input_key]
+        generated_cypher = self._generate_cypher(question, _run_manager)
+        return self._prepare_chain_result(inputs, generated_cypher)
+
+    def _generate_cypher(self, question: str, run_manager: CallbackManagerForChainRun):
+        predicate_descriptions = self._construct_predicate_descriptions(how_many=self.n_predicate_descriptions)
+        generated_cypher = self.cypher_generation_chain(
+            {"question": question, "schema": self.graph_schema, "predicate_descriptions": predicate_descriptions},
+            callbacks=run_manager.get_child(),
+        )[self.cypher_generation_chain.output_key]
+        generated_cypher = extract_cypher(generated_cypher)
+        self._log_it(generated_cypher, run_manager)
+        return generated_cypher
+
+    def _construct_predicate_descriptions(self, how_many: int) -> str:
+        if how_many > 0:
+            result = ["Here are some descriptions to the most common relationships:"]
+            for item in PREDICATE_DESCRIPTIONS[:how_many]:
+                item_as_text = f"({item['subject']})-[{item['predicate']}]->({item['object']}): {item['definition']}"
+                result.append(item_as_text)
+            return "\n".join(result)
+        else:
+            return ""
+
+    def _log_it(self, generated_cypher: str, run_manager: CallbackManagerForChainRun):
+        run_manager.on_text("Generated Cypher:", end="\n", verbose=self.verbose)
+        run_manager.on_text(generated_cypher, color="green", end="\n", verbose=self.verbose)
+
+    def _prepare_chain_result(self, inputs: Dict[str, Any], generated_cypher: str) -> Dict[str, Any]:
+        chain_result = {
+            self.output_key: generated_cypher,
+        }
+        if self.return_intermediate_steps:
+            intermediate_steps = inputs.get(self.intermediate_steps_key, [])
+            intermediate_steps += [{"question": inputs[self.input_key]}]
+            chain_result[self.intermediate_steps_key] = intermediate_steps
+        return chain_result

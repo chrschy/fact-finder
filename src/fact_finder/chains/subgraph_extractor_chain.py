@@ -16,17 +16,8 @@ class SubgraphExtractorChain(Chain):
     output_key: str = "extracted_nodes"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
 
-    def __init__(
-        self,
-        llm: BaseLanguageModel,
-        graph: Neo4jGraph,
-        return_intermediate_steps: bool = True,
-        exclude_types: List[str] = [],
-        include_types: List[str] = [],
-    ):
+    def __init__(self, llm: BaseLanguageModel, graph: Neo4jGraph, return_intermediate_steps: bool = True):
         subgraph_extractor = LLMSubGraphExtractor(llm)
-        if exclude_types and include_types:
-            raise ValueError("Either `exclude_types` or `include_types` " "can be provided, but not both")
         super().__init__(
             subgraph_extractor=subgraph_extractor,
             graph=graph,
@@ -51,27 +42,28 @@ class SubgraphExtractorChain(Chain):
         self._log_it("Subgraph Cypher:", _run_manager, subgraph_cypher)
 
         extracted_nodes = self._query_graph(subgraph_cypher)
-        self._log_it("Extracted Nodes:", _run_manager, subgraph_cypher)
+        self._log_it("Extracted Nodes:", _run_manager, extracted_nodes)
 
-        chain_result = {
-            self.output_key: extracted_nodes,
-        }
+        return self._prepare_chain_result(inputs, subgraph_cypher, extracted_nodes)
 
-        if self.return_intermediate_steps:
-            intermediate_steps = inputs[self.intermediate_steps_key]
-            intermediate_steps.append({"subgraph_cypher": subgraph_cypher})
-            chain_result[self.intermediate_steps_key] = intermediate_steps
-
-        return chain_result
-
-    def _query_graph(self, subgraph_cypher):
-        result = []
+    def _query_graph(self, subgraph_cypher) -> List[Dict[str, Any]]:
         try:
-            result = self.graph.query(subgraph_cypher)
+            return self.graph.query(subgraph_cypher)
         except Exception as e:
             print(f"Sub Graph for {subgraph_cypher} could not be extracted due to {e}")
-        return result
+        return []
 
     def _log_it(self, text: str, _run_manager: CallbackManagerForChainRun, subgraph_cypher: str):
         _run_manager.on_text(text, end="\n", verbose=self.verbose)
         _run_manager.on_text(subgraph_cypher, color="green", end="\n", verbose=self.verbose)
+
+    def _prepare_chain_result(
+        self, inputs: Dict[str, Any], subgraph_cypher: str, extracted_nodes: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        chain_result = {
+            self.output_key: extracted_nodes,
+        }
+        if self.return_intermediate_steps:
+            intermediate_steps = inputs[self.intermediate_steps_key] + [{"subgraph_cypher": subgraph_cypher}]
+            chain_result[self.intermediate_steps_key] = intermediate_steps
+        return chain_result

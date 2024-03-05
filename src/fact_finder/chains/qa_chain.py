@@ -1,6 +1,5 @@
 from typing import Dict, Any, Optional, List
 
-from dotenv import load_dotenv
 from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain_core.callbacks import CallbackManagerForChainRun
@@ -8,27 +7,18 @@ from langchain_core.language_models import BaseLanguageModel
 
 from fact_finder.prompt_templates import CYPHER_QA_PROMPT
 
-load_dotenv()
-
 
 class QAChain(Chain):
     llm_chain: LLMChain
     return_intermediate_steps: bool = True
-    input_key: str = "graph_result"  #: :meta private:
+    question_key: str = "question"  #: :meta private:
+    graph_result_key: str = "graph_result"  #: :meta private:
     output_key: str = "answer"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
-    question_key: str = "question"
     filled_prompt_template_key: str = "qa_filled_prompt_template"
 
-    def __init__(
-        self,
-        llm: BaseLanguageModel,
-        exclude_types: List[str] = [],
-        include_types: List[str] = [],
-    ):
+    def __init__(self, llm: BaseLanguageModel):
         llm_chain = LLMChain(llm=llm, prompt=CYPHER_QA_PROMPT)
-        if exclude_types and include_types:
-            raise ValueError("Either `exclude_types` or `include_types` " "can be provided, but not both")
         super().__init__(
             llm_chain=llm_chain,
         )
@@ -36,7 +26,7 @@ class QAChain(Chain):
     @property
     def input_keys(self) -> List[str]:
         """Return the input keys."""
-        return [self.input_key]
+        return [self.question_key, self.graph_result_key]
 
     @property
     def output_keys(self) -> List[str]:
@@ -45,31 +35,31 @@ class QAChain(Chain):
 
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
-        callbacks = _run_manager.get_child()
+        graph_result = inputs[self.graph_result_key]
+        question = inputs[self.question_key]
+        answer = self._run_qa_chain(graph_result, question, _run_manager)
+        return self._prepare_chain_result(inputs, answer)
 
-        graph_result = inputs[self.input_key]
-        question = inputs[self.intermediate_steps_key][0][self.question_key]
-        answer = self._run_qa_chain(callbacks, graph_result, question)
-
-        self._log_it(_run_manager, answer)
-
-        chain_result = {
-            self.output_key: answer,
-        }
-
-        if self.return_intermediate_steps:
-            intermediate_steps = inputs[self.intermediate_steps_key]
-            intermediate_steps.append({self.output_key: answer})
-            chain_result[self.intermediate_steps_key] = intermediate_steps
-        return chain_result
-
-    def _run_qa_chain(self, callbacks, graph_result, question):
+    def _run_qa_chain(
+        self, graph_result: List[Dict[str, Any]], question: str, run_manager: CallbackManagerForChainRun
+    ) -> str:
         final_result = self.llm_chain(
             {"question": question, "context": graph_result},
-            callbacks=callbacks,
+            callbacks=run_manager.get_child(),
         )[self.llm_chain.output_key]
+        self._log_it(run_manager, final_result)
         return final_result
 
     def _log_it(self, run_manager, graph_result):
         run_manager.on_text("QA Chain Result:", end="\n", verbose=self.verbose)
         run_manager.on_text(str(graph_result), color="green", end="\n", verbose=self.verbose)
+
+    def _prepare_chain_result(self, inputs: Dict[str, Any], answer: str) -> Dict[str, Any]:
+        chain_result = {
+            self.output_key: answer,
+        }
+        if self.return_intermediate_steps:
+            # FIXME not an intermediate result?
+            intermediate_steps = inputs[self.intermediate_steps_key] + [{self.output_key: answer}]
+            chain_result[self.intermediate_steps_key] = intermediate_steps
+        return chain_result

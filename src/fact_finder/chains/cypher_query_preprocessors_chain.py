@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
 
 from langchain.chains.base import Chain
 from langchain_core.callbacks import CallbackManagerForChainRun
@@ -42,36 +42,31 @@ class CypherQueryPreprocessorsChain(Chain):
 
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
-
         generated_cypher = inputs[self.input_key]
-        intermediate_steps = inputs[self.intermediate_steps_key]
-        preprocessed_cypher = self._run_preprocessors(_run_manager, generated_cypher, intermediate_steps)
-        return self._prepare_chain_result(preprocessed_cypher, intermediate_steps)
+        preprocessed_cypher, intermediate_steps = self._run_preprocessors(_run_manager, generated_cypher)
+        return self._prepare_chain_result(inputs, preprocessed_cypher, intermediate_steps)
 
     def _run_preprocessors(
-        self, _run_manager: CallbackManagerForChainRun, generated_cypher: str, intermediate_steps: List
-    ):
-        intermediate_steps.append({})
+        self, _run_manager: CallbackManagerForChainRun, generated_cypher: str
+    ) -> Tuple[str, List[Dict[str, str]]]:
+        intermediate_steps = []
         for processor in self.cypher_query_preprocessors:
             generated_cypher = processor(generated_cypher)
-            self._update_intermediate_steps(generated_cypher, intermediate_steps, processor)
-        self._log_it(_run_manager, generated_cypher, intermediate_steps)
-        return generated_cypher
+            intermediate_steps.append({type(processor).__name__: generated_cypher})
+        self._log_it(_run_manager, generated_cypher)
+        return generated_cypher, intermediate_steps
 
-    def _update_intermediate_steps(
-        self, generated_cypher: str, intermediate_steps: List, processor: CypherQueryPreprocessor
-    ):
-        name_of_preprocessor = type(processor).__name__
-        intermediate_steps[-1][name_of_preprocessor] = generated_cypher
-
-    def _log_it(self, _run_manager: CallbackManagerForChainRun, generated_cypher: str, intermediate_steps: List):
+    def _log_it(self, _run_manager: CallbackManagerForChainRun, generated_cypher: str):
         _run_manager.on_text("Preprocessed Cypher:", end="\n", verbose=self.verbose)
         _run_manager.on_text(generated_cypher, color="green", end="\n", verbose=self.verbose)
 
-    def _prepare_chain_result(self, preprocessed_cypher: str, intermediate_steps: List[str]):
-        chain_result = {
+    def _prepare_chain_result(
+        self, inputs: Dict[str, Any], preprocessed_cypher: str, intermediate_steps: List[Dict[str, str]]
+    ) -> Dict[str, Any]:
+        chain_result: Dict[str, Any] = {
             self.output_key: preprocessed_cypher,
         }
         if self.return_intermediate_steps:
+            intermediate_steps = inputs.get(self.intermediate_steps_key, []) + intermediate_steps
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result

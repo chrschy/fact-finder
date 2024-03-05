@@ -26,24 +26,25 @@ class GraphChain(Chain):
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
         generated_cypher = inputs[self.input_key]
-        intermediate_steps = inputs[self.intermediate_steps_key]
         graph_result = self._query_graph(generated_cypher)
-        intermediate_steps.append({self.output_key: graph_result})
-        chain_result = {
-            self.output_key: graph_result,
-        }
         self._log_it(_run_manager, graph_result)
-        if self.return_intermediate_steps:
-            chain_result[self.intermediate_steps_key] = intermediate_steps
-        return chain_result
+        return self._prepare_chain_result(inputs, graph_result)
 
-    def _query_graph(self, generated_cypher):
+    def _query_graph(self, generated_cypher: str) -> List[Dict[str, Any]]:
         if generated_cypher:
-            graph_result = self.graph.query(generated_cypher)[: self.top_k]
-        else:
-            graph_result = []
-        return graph_result
+            return self.graph.query(generated_cypher)[: self.top_k]
+        return []
 
     def _log_it(self, run_manager, graph_result):
         run_manager.on_text("Graph Result:", end="\n", verbose=self.verbose)
         run_manager.on_text(str(graph_result), color="green", end="\n", verbose=self.verbose)
+
+    def _prepare_chain_result(self, inputs: Dict[str, Any], graph_result: List[Dict[str, Any]]) -> Dict[str, Any]:
+        chain_result = {
+            self.output_key: graph_result,
+        }
+        if self.return_intermediate_steps:
+            # FIXME not an intermediate step?
+            intermediate_steps = inputs[self.intermediate_steps_key] + [{self.output_key: graph_result}]
+            chain_result[self.intermediate_steps_key] = intermediate_steps
+        return chain_result
