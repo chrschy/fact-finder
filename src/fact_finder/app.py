@@ -148,74 +148,88 @@ async def call_chains(message):
 def convert_subgraph(graph: [], result: str) -> Subgraph:
     graph_converted = Subgraph(nodes=[], edges=[])
 
-    result_ents = []
-    for res in result:
-        result_ents += res.values()
+    try:
+        result_ents = []
+        for res in result:
+            result_ents += res.values()
 
-    idx_rel = 0
-    for triplet in graph:
-        trip = [value for key, value in triplet.items() if type(value) is tuple][0]
-        head_type = [key for key, value in triplet.items() if value == trip[0]][0]
-        tail_type = [key for key, value in triplet.items() if value == trip[2]][0]
-        if trip[0]["index"] not in [node.id for node in graph_converted.nodes]:
-            graph_converted.nodes.append(
-                Node(
-                    id=trip[0]["index"],
-                    type=head_type,
-                    name=trip[0]["name"],
-                    in_query=False,
-                    in_answer=trip[0]["name"] in result_ents,
+        idx_rel = 0
+        for triplet in graph:
+            trip = [value for key, value in triplet.items() if type(value) is tuple][0]
+            head_type = [key for key, value in triplet.items() if value == trip[0]]
+            tail_type = [key for key, value in triplet.items() if value == trip[2]]
+            head_type = head_type[0] if len(head_type) > 0 else ""
+            tail_type = tail_type[0] if len(tail_type) > 0 else ""
+            node_head = trip[0] if "index" in trip[0] else list(triplet.values())[0]
+            node_tail = trip[2] if "index" in trip[2] else list(triplet.values())[2]
+
+            if "index" in node_head and node_head["index"] not in [node.id for node in graph_converted.nodes]:
+                graph_converted.nodes.append(
+                    Node(
+                        id=node_head["index"],
+                        type=head_type,
+                        name=node_head["name"],
+                        in_query=False,
+                        in_answer=node_head["name"] in result_ents,
+                    )
                 )
-            )
-        if trip[2]["index"] not in [node.id for node in graph_converted.nodes]:
-            graph_converted.nodes.append(
-                Node(
-                    id=trip[2]["index"],
-                    type=tail_type,
-                    name=trip[2]["name"],
-                    in_query=False,
-                    in_answer=trip[2]["name"] in result_ents,
+            if "index" in node_tail and node_tail["index"] not in [node.id for node in graph_converted.nodes]:
+                graph_converted.nodes.append(
+                    Node(
+                        id=node_tail["index"],
+                        type=tail_type,
+                        name=node_tail["name"],
+                        in_query=False,
+                        in_answer=node_tail["name"] in result_ents,
+                    )
                 )
-            )
-        graph_converted.edges.append(
-            Edge(
-                id=idx_rel,
-                type=trip[1],
-                name=trip[1],
-                source=trip[0]["index"],
-                target=trip[2]["index"],
-                in_query=False,
-                in_answer=trip[2]["name"] in result_ents,
-            )
-        )
-        idx_rel += 1
+            if "index" in node_head and "index" in node_tail:
+                graph_converted.edges.append(
+                    Edge(
+                        id=idx_rel,
+                        type=trip[1],
+                        name=trip[1],
+                        source=node_head["index"],
+                        target=node_tail["index"],
+                        in_query=False,
+                        in_answer=node_tail["name"] in result_ents,
+                    )
+                )
+                idx_rel += 1
+
+    except Exception as e:
+        print(e)
 
     return graph_converted
 
 
 def request_pipeline(text_data: str):
-    try:
-        results = asyncio.run(call_chains(text_data))
-        return {
-            "status": "success",
-            "query": results[0]["intermediate_steps"][0]["query"],
-            "response": results[0]["intermediate_steps"][1]["context"],
-            "answer_graph": results[0]["result"],
-            "answer_llm": results[1]["text"],
-            "graph": convert_subgraph(results[0]["sub_graph"], results[0]["intermediate_steps"][1]["context"]),
-            "graph_neo4j": results[0]["sub_graph"],
-        }
-    except Exception as e:
-        print(e)
-        return {
-            "status": "error",
-            "query": "",
-            "response": "",
-            "answer_graph": "",
-            "answer_llm": "",
-            "graph": {},
-            "graph_neo4j": [],
-        }
+    # try:
+    results = asyncio.run(call_chains(text_data))
+    return {
+        "status": "success",
+        "query": results[0]["intermediate_steps"][0]["query"] if "intermediate_steps" in results[0] else "",
+        "response": results[0]["intermediate_steps"][1]["context"] if "intermediate_steps" in results[0] else "",
+        "answer_graph": results[0]["result"],
+        "answer_llm": results[1]["text"],
+        "graph": (
+            convert_subgraph(results[0]["sub_graph"], results[0]["intermediate_steps"][1]["context"])
+            if "sub_graph" in results[0] and "intermediate_steps" in results[0]
+            else Subgraph(nodes=[], edges=[])
+        ),
+        "graph_neo4j": results[0]["sub_graph"] if "sub_graph" in results[0] else [],
+    }
+    # except Exception as e:
+    #     print(e)
+    #     return {
+    #         "status": "error",
+    #         "query": "",
+    #         "response": "",
+    #         "answer_graph": "",
+    #         "answer_llm": "",
+    #         "graph": {},
+    #         "graph_neo4j": [],
+    #     }
 
 
 def generate_graph(graph: Subgraph, send_request=False):
@@ -287,4 +301,5 @@ if st.button("Search") and text_area_input != "":
         st.write("\n")
         st.caption("\n\nJSON Data:")
         with st.expander("Show JSON"):
+            pipeline_response["graph"] = pipeline_response["graph"].model_dump(mode="json")
             st.json(pipeline_response)
