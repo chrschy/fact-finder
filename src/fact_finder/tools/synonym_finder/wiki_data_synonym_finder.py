@@ -1,9 +1,9 @@
-from SPARQLWrapper import JSON, SPARQLWrapper
-from fact_finder.tools.synonym_finder.synonym_finder import SynonymFinder
-
-
 import ssl
 from typing import List
+
+from SPARQLWrapper import JSON, SPARQLWrapper
+
+from fact_finder.tools.synonym_finder.synonym_finder import SynonymFinder
 
 
 class WikiDataSynonymFinder(SynonymFinder):

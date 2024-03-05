@@ -1,5 +1,5 @@
-from functools import partial
 import re
+from functools import partial
 from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 
 from langchain_community.graphs import Neo4jGraph
