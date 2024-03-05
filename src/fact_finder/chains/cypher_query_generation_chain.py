@@ -1,8 +1,8 @@
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
 
 from langchain.chains import LLMChain
 from langchain.chains.base import Chain
-from langchain.chains.graph_qa.cypher import extract_cypher, construct_schema
+from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel

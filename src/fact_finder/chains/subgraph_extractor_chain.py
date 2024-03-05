@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
 
 from langchain.chains.base import Chain
 from langchain_community.graphs import Neo4jGraph
