@@ -48,12 +48,14 @@ class GraphQAChain(Chain):
         cypher_prompt: BasePromptTemplate,
         answer_generation_prompt: BasePromptTemplate,
         cypher_query_preprocessors: List[CypherQueryPreprocessor],
+        predicate_descriptions: List[Dict[str, str]] = [],
         return_intermediate_steps: bool = True,
     ):
         cypher_query_generation_chain = CypherQueryGenerationChain(
             llm=llm,
             graph_structured_schema=graph.get_structured_schema,
             prompt_template=cypher_prompt,
+            predicate_descriptions=predicate_descriptions,
             return_intermediate_steps=return_intermediate_steps,
         )
         cypher_query_preprocessors_chain = CypherQueryPreprocessorsChain(

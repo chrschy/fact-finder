@@ -7,6 +7,7 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts.prompt import PromptTemplate
 
 from fact_finder.chains.graph_qa_chain import GraphQAChain
+from fact_finder.config.primekg_predicate_descriptions import PREDICATE_DESCRIPTIONS
 from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
 from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 from fact_finder.tools.cypher_preprocessors.format_preprocessor import FormatPreprocessor
@@ -30,6 +31,7 @@ def build_chain(model: BaseLanguageModel, args: List[str] = []) -> Chain:
         cypher_prompt=cypher_prompt,
         answer_generation_prompt=answer_generation_prompt,
         cypher_query_preprocessors=cypher_preprocessors,
+        predicate_descriptions=PREDICATE_DESCRIPTIONS[:10],
         return_intermediate_steps=True,
     )
 

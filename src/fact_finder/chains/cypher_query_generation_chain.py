@@ -7,13 +7,11 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 
-from fact_finder.predicate_descriptions import PREDICATE_DESCRIPTIONS
-
 
 class CypherQueryGenerationChain(Chain):
     cypher_generation_chain: LLMChain
     graph_schema: str
-    n_predicate_descriptions: int
+    predicate_descriptions: List[Dict[str, str]]
     return_intermediate_steps: bool
     input_key: str = "question"  #: :meta private:
     output_key: str = "cypher_query"  #: :meta private:
@@ -24,7 +22,7 @@ class CypherQueryGenerationChain(Chain):
         llm: BaseLanguageModel,
         prompt_template: BasePromptTemplate,
         graph_structured_schema: Dict[str, Any],
-        n_predicate_descriptions: int = 0,
+        predicate_descriptions: List[Dict[str, str]] = [],
         return_intermediate_steps: bool = True,
         exclude_types: List[str] = [],
         include_types: List[str] = [],
@@ -36,7 +34,7 @@ class CypherQueryGenerationChain(Chain):
         super().__init__(
             cypher_generation_chain=cypher_generation_chain,
             graph_schema=graph_schema,
-            n_predicate_descriptions=n_predicate_descriptions,
+            predicate_descriptions=predicate_descriptions,
             return_intermediate_steps=return_intermediate_steps,
         )
 
@@ -61,7 +59,7 @@ class CypherQueryGenerationChain(Chain):
         return self._prepare_chain_result(inputs, generated_cypher)
 
     def _generate_cypher(self, question: str, run_manager: CallbackManagerForChainRun):
-        predicate_descriptions = self._construct_predicate_descriptions(how_many=self.n_predicate_descriptions)
+        predicate_descriptions = self._construct_predicate_descriptions()
         generated_cypher = self.cypher_generation_chain(
             {"question": question, "schema": self.graph_schema, "predicate_descriptions": predicate_descriptions},
             callbacks=run_manager.get_child(),
@@ -70,15 +68,14 @@ class CypherQueryGenerationChain(Chain):
         self._log_it(generated_cypher, run_manager)
         return generated_cypher
 
-    def _construct_predicate_descriptions(self, how_many: int) -> str:
-        if how_many > 0:
-            result = ["Here are some descriptions to the most common relationships:"]
-            for item in PREDICATE_DESCRIPTIONS[:how_many]:
-                item_as_text = f"({item['subject']})-[{item['predicate']}]->({item['object']}): {item['definition']}"
-                result.append(item_as_text)
-            return "\n".join(result)
-        else:
+    def _construct_predicate_descriptions(self) -> str:
+        if len(self.predicate_descriptions) == 0:
             return ""
+        result = ["Here are some descriptions to the most common relationships:"]
+        for item in self.predicate_descriptions:
+            item_as_text = f"({item['subject']})-[{item['predicate']}]->({item['object']}): {item['definition']}"
+            result.append(item_as_text)
+        return "\n".join(result)
 
     def _log_it(self, generated_cypher: str, run_manager: CallbackManagerForChainRun):
         run_manager.on_text("Generated Cypher:", end="\n", verbose=self.verbose)
