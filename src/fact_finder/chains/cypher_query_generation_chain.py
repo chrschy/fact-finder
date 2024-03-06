@@ -11,7 +11,7 @@ from langchain_core.prompts import BasePromptTemplate
 class CypherQueryGenerationChain(Chain):
     cypher_generation_chain: LLMChain
     graph_schema: str
-    predicate_descriptions: List[Dict[str, str]]
+    predicate_descriptions_text: str
     return_intermediate_steps: bool
     input_key: str = "question"  #: :meta private:
     output_key: str = "cypher_query"  #: :meta private:
@@ -31,10 +31,11 @@ class CypherQueryGenerationChain(Chain):
         if exclude_types and include_types:
             raise ValueError("Either `exclude_types` or `include_types` " "can be provided, but not both")
         graph_schema = construct_schema(graph_structured_schema, include_types, exclude_types)
+        predicate_descriptions_text = self._construct_predicate_descriptions_text(predicate_descriptions)
         super().__init__(
             cypher_generation_chain=cypher_generation_chain,
             graph_schema=graph_schema,
-            predicate_descriptions=predicate_descriptions,
+            predicate_descriptions_text=predicate_descriptions_text,
             return_intermediate_steps=return_intermediate_steps,
         )
 
@@ -58,24 +59,27 @@ class CypherQueryGenerationChain(Chain):
         generated_cypher = self._generate_cypher(question, _run_manager)
         return self._prepare_chain_result(inputs, generated_cypher)
 
-    def _generate_cypher(self, question: str, run_manager: CallbackManagerForChainRun):
-        predicate_descriptions = self._construct_predicate_descriptions()
+    def _construct_predicate_descriptions_text(self, predicate_descriptions: List[Dict[str, str]]) -> str:
+        if len(predicate_descriptions) == 0:
+            return ""
+        result = ["Here are some descriptions to the most common relationships:"]
+        for item in predicate_descriptions:
+            item_as_text = f"({item['subject']})-[{item['predicate']}]->({item['object']}): {item['definition']}"
+            result.append(item_as_text)
+        return "\n".join(result)
+
+    def _generate_cypher(self, question: str, run_manager: CallbackManagerForChainRun) -> str:
         generated_cypher = self.cypher_generation_chain(
-            {"question": question, "schema": self.graph_schema, "predicate_descriptions": predicate_descriptions},
+            {
+                "question": question,
+                "schema": self.graph_schema,
+                "predicate_descriptions": self.predicate_descriptions_text,
+            },
             callbacks=run_manager.get_child(),
         )[self.cypher_generation_chain.output_key]
         generated_cypher = extract_cypher(generated_cypher)
         self._log_it(generated_cypher, run_manager)
         return generated_cypher
-
-    def _construct_predicate_descriptions(self) -> str:
-        if len(self.predicate_descriptions) == 0:
-            return ""
-        result = ["Here are some descriptions to the most common relationships:"]
-        for item in self.predicate_descriptions:
-            item_as_text = f"({item['subject']})-[{item['predicate']}]->({item['object']}): {item['definition']}"
-            result.append(item_as_text)
-        return "\n".join(result)
 
     def _log_it(self, generated_cypher: str, run_manager: CallbackManagerForChainRun):
         run_manager.on_text("Generated Cypher:", end="\n", verbose=self.verbose)
