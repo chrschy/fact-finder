@@ -7,8 +7,8 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 
 class GraphChain(Chain):
     graph: Neo4jGraph
-    return_intermediate_steps: bool = True
     top_k: int = 20
+    return_intermediate_steps: bool = True
     input_key: str = "preprocessed_cypher_query"  #: :meta private:
     output_key: str = "graph_result"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
