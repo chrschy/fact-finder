@@ -1,20 +1,91 @@
-from typing import List, Dict, Any, Optional
-from unittest.mock import MagicMock, PropertyMock, patch
+from typing import Any, Dict, List
+from unittest.mock import ANY, MagicMock
 
 import pytest
-from dotenv import load_dotenv
 from langchain.chains import LLMChain
-from langchain_community.graphs import Neo4jGraph
+from langchain.chains.graph_qa.cypher import construct_schema
 from langchain_core.callbacks import CallbackManagerForChainRun
-from langchain_core.language_models import BaseChatModel
+from langchain_core.language_models import BaseLanguageModel
 from langchain_core.messages import AIMessage
-from langchain_core.outputs import LLMResult, ChatGeneration
+from langchain_core.outputs import ChatGeneration, LLMResult
+from langchain_core.prompts.prompt import PromptTemplate
 
 from fact_finder.chains.cypher_query_generation_chain import CypherQueryGenerationChain
+from fact_finder.config.primekg_predicate_descriptions import PREDICATE_DESCRIPTIONS
 from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT
-from fact_finder.utils import build_neo4j_graph, load_chat_model
+from tests.chains.helpers import build_llm_mock
 
-load_dotenv()
+
+def test_cypher_generation_is_called_with_expected_arguments(
+    question: str, chain: CypherQueryGenerationChain, cypher_llm: MagicMock, cypher_prompt: str
+):
+    chain.invoke(input={chain.input_key: question})
+    cypher_llm.generate_prompt.assert_called_once_with([cypher_prompt], None, callbacks=ANY)
+
+
+@pytest.mark.parametrize("how_many", (0, 3))
+def test_construct_predicate_descriptions_produces_strings(how_many: int, chain: CypherQueryGenerationChain):
+    predicate_descriptions = chain._construct_predicate_descriptions_text(PREDICATE_DESCRIPTIONS[:how_many])
+    assert isinstance(predicate_descriptions, str)
+
+
+def test_construct_predicate_descriptions_produces_expected_number_of_lines(chain: CypherQueryGenerationChain):
+    how_many = 3
+    predicate_descriptions = chain._construct_predicate_descriptions_text(PREDICATE_DESCRIPTIONS[:how_many])
+    lines = predicate_descriptions.split("\n")
+    assert len(lines) == how_many + 1
+
+
+def test_construct_predicate_descriptions_produces_header(chain: CypherQueryGenerationChain):
+    how_many = 3
+    predicate_descriptions = chain._construct_predicate_descriptions_text(PREDICATE_DESCRIPTIONS[:how_many])
+    lines = predicate_descriptions.split("\n")
+    assert lines[0] == "Here are some descriptions to the most common relationships:"
+
+
+def test_construct_predicate_descriptions_produces_empty_string_for_empty_list(chain: CypherQueryGenerationChain):
+    predicate_descriptions = chain._construct_predicate_descriptions_text([])
+    assert predicate_descriptions == ""
+
+
+def test_produces_result_with_output_key(chain_with_mocked_llm: CypherQueryGenerationChain, question2: str):
+    result = chain_with_mocked_llm(question2)
+    assert chain_with_mocked_llm.output_key in result.keys()
+
+
+def test_question_in_intermediate_steps(chain_with_mocked_llm: CypherQueryGenerationChain, question2: str):
+    result = chain_with_mocked_llm(question2)
+    assert result["intermediate_steps"][0]["question"] == question2
+
+
+def test_unchanged_in_result(chain_with_mocked_llm: CypherQueryGenerationChain, question2: str):
+    result = chain_with_mocked_llm(question2)
+    assert result[chain_with_mocked_llm.input_key] == question2
+
+
+def test_produces_expected_result(chain_with_mocked_llm: CypherQueryGenerationChain, question2: str):
+    result = chain_with_mocked_llm(question2)
+    assert (
+        result[chain_with_mocked_llm.output_key]
+        == "MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d.name"
+    )
+
+
+@pytest.fixture
+def chain_with_mocked_llm(chain: CypherQueryGenerationChain, llm_chain: LLMChain) -> CypherQueryGenerationChain:
+    chain.cypher_generation_chain = llm_chain
+    return chain
+
+
+@pytest.fixture
+def llm_chain(cypher_llm, llm_chain_result) -> LLMChain:
+    class LLMChainMock(LLMChain):
+        def generate(
+            self, input_list: List[Dict[str, Any]], run_manager: CallbackManagerForChainRun | None = None
+        ) -> LLMResult:
+            return llm_chain_result
+
+    return LLMChainMock(llm=cypher_llm, prompt=CYPHER_GENERATION_PROMPT)
 
 
 @pytest.fixture
@@ -38,120 +109,58 @@ def llm_chain_result() -> LLMResult:
     )
 
 
-@pytest.fixture()
-def chat_model() -> BaseChatModel:
-    return MagicMock(spec=BaseChatModel)
+@pytest.fixture
+def cypher_prompt(cypher_prompt_template, schema, question) -> str:
+    return cypher_prompt_template.format_prompt(schema=schema, question=question)
 
 
 @pytest.fixture
-def llm_chain(chat_model, llm_chain_result) -> LLMChain:
-    class LLMChainMock(LLMChain):
-        def generate(
-            self, input_list: List[Dict[str, Any]], run_manager: CallbackManagerForChainRun | None = None
-        ) -> LLMResult:
-            return llm_chain_result
-
-    return LLMChainMock(llm=chat_model, prompt=CYPHER_GENERATION_PROMPT)
-
-
-@pytest.fixture
-def cypher_chain(llm_chain, graph):
-    chain = CypherQueryGenerationChain(llm=llm_chain, graph=graph, prompt_template=CYPHER_GENERATION_PROMPT)
-    return chain
-
-
-@pytest.fixture
-def graph() -> Neo4jGraph:
-    graph = MagicMock(spec=Neo4jGraph)
-    return graph
-
-
-def test_cypher_query_generation_chain_construct_predicate_descriptions(cypher_chain):
-    how_many = 3
-    predicate_descriptions = cypher_chain._construct_predicate_descriptions(how_many)
-    assert isinstance(predicate_descriptions, str)
-    predicate_descriptions_as_list = predicate_descriptions.split("\n")
-    assert predicate_descriptions_as_list[0] == "Here are some descriptions to the most common relationships:"
-    assert len(predicate_descriptions_as_list) - 1 == how_many
-
-    how_many = 0
-    predicate_descriptions = cypher_chain._construct_predicate_descriptions(how_many)
-    assert isinstance(predicate_descriptions, str)
-    assert predicate_descriptions == ""
-
-
-def test_mocked(chat_model: BaseChatModel, llm_chain: LLMChain, graph: Neo4jGraph, structured_schema, question):
-    with patch(
-        "langchain_community.graphs.Neo4jGraph.get_structured_schema", new_callable=PropertyMock
-    ) as mock_get_structured_schema:
-        mock_get_structured_schema.return_value = structured_schema
-        graph = graph
-        chain = CypherQueryGenerationChain(llm=chat_model, graph=graph, prompt_template=CYPHER_GENERATION_PROMPT)
-        chain.cypher_generation_chain = llm_chain
-        result = chain(question)
-
-        assert chain.output_key in result.keys()
-        assert result["intermediate_steps"][0]["question"] == question
-        assert result["question"] == question
-        assert (
-            result["cypher_query"]
-            == "MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d.name"
-        )
-        assert len(result) == 3
+def cypher_prompt_template() -> PromptTemplate:
+    return PromptTemplate(
+        input_variables=["schema", "question"], template="Generate some cypher with schema:\n{schema}\nFor {question}:"
+    )
 
 
 @pytest.fixture
 def question() -> str:
-    return "Which drugs are associated with epilepsy?"
+    return "<this is the user question>"
 
 
 @pytest.fixture
-def structured_schema():
+def chain(cypher_llm, structured_schema, cypher_prompt_template) -> CypherQueryGenerationChain:
+    chain = CypherQueryGenerationChain(
+        llm=cypher_llm, graph_structured_schema=structured_schema, prompt_template=cypher_prompt_template
+    )
+    return chain
+
+
+@pytest.fixture
+def cypher_prompt_template() -> PromptTemplate:
+    return PromptTemplate(
+        input_variables=["schema", "question"], template="Generate some cypher with schema:\n{schema}\nFor {question}:"
+    )
+
+
+@pytest.fixture
+def cypher_llm(cypher_query) -> BaseLanguageModel:
+    return build_llm_mock(cypher_query)
+
+
+@pytest.fixture(params=["<this is a cypher query>"])
+def cypher_query(request) -> str:
+    return request.param
+
+
+@pytest.fixture
+def schema(structured_schema) -> str:
+    return construct_schema(structured_schema, [], [])
+
+
+@pytest.fixture
+def structured_schema() -> Dict[str, Any]:
     return {
         "node_props": {
-            "exposure": [
-                {"property": "id", "type": "STRING"},
-                {"property": "name", "type": "STRING"},
-                {"property": "source", "type": "STRING"},
-                {"property": "index", "type": "INTEGER"},
-            ],
-            "drug": [
-                {"property": "id", "type": "STRING"},
-                {"property": "name", "type": "STRING"},
-                {"property": "source", "type": "STRING"},
-                {"property": "index", "type": "INTEGER"},
-            ],
-            "molecular_function": [
-                {"property": "id", "type": "STRING"},
-                {"property": "name", "type": "STRING"},
-                {"property": "source", "type": "STRING"},
-                {"property": "index", "type": "INTEGER"},
-            ],
-            "gene_or_protein": [
-                {"property": "id", "type": "STRING"},
-                {"property": "name", "type": "STRING"},
-                {"property": "source", "type": "STRING"},
-                {"property": "index", "type": "INTEGER"},
-            ],
-            "cellular_component": [
-                {"property": "id", "type": "STRING"},
-                {"property": "name", "type": "STRING"},
-                {"property": "source", "type": "STRING"},
-                {"property": "index", "type": "INTEGER"},
-            ],
-            "effect_or_phenotype": [
-                {"property": "id", "type": "STRING"},
-                {"property": "name", "type": "STRING"},
-                {"property": "source", "type": "STRING"},
-                {"property": "index", "type": "INTEGER"},
-            ],
             "disease": [
-                {"property": "id", "type": "STRING"},
-                {"property": "name", "type": "STRING"},
-                {"property": "source", "type": "STRING"},
-                {"property": "index", "type": "INTEGER"},
-            ],
-            "pathway": [
                 {"property": "id", "type": "STRING"},
                 {"property": "name", "type": "STRING"},
                 {"property": "source", "type": "STRING"},
@@ -163,90 +172,17 @@ def structured_schema():
                 {"property": "source", "type": "STRING"},
                 {"property": "index", "type": "INTEGER"},
             ],
-            "biological_process": [
-                {"property": "id", "type": "STRING"},
-                {"property": "name", "type": "STRING"},
-                {"property": "source", "type": "STRING"},
-                {"property": "index", "type": "INTEGER"},
-            ],
         },
         "rel_props": {},
         "relationships": [
-            {"start": "exposure", "type": "interacts_with", "end": "gene_or_protein"},
-            {"start": "exposure", "type": "interacts_with", "end": "biological_process"},
-            {"start": "exposure", "type": "interacts_with", "end": "molecular_function"},
-            {"start": "exposure", "type": "interacts_with", "end": "cellular_component"},
-            {"start": "exposure", "type": "parent_child", "end": "exposure"},
-            {"start": "exposure", "type": "linked_to", "end": "disease"},
-            {"start": "drug", "type": "enzyme", "end": "gene_or_protein"},
-            {"start": "drug", "type": "synergistic_interaction", "end": "drug"},
-            {"start": "drug", "type": "contraindication", "end": "disease"},
-            {"start": "drug", "type": "target", "end": "gene_or_protein"},
-            {"start": "drug", "type": "carrier", "end": "gene_or_protein"},
-            {"start": "drug", "type": "transporter", "end": "gene_or_protein"},
-            {"start": "drug", "type": "indication", "end": "disease"},
-            {"start": "drug", "type": "side_effect", "end": "effect_or_phenotype"},
-            {"start": "drug", "type": "off_label_use", "end": "disease"},
-            {"start": "molecular_function", "type": "interacts_with", "end": "gene_or_protein"},
-            {"start": "molecular_function", "type": "interacts_with", "end": "exposure"},
-            {"start": "molecular_function", "type": "parent_child", "end": "molecular_function"},
-            {"start": "gene_or_protein", "type": "associated_with", "end": "disease"},
-            {"start": "gene_or_protein", "type": "associated_with", "end": "effect_or_phenotype"},
-            {"start": "gene_or_protein", "type": "ppi", "end": "gene_or_protein"},
-            {"start": "gene_or_protein", "type": "target", "end": "drug"},
-            {"start": "gene_or_protein", "type": "expression_present", "end": "anatomy"},
-            {"start": "gene_or_protein", "type": "expression_absent", "end": "anatomy"},
-            {"start": "gene_or_protein", "type": "interacts_with", "end": "biological_process"},
-            {"start": "gene_or_protein", "type": "interacts_with", "end": "molecular_function"},
-            {"start": "gene_or_protein", "type": "interacts_with", "end": "cellular_component"},
-            {"start": "gene_or_protein", "type": "interacts_with", "end": "pathway"},
-            {"start": "gene_or_protein", "type": "interacts_with", "end": "exposure"},
-            {"start": "gene_or_protein", "type": "enzyme", "end": "drug"},
-            {"start": "gene_or_protein", "type": "transporter", "end": "drug"},
-            {"start": "gene_or_protein", "type": "carrier", "end": "drug"},
-            {"start": "cellular_component", "type": "parent_child", "end": "cellular_component"},
-            {"start": "cellular_component", "type": "interacts_with", "end": "gene_or_protein"},
-            {"start": "cellular_component", "type": "interacts_with", "end": "exposure"},
-            {"start": "effect_or_phenotype", "type": "phenotype_present", "end": "disease"},
-            {"start": "effect_or_phenotype", "type": "parent_child", "end": "effect_or_phenotype"},
-            {"start": "effect_or_phenotype", "type": "phenotype_absent", "end": "disease"},
-            {"start": "effect_or_phenotype", "type": "associated_with", "end": "gene_or_protein"},
-            {"start": "effect_or_phenotype", "type": "side_effect", "end": "drug"},
             {"start": "disease", "type": "associated_with", "end": "gene_or_protein"},
             {"start": "disease", "type": "phenotype_present", "end": "effect_or_phenotype"},
             {"start": "disease", "type": "phenotype_absent", "end": "effect_or_phenotype"},
             {"start": "disease", "type": "parent_child", "end": "disease"},
-            {"start": "disease", "type": "linked_to", "end": "exposure"},
-            {"start": "disease", "type": "indication", "end": "drug"},
-            {"start": "disease", "type": "contraindication", "end": "drug"},
-            {"start": "disease", "type": "off_label_use", "end": "drug"},
-            {"start": "pathway", "type": "parent_child", "end": "pathway"},
-            {"start": "pathway", "type": "interacts_with", "end": "gene_or_protein"},
-            {"start": "anatomy", "type": "parent_child", "end": "anatomy"},
-            {"start": "anatomy", "type": "expression_present", "end": "gene_or_protein"},
-            {"start": "anatomy", "type": "expression_absent", "end": "gene_or_protein"},
-            {"start": "biological_process", "type": "interacts_with", "end": "gene_or_protein"},
-            {"start": "biological_process", "type": "interacts_with", "end": "exposure"},
-            {"start": "biological_process", "type": "parent_child", "end": "biological_process"},
         ],
     }
 
 
-@pytest.mark.skip
-def test_e2e(llm_e2e, graph_e2e):
-    chain = CypherQueryGenerationChain(llm=llm_e2e, graph=graph_e2e, prompt_template=CYPHER_GENERATION_PROMPT)
-    result = chain("Which drugs are associated with epilepsy?")
-    assert (
-        result["cypher_query"]
-        == "MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d.name"
-    )
-
-
-@pytest.fixture(scope="session")
-def llm_e2e():
-    return load_chat_model()
-
-
-@pytest.fixture(scope="session")
-def graph_e2e():
-    return build_neo4j_graph()
+@pytest.fixture
+def question2() -> str:
+    return "Which drugs are associated with epilepsy?"
