@@ -12,7 +12,8 @@ dependencies = [
     "streamlit",
     "nltk",
     "SPARQLWrapper",
-    "neo4j"
+    "neo4j",
+    "semanticscholar"
 ]
 
 [project.optional-dependencies]
