@@ -1,9 +1,10 @@
 from typing import Any, Dict, List, Optional, Tuple
 
+from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import (
+    CypherQueryPreprocessor,
+)
 from langchain.chains.base import Chain
 from langchain_core.callbacks import CallbackManagerForChainRun
-
-from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 
 
 class CypherQueryPreprocessorsChain(Chain):
@@ -11,24 +12,7 @@ class CypherQueryPreprocessorsChain(Chain):
     return_intermediate_steps: bool = True
     input_key: str = "cypher_query"  #: :meta private:
     output_key: str = "preprocessed_cypher_query"  #: :meta private:
-    intermediate_steps_key: str = "intermediate_steps"
-
-    # todo having an __init__() throws a pydantic error
-    """
-    we can still initialize the chain with e.g.
-    chain = PreprocessorsChain(return_intermediate_steps=True, cypher_query_preprocessors=preprocessors)
-    but this is not as readable as having a constructor
-    
-    def __init__(
-        self, cypher_query_preprocessors: List[CypherQueryPreprocessor] = [], return_intermediate_steps: bool = True
-    ):
-        self.cypher_query_preprocessors = cypher_query_preprocessors
-        self.return_intermediate_steps = return_intermediate_steps
-        super().__init__(
-            cypher_query_preprocessors=cypher_query_preprocessors,
-            return_intermediate_steps=return_intermediate_steps,
-        )
-    """
+    intermediate_steps_key: str = "intermediate_steps"  #: :meta private:
 
     @property
     def input_keys(self) -> List[str]:
