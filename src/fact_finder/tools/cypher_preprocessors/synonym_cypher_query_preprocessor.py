@@ -1,10 +1,10 @@
-from functools import partial
 import re
+from functools import partial
 from typing import Dict, Iterable, List, Optional, Set, Tuple, Union
 
 from langchain_community.graphs import Neo4jGraph
 
-from fact_finder.qa_service.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 from fact_finder.tools.synonym_finder.synonym_finder import SynonymFinder
 
 

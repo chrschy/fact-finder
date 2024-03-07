@@ -47,10 +47,15 @@ AI:
 LLM_PROMPT = PromptTemplate(input_variables=["question"], template=LLM_PROMPT_TEMPLATE)
 
 SUBGRAPH_EXTRACTOR_PROMPT_TEMPLATE: str = """
-Task: Modify a given Cypher query. The new Cypher query returns all relationship properties used in the query instead of the answer to the question. It also returns all nodes.
+Task: Modify a given Cypher query. The new Cypher query returns all relationships and properties used in the query instead of the answer to the question. It also returns all nodes.
 Instructions:
 If there is no sensible Cypher statement for the given query, state so and prepend CYPHER_ERROR to your answer.
 Only return the modified cypher query, nothing else.
+It is very important to also ALWAYS add a variable to the predicate, like so:
+WRONG:
+MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d, dis, properties(indication)
+CORRECT:
+MATCH (d:drug)-[i:indication]->(dis:disease) WHERE dis.name = 'epilepsy' RETURN d, dis, i
  
 The Cypher query is:
 {cypher_query}

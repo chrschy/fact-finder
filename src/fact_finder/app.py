@@ -1,6 +1,6 @@
 import asyncio
 import sys
-from typing import List
+from typing import Any, Dict, List
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -11,6 +11,7 @@ from pyvis.network import Network
 
 import fact_finder.config.primekg_config as graph_config
 import fact_finder.config.simple_config as llm_config
+from fact_finder.chains.graph_qa_chain import GraphQAChainOutput
 from fact_finder.utils import load_chat_model
 
 load_dotenv()
@@ -132,11 +133,11 @@ def get_html(html: str, legend=False):
 
 
 async def call_neo4j(message):
-    return st.session_state.neo4j_chain(message)
+    return st.session_state.neo4j_chain.invoke(message)  # FIXME use ainvoke?
 
 
 async def call_llm(message):
-    return st.session_state.llm_chain(message)
+    return st.session_state.llm_chain.invoke(message)  # FIXME use ainvoke?
 
 
 async def call_chains(message):
@@ -145,7 +146,7 @@ async def call_chains(message):
     return results
 
 
-def convert_subgraph(graph: [], result: str) -> Subgraph:
+def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) -> Subgraph:
     graph_converted = Subgraph(nodes=[], edges=[])
 
     try:
@@ -206,18 +207,15 @@ def convert_subgraph(graph: [], result: str) -> Subgraph:
 def request_pipeline(text_data: str):
     # try:
     results = asyncio.run(call_chains(text_data))
+    graph_result: GraphQAChainOutput = results[0]["graph_qa_output"]
     return {
         "status": "success",
-        "query": results[0]["intermediate_steps"][0]["query"] if "intermediate_steps" in results[0] else "",
-        "response": results[0]["intermediate_steps"][1]["context"] if "intermediate_steps" in results[0] else "",
-        "answer_graph": results[0]["result"],
+        "query": graph_result.cypher_query,
+        "response": graph_result.graph_response,
+        "answer_graph": graph_result.answer,
         "answer_llm": results[1]["text"],
-        "graph": (
-            convert_subgraph(results[0]["sub_graph"], results[0]["intermediate_steps"][1]["context"])
-            if "sub_graph" in results[0] and "intermediate_steps" in results[0]
-            else Subgraph(nodes=[], edges=[])
-        ),
-        "graph_neo4j": results[0]["sub_graph"] if "sub_graph" in results[0] else [],
+        "graph": convert_subgraph(graph_result.evidence_sub_graph, graph_result.graph_response),
+        "graph_neo4j": graph_result.evidence_sub_graph,
     }
     # except Exception as e:
     #     print(e)
