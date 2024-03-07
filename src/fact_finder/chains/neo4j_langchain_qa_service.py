@@ -12,7 +12,7 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.pydantic_v1 import Field
 
-from fact_finder.chains.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 
 INTERMEDIATE_STEPS_KEY = "intermediate_steps"
