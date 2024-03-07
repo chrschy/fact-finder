@@ -155,53 +155,79 @@ def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) 
             result_ents += res.values()
 
         idx_rel = 0
-        for triplet in graph:
-            trip = [value for key, value in triplet.items() if type(value) is tuple][0]
-            head_type = [key for key, value in triplet.items() if value == trip[0]]
-            tail_type = [key for key, value in triplet.items() if value == trip[2]]
-            head_type = head_type[0] if len(head_type) > 0 else ""
-            tail_type = tail_type[0] if len(tail_type) > 0 else ""
-            node_head = trip[0] if "index" in trip[0] else list(triplet.values())[0]
-            node_tail = trip[2] if "index" in trip[2] else list(triplet.values())[2]
-
-            if "index" in node_head and node_head["index"] not in [node.id for node in graph_converted.nodes]:
-                graph_converted.nodes.append(
-                    Node(
-                        id=node_head["index"],
-                        type=head_type,
-                        name=node_head["name"],
-                        in_query=False,
-                        in_answer=node_head["name"] in result_ents,
-                    )
-                )
-            if "index" in node_tail and node_tail["index"] not in [node.id for node in graph_converted.nodes]:
-                graph_converted.nodes.append(
-                    Node(
-                        id=node_tail["index"],
-                        type=tail_type,
-                        name=node_tail["name"],
-                        in_query=False,
-                        in_answer=node_tail["name"] in result_ents,
-                    )
-                )
-            if "index" in node_head and "index" in node_tail:
-                graph_converted.edges.append(
-                    Edge(
-                        id=idx_rel,
-                        type=trip[1],
-                        name=trip[1],
-                        source=node_head["index"],
-                        target=node_tail["index"],
-                        in_query=False,
-                        in_answer=node_tail["name"] in result_ents,
-                    )
-                )
+        for entry in graph:
+            if _contains_triple(entry):
+                _process_triple(entry, graph_converted, result_ents, idx_rel)
                 idx_rel += 1
+            else:
+                _process_nodes_only(entry, graph_converted, result_ents)
+
 
     except Exception as e:
         print(e)
 
     return graph_converted
+
+def _contains_triple(entry):
+    return len([value for key, value in entry.items() if type(value) is tuple]) > 0
+
+
+def _process_triple(entry, graph_converted: Subgraph, result_ents: list, idx_rel: int) -> None:
+    trip = [value for key, value in entry.items() if type(value) is tuple][0]
+    head_type = [key for key, value in entry.items() if value == trip[0]]
+    tail_type = [key for key, value in entry.items() if value == trip[2]]
+    head_type = head_type[0] if len(head_type) > 0 else ""
+    tail_type = tail_type[0] if len(tail_type) > 0 else ""
+    node_head = trip[0] if "index" in trip[0] else list(entry.values())[0]
+    node_tail = trip[2] if "index" in trip[2] else list(entry.values())[2]
+
+    if "index" in node_head and node_head["index"] not in [node.id for node in graph_converted.nodes]:
+        graph_converted.nodes.append(
+            Node(
+                id=node_head["index"],
+                type=head_type,
+                name=node_head["name"],
+                in_query=False,
+                in_answer=node_head["name"] in result_ents,
+            )
+        )
+    if "index" in node_tail and node_tail["index"] not in [node.id for node in graph_converted.nodes]:
+        graph_converted.nodes.append(
+            Node(
+                id=node_tail["index"],
+                type=tail_type,
+                name=node_tail["name"],
+                in_query=False,
+                in_answer=node_tail["name"] in result_ents,
+            )
+        )
+    if "index" in node_head and "index" in node_tail:
+        graph_converted.edges.append(
+            Edge(
+                id=idx_rel,
+                type=trip[1],
+                name=trip[1],
+                source=node_head["index"],
+                target=node_tail["index"],
+                in_query=False,
+                in_answer=node_tail["name"] in result_ents,
+            )
+        )
+def _process_nodes_only(entry, graph_converted: Subgraph, result_ents: list) -> None:
+    for variable_binding, possible_node in entry.items():
+        if not isinstance(possible_node, dict):
+            continue
+        if "index" in possible_node and possible_node["index"] not in [node.id for node in graph_converted.nodes]:
+            graph_converted.nodes.append(
+                Node(
+                    id=possible_node["index"],
+                    type=variable_binding,
+                    name=possible_node["name"],
+                    in_query=False,
+                    in_answer=possible_node["name"] in result_ents,
+                )
+            )
+
 
 
 def request_pipeline(text_data: str):
