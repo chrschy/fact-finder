@@ -52,7 +52,7 @@ class TextSearchQAChain(Chain):
             callbacks=run_manager.get_child(),
         )[self.keyword_generation_llm_chain.output_key]
 
-        rag_inputs = self.semantic_scholar_search.search(keywords=keywords)
+        rag_inputs = self.semantic_scholar_search.search_by_abstracts(keywords=keywords)
         rag_inputs = "\n\n".join(rag_inputs)
 
         answer = self.rag_answer_generation_llm_chain(
