@@ -1,9 +1,11 @@
 from typing import List
-from fact_finder.prompt_templates import LLM_PROMPT
+
 from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts.prompt import PromptTemplate
+
+from fact_finder.prompt_templates import LLM_PROMPT
 
 
 def build_chain(model: BaseLanguageModel, args: List[str] = []) -> Chain:

@@ -1,9 +1,9 @@
-from SPARQLWrapper import JSON, SPARQLWrapper
-from fact_finder.tools.synonym_finder.synonym_finder import SynonymFinder
-
-
 import ssl
 from typing import List
+
+from SPARQLWrapper import JSON, SPARQLWrapper
+
+from fact_finder.tools.synonym_finder.synonym_finder import SynonymFinder
 
 
 class WikiDataSynonymFinder(SynonymFinder):
@@ -44,7 +44,6 @@ class WikiDataSynonymFinder(SynonymFinder):
         return query
 
     def __generate_sparql_backwards_query(self, name: str) -> str:
-        # TODO test and adjust the query such that it works when node="alcohol" -> "ethanol"
         query = """SELECT DISTINCT ?alt_label WHERE {
                 ?s skos:altLabel ?alt_label .
                 ?s rdfs:label "%s"@en .
