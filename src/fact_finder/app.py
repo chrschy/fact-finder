@@ -6,15 +6,38 @@ import streamlit as st
 import streamlit.components.v1 as components
 from dotenv import load_dotenv
 from PIL import Image
+from pydantic import BaseModel
 from pyvis.network import Network
 
 import fact_finder.config.primekg_config as graph_config
 import fact_finder.config.simple_config as llm_config
-from fact_finder.qa_service.neo4j_langchain_qa_service import Subgraph
 from fact_finder.chains.graph_qa_chain import GraphQAChainOutput
 from fact_finder.utils import load_chat_model
 
 load_dotenv()
+
+
+class Node(BaseModel):
+    id: int
+    type: str
+    name: str
+    in_query: bool
+    in_answer: bool
+
+
+class Edge(BaseModel):
+    id: int
+    type: str
+    name: str
+    source: int
+    target: int
+    in_query: bool
+    in_answer: bool
+
+
+class Subgraph(BaseModel):
+    nodes: List[Node]
+    edges: List[Edge]
 
 
 ############################################################
@@ -90,6 +113,7 @@ if "counter" not in st.session_state:
         chat_model = load_chat_model()
         st.session_state.neo4j_chain = graph_config.build_chain(chat_model, sys.argv)
         st.session_state.llm_chain = llm_config.build_chain(chat_model, sys.argv)
+        st.session_state.summary_chain = graph_config.build_chain_summary(chat_model, sys.argv)
 
 
 ############################################################
@@ -117,14 +141,19 @@ async def call_llm(message):
     return st.session_state.llm_chain.invoke(message)  # FIXME use ainvoke?
 
 
+async def call_summary(sub_graph: str):
+    return st.session_state.summary_chain.invoke(sub_graph)  # FIXME use ainvoke?
+
+
 async def call_chains(message):
     results = await asyncio.gather(call_neo4j(message), call_llm(message))
     print(results)
     return results
 
 
-def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) -> Subgraph:
+def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) -> (Subgraph, str):
     graph_converted = Subgraph(nodes=[], edges=[])
+    graph_triplets = ""
 
     try:
         result_ents = []
@@ -132,82 +161,124 @@ def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) 
             result_ents += res.values()
 
         idx_rel = 0
-        for triplet in graph:
-            trip = [value for key, value in triplet.items() if type(value) is tuple][0]
-            head_type = [key for key, value in triplet.items() if value == trip[0]]
-            tail_type = [key for key, value in triplet.items() if value == trip[2]]
-            head_type = head_type[0] if len(head_type) > 0 else ""
-            tail_type = tail_type[0] if len(tail_type) > 0 else ""
-            node_head = trip[0] if "index" in trip[0] else list(triplet.values())[0]
-            node_tail = trip[2] if "index" in trip[2] else list(triplet.values())[2]
-
-            if "index" in node_head and node_head["index"] not in [node.id for node in graph_converted.nodes]:
-                graph_converted.nodes.append(
-                    Node(
-                        id=node_head["index"],
-                        type=head_type,
-                        name=node_head["name"],
-                        in_query=False,
-                        in_answer=node_head["name"] in result_ents,
-                    )
-                )
-            if "index" in node_tail and node_tail["index"] not in [node.id for node in graph_converted.nodes]:
-                graph_converted.nodes.append(
-                    Node(
-                        id=node_tail["index"],
-                        type=tail_type,
-                        name=node_tail["name"],
-                        in_query=False,
-                        in_answer=node_tail["name"] in result_ents,
-                    )
-                )
-            if "index" in node_head and "index" in node_tail:
-                graph_converted.edges.append(
-                    Edge(
-                        id=idx_rel,
-                        type=trip[1],
-                        name=trip[1],
-                        source=node_head["index"],
-                        target=node_tail["index"],
-                        in_query=False,
-                        in_answer=node_tail["name"] in result_ents,
-                    )
-                )
+        for entry in graph:
+            if _contains_triple(entry):
+                graph_triplet = _process_triple(entry, graph_converted, result_ents, idx_rel)
                 idx_rel += 1
+            else:
+                graph_triplet = _process_nodes_only(entry, graph_converted, result_ents)
+
+            graph_triplets += graph_triplet
+
 
     except Exception as e:
         print(e)
 
-    return graph_converted
+    return (graph_converted, graph_triplets)
 
+def _contains_triple(entry):
+    return len([value for key, value in entry.items() if type(value) is tuple]) > 0
+
+
+def _process_triple(entry, graph_converted: Subgraph, result_ents: list, idx_rel: int) -> None:
+    graph_triplet = ""
+    trip = [value for key, value in entry.items() if type(value) is tuple][0]
+    head_type = [key for key, value in entry.items() if value == trip[0]]
+    tail_type = [key for key, value in entry.items() if value == trip[2]]
+    head_type = head_type[0] if len(head_type) > 0 else ""
+    tail_type = tail_type[0] if len(tail_type) > 0 else ""
+    node_head = trip[0] if "index" in trip[0] else list(entry.values())[0]
+    node_tail = trip[2] if "index" in trip[2] else list(entry.values())[2]
+
+    if "index" in node_head and node_head["index"] not in [node.id for node in graph_converted.nodes]:
+        graph_converted.nodes.append(
+            Node(
+                id=node_head["index"],
+                type=head_type,
+                name=node_head["name"],
+                in_query=False,
+                in_answer=node_head["name"] in result_ents,
+            )
+        )
+    if "index" in node_tail and node_tail["index"] not in [node.id for node in graph_converted.nodes]:
+        graph_converted.nodes.append(
+            Node(
+                id=node_tail["index"],
+                type=tail_type,
+                name=node_tail["name"],
+                in_query=False,
+                in_answer=node_tail["name"] in result_ents,
+            )
+        )
+    if "index" in node_head and "index" in node_tail:
+        graph_converted.edges.append(
+            Edge(
+                id=idx_rel,
+                type=trip[1],
+                name=trip[1],
+                source=node_head["index"],
+                target=node_tail["index"],
+                in_query=False,
+                in_answer=node_tail["name"] in result_ents,
+            )
+        )
+    
+    try:
+        graph_triplet = f'("{node_head["name"]}", "{trip[1]}", "{node_tail["name"]}"), '
+    except Exception as e:
+        print(e)
+    
+    return graph_triplet
+
+
+def _process_nodes_only(entry, graph_converted: Subgraph, result_ents: list) -> None:
+    graph_triplet = ""
+    for variable_binding, possible_node in entry.items():
+        if not isinstance(possible_node, dict):
+            continue
+        if "index" in possible_node and possible_node["index"] not in [node.id for node in graph_converted.nodes]:
+            graph_converted.nodes.append(
+                Node(
+                    id=possible_node["index"],
+                    type=variable_binding,
+                    name=possible_node["name"],
+                    in_query=False,
+                    in_answer=possible_node["name"] in result_ents,
+                )
+            )
+            try:
+                graph_triplet += f'("{possible_node["name"]}"), '
+            except Exception as e:
+                print(e)
+    return graph_triplet
 
 def request_pipeline(text_data: str):
-    # try:
-    results = asyncio.run(call_chains(text_data))
-    graph_result: GraphQAChainOutput = results[0]["graph_qa_output"]
-    return {
-        "status": "success",
-        "query": graph_result.cypher_query,
-        "response": graph_result.graph_response,
-        "answer_graph": graph_result.answer,
-        "answer_llm": results[1]["text"],
-        "graph": results[0]["sub_graph"] if "sub_graph" in results[0] else [],
-        "graph_neo4j": results[0]["sub_graph_neo4j"] if "sub_graph_neo4j" in results[0] else [],
-        "graph_summary": results[0]["sub_graph_summary"] if "sub_graph_summary" in results[0] else "",
-        # "graph": convert_subgraph(graph_result.evidence_sub_graph, graph_result.graph_response),
-        # "graph_neo4j": graph_result.evidence_sub_graph,
-    }
-    # except Exception as e:
-    #     print(e)
-    #     return {
-    #         "status": "error",
-    #         "query": "",
-    #         "response": "",
-    #         "answer_graph": "",
-    #         "answer_llm": "",
-    #         "graph": {},
-    #         "graph_neo4j": [],
-    #     }
+    try:
+        results = asyncio.run(call_chains(text_data))
+        graph_result: GraphQAChainOutput = results[0]["graph_qa_output"]
+        subgraph, triplets = convert_subgraph(graph_result.evidence_sub_graph, graph_result.graph_response)
+        return {
+            "status": "success",
+            "query": graph_result.cypher_query,
+            "response": graph_result.graph_response,
+            "answer_graph": graph_result.answer,
+            "answer_llm": results[1]["text"],
+            "graph": subgraph,
+            "graph_neo4j": graph_result.evidence_sub_graph,
+            "graph_summary": asyncio.run(call_summary(triplets))["summary"]
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "status": "error",
+            "query": "",
+            "response": "",
+            "answer_graph": "",
+            "answer_llm": "",
+            "graph": {},
+            "graph_neo4j": [],
+            "graph_summary": ""
+        }
 
 
 def generate_graph(graph: Subgraph, send_request=False):

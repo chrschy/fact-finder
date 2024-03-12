@@ -7,8 +7,9 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts.prompt import PromptTemplate
 
 from fact_finder.chains.graph_qa_chain import GraphQAChain
+from fact_finder.chains.graph_summary_chain import GraphSummaryChain
 from fact_finder.config.primekg_predicate_descriptions import PREDICATE_DESCRIPTIONS
-from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
+from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT, SUBGRAPH_SUMMARY_PROMPT
 from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
 from fact_finder.tools.cypher_preprocessors.format_preprocessor import FormatPreprocessor
 from fact_finder.tools.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
@@ -33,6 +34,14 @@ def build_chain(model: BaseLanguageModel, args: List[str] = []) -> Chain:
         cypher_query_preprocessors=cypher_preprocessors,
         predicate_descriptions=PREDICATE_DESCRIPTIONS[:10],
         return_intermediate_steps=True,
+    )
+
+
+def build_chain_summary(model: BaseLanguageModel, args: List[str] = []) -> Chain:
+    return GraphSummaryChain(
+        llm=model,
+        graph_summary_template=SUBGRAPH_SUMMARY_PROMPT,
+        return_intermediate_steps=True
     )
 
 
