@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
 
 from langchain.chains import LLMChain
 from langchain.chains.base import Chain
@@ -38,11 +38,12 @@ class GraphSummaryChain(Chain):
         )
 
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
-        #todo add intermediate steps
+        # todo add intermediate steps
         graph_triplets = inputs[self.input_key]
 
         summary = self.graph_summary_llm_chain(
-            {"sub_graph": graph_triplets}, callbacks=run_manager.get_child(),
+            {"sub_graph": graph_triplets},
+            callbacks=run_manager.get_child(),
         )[self.graph_summary_llm_chain.output_key]
 
         result: Dict[str, Any] = {self.output_key: summary}

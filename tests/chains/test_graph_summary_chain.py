@@ -22,16 +22,10 @@ Triplets of the subgraph:
 
 @pytest.fixture
 def graph_summary_chain(graph_summary_template) -> GraphSummaryChain:
-    return GraphSummaryChain(
-        llm=load_chat_model(),
-        graph_summary_template=graph_summary_template
-    )
+    return GraphSummaryChain(llm=load_chat_model(), graph_summary_template=graph_summary_template)
 
 
 def test_simple_question(graph_summary_chain):
     answer = graph_summary_chain({"sub_graph": "(psoriasis, is a, disease)"})
     print(answer)
-    assert answer["summary"].startswith(
-        "Psoriasis is a disease"
-    )
-
+    assert answer["summary"].startswith("Psoriasis is a disease")

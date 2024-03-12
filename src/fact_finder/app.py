@@ -170,11 +170,11 @@ def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) 
 
             graph_triplets += graph_triplet
 
-
     except Exception as e:
         print(e)
 
     return (graph_converted, graph_triplets)
+
 
 def _contains_triple(entry):
     return len([value for key, value in entry.items() if type(value) is tuple]) > 0
@@ -222,12 +222,12 @@ def _process_triple(entry, graph_converted: Subgraph, result_ents: list, idx_rel
                 in_answer=node_tail["name"] in result_ents,
             )
         )
-    
+
     try:
         graph_triplet = f'("{node_head["name"]}", "{trip[1]}", "{node_tail["name"]}"), '
     except Exception as e:
         print(e)
-    
+
     return graph_triplet
 
 
@@ -252,6 +252,7 @@ def _process_nodes_only(entry, graph_converted: Subgraph, result_ents: list) -> 
                 print(e)
     return graph_triplet
 
+
 def request_pipeline(text_data: str):
     try:
         results = asyncio.run(call_chains(text_data))
@@ -265,7 +266,7 @@ def request_pipeline(text_data: str):
             "answer_llm": results[1]["text"],
             "graph": subgraph,
             "graph_neo4j": graph_result.evidence_sub_graph,
-            "graph_summary": asyncio.run(call_summary(triplets))["summary"]
+            "graph_summary": asyncio.run(call_summary(triplets))["summary"],
         }
     except Exception as e:
         print(e)
@@ -277,7 +278,7 @@ def request_pipeline(text_data: str):
             "answer_llm": "",
             "graph": {},
             "graph_neo4j": [],
-            "graph_summary": ""
+            "graph_summary": "",
         }
 
 
