@@ -63,3 +63,16 @@ The Cypher query is:
 SUBGRAPH_EXTRACTOR_PROMPT = PromptTemplate(
     input_variables=["cypher_query"], template=SUBGRAPH_EXTRACTOR_PROMPT_TEMPLATE
 )
+
+
+KEYWORD_PROMPT_TEMPLATE: str = """You are a helpful assistant. You get a user question in natural language. Please transform it into keywords that can be used in semantic scholar keyword search:
+Question: {question}
+"""
+KEYWORD_PROMPT = PromptTemplate(input_variables=["question"], template=KEYWORD_PROMPT_TEMPLATE)
+
+
+RAG_PROMPT_TEMPLATE: str = """You are a helpful assistant. You get a user question in natural language. Given the following context, please answer the given question based only on the context. Do not hallucinate. If you cannot answer based on the context, say 'Dunno'.
+Context: {context}, 
+Question: {question}
+"""
+RAG_PROMPT = PromptTemplate(input_variables=["context", "question"], template=RAG_PROMPT_TEMPLATE)

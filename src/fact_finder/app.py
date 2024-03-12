@@ -113,6 +113,7 @@ if "counter" not in st.session_state:
         chat_model = load_chat_model()
         st.session_state.neo4j_chain = graph_config.build_chain(chat_model, sys.argv)
         st.session_state.llm_chain = llm_config.build_chain(chat_model, sys.argv)
+        st.session_state.rag_chain = llm_config.build_rag_chain(chat_model, sys.argv)
 
 
 ############################################################
@@ -140,8 +141,12 @@ async def call_llm(message):
     return st.session_state.llm_chain.invoke(message)  # FIXME use ainvoke?
 
 
+async def call_rag(message):
+    return st.session_state.rag_chain.invoke(message)  # FIXME use ainvoke?
+
+
 async def call_chains(message):
-    results = await asyncio.gather(call_neo4j(message), call_llm(message))
+    results = await asyncio.gather(call_neo4j(message), call_llm(message), call_rag(message))
     print(results)
     return results
 
@@ -162,11 +167,11 @@ def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) 
             else:
                 _process_nodes_only(entry, graph_converted, result_ents)
 
-
     except Exception as e:
         print(e)
 
     return graph_converted
+
 
 def _contains_triple(entry):
     return len([value for key, value in entry.items() if type(value) is tuple]) > 0
@@ -213,6 +218,8 @@ def _process_triple(entry, graph_converted: Subgraph, result_ents: list, idx_rel
                 in_answer=node_tail["name"] in result_ents,
             )
         )
+
+
 def _process_nodes_only(entry, graph_converted: Subgraph, result_ents: list) -> None:
     for variable_binding, possible_node in entry.items():
         if not isinstance(possible_node, dict):
@@ -229,31 +236,32 @@ def _process_nodes_only(entry, graph_converted: Subgraph, result_ents: list) -> 
             )
 
 
-
 def request_pipeline(text_data: str):
-    # try:
-    results = asyncio.run(call_chains(text_data))
-    graph_result: GraphQAChainOutput = results[0]["graph_qa_output"]
-    return {
-        "status": "success",
-        "query": graph_result.cypher_query,
-        "response": graph_result.graph_response,
-        "answer_graph": graph_result.answer,
-        "answer_llm": results[1]["text"],
-        "graph": convert_subgraph(graph_result.evidence_sub_graph, graph_result.graph_response),
-        "graph_neo4j": graph_result.evidence_sub_graph,
-    }
-    # except Exception as e:
-    #     print(e)
-    #     return {
-    #         "status": "error",
-    #         "query": "",
-    #         "response": "",
-    #         "answer_graph": "",
-    #         "answer_llm": "",
-    #         "graph": {},
-    #         "graph_neo4j": [],
-    #     }
+    try:
+        results = asyncio.run(call_chains(text_data))
+        graph_result: GraphQAChainOutput = results[0]["graph_qa_output"]
+        return {
+            "status": "success",
+            "query": graph_result.cypher_query,
+            "response": graph_result.graph_response,
+            "answer_graph": graph_result.answer,
+            "answer_llm": results[1]["text"],
+            "answer_rag": results[2]["rag_output"],
+            "graph": convert_subgraph(graph_result.evidence_sub_graph, graph_result.graph_response),
+            "graph_neo4j": graph_result.evidence_sub_graph,
+        }
+    except Exception as e:
+        print(e)
+        return {
+            "status": "error",
+            "query": "",
+            "response": "",
+            "answer_graph": "",
+            "answer_llm": "",
+            "answer_rag": "",
+            "graph": {},
+            "graph_neo4j": [],
+        }
 
 
 def generate_graph(graph: Subgraph, send_request=False):
@@ -310,8 +318,9 @@ if st.button("Search") and text_area_input != "":
     if pipeline_response["status"] == "error":
         st.error("Error while executing Search.")
     else:
-        st.text_area("Answer of LLM", value=pipeline_response["answer_llm"], height=180)
-        st.text_area("Answer of Graph", value=pipeline_response["answer_graph"], height=180)
+        st.text_area("Answer using LLM", value=pipeline_response["answer_llm"], height=180)
+        st.text_area("Answer using Documents", value=pipeline_response["answer_rag"], height=180)
+        st.text_area("Answer using Graph", value=pipeline_response["answer_graph"], height=180)
 
         st.write("\n")
         st.markdown("#### **Evidence**")
