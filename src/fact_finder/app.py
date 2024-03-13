@@ -114,6 +114,7 @@ if "counter" not in st.session_state:
         st.session_state.neo4j_chain = graph_config.build_chain(chat_model, sys.argv)
         st.session_state.llm_chain = llm_config.build_chain(chat_model, sys.argv)
         st.session_state.rag_chain = llm_config.build_rag_chain(chat_model, sys.argv)
+        st.session_state.summary_chain = graph_config.build_chain_summary(chat_model, sys.argv)
 
 
 ############################################################
@@ -143,6 +144,10 @@ async def call_llm(message):
 
 async def call_rag(message):
     return st.session_state.rag_chain.invoke(message)  # FIXME use ainvoke?
+  
+  
+async def call_summary(sub_graph: str):
+    return st.session_state.summary_chain.invoke(sub_graph)  # FIXME use ainvoke?
 
 
 async def call_chains(message):
@@ -151,8 +156,9 @@ async def call_chains(message):
     return results
 
 
-def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) -> Subgraph:
+def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) -> (Subgraph, str):
     graph_converted = Subgraph(nodes=[], edges=[])
+    graph_triplets = ""
 
     try:
         result_ents = []
@@ -162,15 +168,94 @@ def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) 
         idx_rel = 0
         for entry in graph:
             if _contains_triple(entry):
-                _process_triple(entry, graph_converted, result_ents, idx_rel)
+                graph_triplet = _process_triple(entry, graph_converted, result_ents, idx_rel)
                 idx_rel += 1
             else:
-                _process_nodes_only(entry, graph_converted, result_ents)
+                graph_triplet = _process_nodes_only(entry, graph_converted, result_ents)
+
+            graph_triplets += graph_triplet
 
     except Exception as e:
         print(e)
 
-    return graph_converted
+    return (graph_converted, graph_triplets)
+
+
+def _contains_triple(entry):
+    return len([value for key, value in entry.items() if type(value) is tuple]) > 0
+
+
+def _process_triple(entry, graph_converted: Subgraph, result_ents: list, idx_rel: int) -> None:
+    graph_triplet = ""
+    trip = [value for key, value in entry.items() if type(value) is tuple][0]
+    head_type = [key for key, value in entry.items() if value == trip[0]]
+    tail_type = [key for key, value in entry.items() if value == trip[2]]
+    head_type = head_type[0] if len(head_type) > 0 else ""
+    tail_type = tail_type[0] if len(tail_type) > 0 else ""
+    node_head = trip[0] if "index" in trip[0] else list(entry.values())[0]
+    node_tail = trip[2] if "index" in trip[2] else list(entry.values())[2]
+
+    if "index" in node_head and node_head["index"] not in [node.id for node in graph_converted.nodes]:
+        graph_converted.nodes.append(
+            Node(
+                id=node_head["index"],
+                type=head_type,
+                name=node_head["name"],
+                in_query=False,
+                in_answer=node_head["name"] in result_ents,
+            )
+        )
+    if "index" in node_tail and node_tail["index"] not in [node.id for node in graph_converted.nodes]:
+        graph_converted.nodes.append(
+            Node(
+                id=node_tail["index"],
+                type=tail_type,
+                name=node_tail["name"],
+                in_query=False,
+                in_answer=node_tail["name"] in result_ents,
+            )
+        )
+    if "index" in node_head and "index" in node_tail:
+        graph_converted.edges.append(
+            Edge(
+                id=idx_rel,
+                type=trip[1],
+                name=trip[1],
+                source=node_head["index"],
+                target=node_tail["index"],
+                in_query=False,
+                in_answer=node_tail["name"] in result_ents,
+            )
+        )
+
+    try:
+        graph_triplet = f'("{node_head["name"]}", "{trip[1]}", "{node_tail["name"]}"), '
+    except Exception as e:
+        print(e)
+
+    return graph_triplet
+
+
+def _process_nodes_only(entry, graph_converted: Subgraph, result_ents: list) -> None:
+    graph_triplet = ""
+    for variable_binding, possible_node in entry.items():
+        if not isinstance(possible_node, dict):
+            continue
+        if "index" in possible_node and possible_node["index"] not in [node.id for node in graph_converted.nodes]:
+            graph_converted.nodes.append(
+                Node(
+                    id=possible_node["index"],
+                    type=variable_binding,
+                    name=possible_node["name"],
+                    in_query=False,
+                    in_answer=possible_node["name"] in result_ents,
+                )
+            )
+            try:
+                graph_triplet += f'("{possible_node["name"]}"), '
+            except Exception as e:
+                print(e)
+    return graph_triplet
 
 
 def _contains_triple(entry):
@@ -240,6 +325,7 @@ def request_pipeline(text_data: str):
     try:
         results = asyncio.run(call_chains(text_data))
         graph_result: GraphQAChainOutput = results[0]["graph_qa_output"]
+        subgraph, triplets = convert_subgraph(graph_result.evidence_sub_graph, graph_result.graph_response)
         return {
             "status": "success",
             "query": graph_result.cypher_query,
@@ -247,8 +333,9 @@ def request_pipeline(text_data: str):
             "answer_graph": graph_result.answer,
             "answer_llm": results[1]["text"],
             "answer_rag": results[2]["rag_output"],
-            "graph": convert_subgraph(graph_result.evidence_sub_graph, graph_result.graph_response),
+            "graph": subgraph,
             "graph_neo4j": graph_result.evidence_sub_graph,
+            "graph_summary": asyncio.run(call_summary(triplets))["summary"],
         }
     except Exception as e:
         print(e)
@@ -261,6 +348,7 @@ def request_pipeline(text_data: str):
             "answer_rag": "",
             "graph": {},
             "graph_neo4j": [],
+            "graph_summary": "",
         }
 
 
@@ -331,6 +419,7 @@ if st.button("Search") and text_area_input != "":
         st.caption("\n\nRelevant Subgraph:")
         html_graph_req = generate_graph(pipeline_response["graph"], send_request=True)
         components.html(html_graph_req, height=550)
+        st.text_area("Graph Summary", value=pipeline_response["graph_summary"], height=180)
         st.write("\n")
         st.caption("\n\nJSON Data:")
         with st.expander("Show JSON"):
