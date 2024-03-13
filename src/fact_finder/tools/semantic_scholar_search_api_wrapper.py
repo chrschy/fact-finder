@@ -1,7 +1,7 @@
 from typing import List
 
 import requests
-
+import os
 
 class SemanticScholarSearchApiWrapper:
 
