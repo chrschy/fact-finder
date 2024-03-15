@@ -5,7 +5,6 @@ from typing import Callable, Dict, Iterable, List, Optional, Set, Tuple, TypeVar
 import numpy as np
 import pandas as pd
 
-
 T = TypeVar("T")
 # P = ParamSpec("P")
 
@@ -65,7 +64,7 @@ class Neo4jPrimeKGImporter:
         "orphanet_epidemiology",
         # "orphanet_clinical_description",
         "orphanet_management_and_treatment",
-        "mayo_symptoms",
+        # "mayo_symptoms",  # symptom description can conflict with phenotype relation that is already part of PrimeKG
         "mayo_causes",
         "mayo_risk_factors",
         "mayo_complications",
@@ -153,7 +152,11 @@ class Neo4jPrimeKGImporter:
         node_df = self._drug_features[self._property_drug_feature_columns].copy()
         node_df = self._extract_drug_node_property_values(node_df)
         node_df = node_df.rename(columns={"node_index": "index", "state": "aggregate_state"})
-        node_df = node_df.fillna("no information available")
+        string_columns = node_df.select_dtypes(include=[object])
+        node_df[string_columns.columns] = string_columns.fillna("no information available")
+        node_df = node_df.rename(
+            columns={"molecular_weight": "molecular_weight:float", "tpsa": "tpsa:float", "clogp": "clogp:float"}
+        )
         return pd.merge(df, node_df, on="index")
 
     def _extract_drug_node_property_values(self, node_df: pd.DataFrame) -> pd.DataFrame:
@@ -163,15 +166,12 @@ class Neo4jPrimeKGImporter:
         node_df["molecular_weight"] = node_df["molecular_weight"].apply(
             lambda s: float(s[len("The molecular weight is ") : -1]) if isinstance(s, str) else s
         )
-        node_df["molecular_weight"] = node_df["molecular_weight"].fillna(-1.0)
         node_df["tpsa"] = node_df["tpsa"].apply(
             lambda s: float(s.split(" ")[-1].strip(".")) if isinstance(s, str) else s
         )
-        node_df["tpsa"] = node_df["tpsa"].fillna(-1.0)
         node_df["clogp"] = node_df["clogp"].apply(
             lambda s: float(s.split(" ")[-1].strip(".")) if isinstance(s, str) else s
         )
-        node_df["clogp"] = node_df["clogp"].fillna(-1.0)
         return node_df
 
     @log_it
@@ -183,7 +183,8 @@ class Neo4jPrimeKGImporter:
         node_df = node_df[self._property_disease_feature_columns]
         node_df = self._extract_disease_node_property_values(node_df)
         node_df = self._rename_disease_property_columns(node_df)
-        node_df = node_df.fillna("no information available")
+        string_columns = node_df.select_dtypes(include=[object])
+        node_df[string_columns.columns] = string_columns.fillna("no information available")
         return pd.merge(df, node_df, on="index")
 
     def _extract_disease_node_description(self, node_df: pd.DataFrame) -> pd.DataFrame:
@@ -212,7 +213,7 @@ class Neo4jPrimeKGImporter:
                 "orphanet_prevalence": "prevalence",
                 "orphanet_epidemiology": "epidemiology",
                 "orphanet_management_and_treatment": "management_and_treatment",
-                "mayo_symptoms": "symptoms",
+                # "mayo_symptoms": "symptoms",
                 "mayo_causes": "causes",
                 "mayo_risk_factors": "risk_factors",
                 "mayo_complications": "complications",
