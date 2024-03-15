@@ -65,6 +65,19 @@ SUBGRAPH_EXTRACTOR_PROMPT = PromptTemplate(
 )
 
 
+KEYWORD_PROMPT_TEMPLATE: str = """You are a helpful assistant. You get a user question in natural language. Please transform it into keywords that can be used in semantic scholar keyword search:
+Question: {question}
+"""
+KEYWORD_PROMPT = PromptTemplate(input_variables=["question"], template=KEYWORD_PROMPT_TEMPLATE)
+
+
+RAG_PROMPT_TEMPLATE: str = """You are a helpful assistant. You get a user question in natural language. Given the following context, please answer the given question based only on the context. Do not hallucinate. If you cannot answer based on the context, say 'Dunno'.
+Context: {context}, 
+Question: {question}
+"""
+RAG_PROMPT = PromptTemplate(input_variables=["context", "question"], template=RAG_PROMPT_TEMPLATE)
+
+
 SUBGRAPH_SUMMARY_PROMPT_TEMPLATE: str = """
 Verbalize the given triplets of a subgraph to natural text. Use all triplets for the verbalization.
  
@@ -74,3 +87,4 @@ Triplets of the subgraph:
 SUBGRAPH_SUMMARY_PROMPT = PromptTemplate(
     input_variables=["sub_graph"], template=SUBGRAPH_SUMMARY_PROMPT_TEMPLATE
 )
+

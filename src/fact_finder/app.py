@@ -113,6 +113,7 @@ if "counter" not in st.session_state:
         chat_model = load_chat_model()
         st.session_state.neo4j_chain = graph_config.build_chain(chat_model, sys.argv)
         st.session_state.llm_chain = llm_config.build_chain(chat_model, sys.argv)
+        st.session_state.rag_chain = llm_config.build_rag_chain(chat_model, sys.argv)
         st.session_state.summary_chain = graph_config.build_chain_summary(chat_model, sys.argv)
 
 
@@ -141,12 +142,16 @@ async def call_llm(message):
     return st.session_state.llm_chain.invoke(message)  # FIXME use ainvoke?
 
 
+async def call_rag(message):
+    return st.session_state.rag_chain.invoke(message)  # FIXME use ainvoke?
+  
+  
 async def call_summary(sub_graph: str):
     return st.session_state.summary_chain.invoke(sub_graph)  # FIXME use ainvoke?
 
 
 async def call_chains(message):
-    results = await asyncio.gather(call_neo4j(message), call_llm(message))
+    results = await asyncio.gather(call_neo4j(message), call_llm(message), call_rag(message))
     print(results)
     return results
 
@@ -253,6 +258,69 @@ def _process_nodes_only(entry, graph_converted: Subgraph, result_ents: list) -> 
     return graph_triplet
 
 
+def _contains_triple(entry):
+    return len([value for key, value in entry.items() if type(value) is tuple]) > 0
+
+
+def _process_triple(entry, graph_converted: Subgraph, result_ents: list, idx_rel: int) -> None:
+    trip = [value for key, value in entry.items() if type(value) is tuple][0]
+    head_type = [key for key, value in entry.items() if value == trip[0]]
+    tail_type = [key for key, value in entry.items() if value == trip[2]]
+    head_type = head_type[0] if len(head_type) > 0 else ""
+    tail_type = tail_type[0] if len(tail_type) > 0 else ""
+    node_head = trip[0] if "index" in trip[0] else list(entry.values())[0]
+    node_tail = trip[2] if "index" in trip[2] else list(entry.values())[2]
+
+    if "index" in node_head and node_head["index"] not in [node.id for node in graph_converted.nodes]:
+        graph_converted.nodes.append(
+            Node(
+                id=node_head["index"],
+                type=head_type,
+                name=node_head["name"],
+                in_query=False,
+                in_answer=node_head["name"] in result_ents,
+            )
+        )
+    if "index" in node_tail and node_tail["index"] not in [node.id for node in graph_converted.nodes]:
+        graph_converted.nodes.append(
+            Node(
+                id=node_tail["index"],
+                type=tail_type,
+                name=node_tail["name"],
+                in_query=False,
+                in_answer=node_tail["name"] in result_ents,
+            )
+        )
+    if "index" in node_head and "index" in node_tail:
+        graph_converted.edges.append(
+            Edge(
+                id=idx_rel,
+                type=trip[1],
+                name=trip[1],
+                source=node_head["index"],
+                target=node_tail["index"],
+                in_query=False,
+                in_answer=node_tail["name"] in result_ents,
+            )
+        )
+
+
+def _process_nodes_only(entry, graph_converted: Subgraph, result_ents: list) -> None:
+    for variable_binding, possible_node in entry.items():
+        if not isinstance(possible_node, dict):
+            continue
+        if "index" in possible_node and possible_node["index"] not in [node.id for node in graph_converted.nodes]:
+            graph_converted.nodes.append(
+                Node(
+                    id=possible_node["index"],
+                    type=variable_binding,
+                    name=possible_node["name"],
+                    in_query=False,
+                    in_answer=possible_node["name"] in result_ents,
+                )
+            )
+
+
 def request_pipeline(text_data: str):
     try:
         results = asyncio.run(call_chains(text_data))
@@ -264,6 +332,7 @@ def request_pipeline(text_data: str):
             "response": graph_result.graph_response,
             "answer_graph": graph_result.answer,
             "answer_llm": results[1]["text"],
+            "answer_rag": results[2]["rag_output"],
             "graph": subgraph,
             "graph_neo4j": graph_result.evidence_sub_graph,
             "graph_summary": asyncio.run(call_summary(triplets))["summary"],
@@ -276,6 +345,7 @@ def request_pipeline(text_data: str):
             "response": "",
             "answer_graph": "",
             "answer_llm": "",
+            "answer_rag": "",
             "graph": {},
             "graph_neo4j": [],
             "graph_summary": "",
@@ -336,8 +406,9 @@ if st.button("Search") and text_area_input != "":
     if pipeline_response["status"] == "error":
         st.error("Error while executing Search.")
     else:
-        st.text_area("Answer of LLM", value=pipeline_response["answer_llm"], height=180)
-        st.text_area("Answer of Graph", value=pipeline_response["answer_graph"], height=180)
+        st.text_area("Answer using LLM", value=pipeline_response["answer_llm"], height=180)
+        st.text_area("Answer using Documents", value=pipeline_response["answer_rag"], height=180)
+        st.text_area("Answer using Graph", value=pipeline_response["answer_graph"], height=180)
 
         st.write("\n")
         st.markdown("#### **Evidence**")
