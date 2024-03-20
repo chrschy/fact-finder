@@ -5,15 +5,18 @@ from dotenv import load_dotenv
 from langchain_community.graphs import Neo4jGraph
 
 from fact_finder.chains.subgraph_extractor_chain import SubgraphExtractorChain
+from fact_finder.tools.subgraph_extension import SubgraphExpansion
 from fact_finder.utils import load_chat_model
 
 load_dotenv()
 
 
 def test_subgraph_extraction_chain(llm, graph, cypher_query_preprocessors_chain_result, expected_graph_result):
-    chain = SubgraphExtractorChain(llm, graph)
+    chain = SubgraphExtractorChain(llm, graph, subgraph_expansion=SubgraphExpansion(graph), use_subgraph_expansion=True)
     result = chain(cypher_query_preprocessors_chain_result)
-    assert result[chain.output_key] == expected_graph_result
+    assert result[chain.output_key][chain.output_key] == expected_graph_result
+    assert expected_graph_result[0] in result[chain.output_key]["expanded_nodes"]
+    assert len(result[chain.output_key]["expanded_nodes"]) > len(result[chain.output_key][chain.output_key])
     assert chain.output_key in result.keys()
 
 

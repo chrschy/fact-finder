@@ -37,3 +37,11 @@ def load_chat_model() -> BaseChatModel:
         os.environ["AZURE_OPENAI_ENDPOINT"] = endpoint
         return AzureChatOpenAI(openai_api_version=api_version, azure_deployment=deployment_name)
     return ChatOpenAI(model="gpt-4", streaming=False, temperature=0, api_key=OPENAI_API_KEY)
+
+
+def graph_result_contains_triple(graph_result_entry):
+    return len(get_triples_from_graph_result(graph_result_entry)) > 0
+
+
+def get_triples_from_graph_result(graph_result_entry) -> List[dict]:
+    return [value for key, value in graph_result_entry.items() if type(value) is tuple]

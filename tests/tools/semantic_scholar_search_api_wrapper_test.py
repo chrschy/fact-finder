@@ -19,9 +19,10 @@ def test_search_by_abstract(semantic_scholar_search_api_wrapper):
     assert result[4].startswith("Prevalence and Odds")
 
 
-def _mock_get(url: str, params: dict):
+def _mock_get(url: str, params: dict, headers: dict):
     assert "https://api.semanticscholar.org/graph/v1/paper/search" == url
     assert {"fields": "title,abstract", "limit": 5, "query": "psoriasis, symptoms"} == params
+    assert "x-api-key" in headers.keys()
     response = MagicMock()
     response.status_code = 200
     response.json = lambda: {
