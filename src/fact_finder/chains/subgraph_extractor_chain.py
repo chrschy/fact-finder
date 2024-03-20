@@ -1,3 +1,4 @@
+import json
 from typing import Any, Dict, List, Optional
 
 from langchain.chains.base import Chain
@@ -6,21 +7,33 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
+from fact_finder.tools.subgraph_extension import SubgraphExpansion
 
 
 class SubgraphExtractorChain(Chain):
     graph: Neo4jGraph
     subgraph_extractor: LLMSubGraphExtractor
+    subgraph_expansion: SubgraphExpansion
+    use_subgraph_expansion: bool
     return_intermediate_steps: bool
     input_key: str = "cypher_query"  #: :meta private:
     output_key: str = "extracted_nodes"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
 
-    def __init__(self, llm: BaseLanguageModel, graph: Neo4jGraph, return_intermediate_steps: bool = True):
+    def __init__(
+        self,
+        llm: BaseLanguageModel,
+        graph: Neo4jGraph,
+        subgraph_expansion: SubgraphExpansion,
+        use_subgraph_expansion: bool,
+        return_intermediate_steps: bool = True,
+    ):
         subgraph_extractor = LLMSubGraphExtractor(llm)
         super().__init__(
             subgraph_extractor=subgraph_extractor,
             graph=graph,
+            subgraph_expansion=subgraph_expansion,
+            use_subgraph_expansion=use_subgraph_expansion,
             return_intermediate_steps=return_intermediate_steps,
         )
 
@@ -42,8 +55,9 @@ class SubgraphExtractorChain(Chain):
         self._log_it("Subgraph Cypher:", _run_manager, subgraph_cypher)
 
         extracted_nodes = self._query_graph(subgraph_cypher)
+        if self.use_subgraph_expansion:
+            extracted_nodes = self.subgraph_expansion.expand(nodes=extracted_nodes)
         self._log_it("Extracted Nodes:", _run_manager, extracted_nodes)
-
         return self._prepare_chain_result(inputs, subgraph_cypher, extracted_nodes)
 
     def _query_graph(self, subgraph_cypher) -> List[Dict[str, Any]]:

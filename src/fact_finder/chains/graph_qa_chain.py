@@ -18,6 +18,8 @@ from langchain_core.prompts import BasePromptTemplate
 from langchain_core.runnables import RunnableConfig, RunnableLambda, RunnableSequence
 from pydantic import BaseModel
 
+from fact_finder.tools.subgraph_extension import SubgraphExpansion
+
 
 class GraphQAChainOutput(BaseModel):
     question: str
@@ -111,7 +113,11 @@ class GraphQAChain(Chain):
             llm=llm, prompt_template=answer_generation_prompt, return_intermediate_steps=return_intermediate_steps
         )
         subgraph_extractor_chain = SubgraphExtractorChain(
-            llm=llm, graph=graph, return_intermediate_steps=return_intermediate_steps
+            llm=llm,
+            graph=graph,
+            return_intermediate_steps=return_intermediate_steps,
+            subgraph_expansion=SubgraphExpansion(graph=graph),
+            use_subgraph_expansion=True,
         )
         output_chain = GraphQAChainOutputPreparation(return_intermediate_steps=return_intermediate_steps)
 
