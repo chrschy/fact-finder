@@ -1,7 +1,8 @@
+import os
 from typing import List
 
 import requests
-import os
+
 
 class SemanticScholarSearchApiWrapper:
 
@@ -30,7 +31,6 @@ class SemanticScholarSearchApiWrapper:
         raise NotImplementedError
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     sem = SemanticScholarSearchApiWrapper()
     print(sem.search_by_abstracts("Alternative causes, fever, malaria infections"))

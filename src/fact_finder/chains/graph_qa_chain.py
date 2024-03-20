@@ -27,6 +27,7 @@ class GraphQAChainOutput(BaseModel):
     graph_response: List[Dict[str, Any]]
     answer: str
     evidence_sub_graph: List[Dict[str, Any]]
+    expanded_evidence_subgraph: List[Dict[str, Any]]
 
 
 class GraphQAChain(Chain):
@@ -169,6 +170,7 @@ class GraphQAChainEarlyStopping(Chain):
                 graph_response=[],
                 answer=answer,
                 evidence_sub_graph=[],
+                expanded_evidence_subgraph=[],
             )
         }
         if self.return_intermediate_steps and self.intermediate_steps_key in inputs:
@@ -183,6 +185,7 @@ class GraphQAChainOutputPreparation(Chain):
     query_key: str = "preprocessed_cypher_query"  #: :meta private:
     graph_key: str = "graph_result"  #: :meta private:
     evidence_key: str = "extracted_nodes"  #: :meta private:
+    expanded_evidence_key: str = "expanded_nodes"  #: :meta private:
     output_key: str = "graph_qa_output"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"  #: :meta private:
 
@@ -201,13 +204,15 @@ class GraphQAChainOutputPreparation(Chain):
         inputs: Dict[str, Any],
         run_manager: Optional[CallbackManagerForChainRun] = None,
     ) -> Dict[str, Any]:
+        print("bla")
         result: Dict[str, Any] = {
             self.output_key: GraphQAChainOutput(
                 question=inputs[self.answer_key][self.question_key],
                 cypher_query=inputs[self.answer_key][self.query_key],
                 graph_response=inputs[self.answer_key][self.graph_key],
                 answer=inputs[self.answer_key][self.answer_key],
-                evidence_sub_graph=inputs[self.evidence_key][self.evidence_key],
+                evidence_sub_graph=inputs[self.evidence_key][self.evidence_key][self.evidence_key],
+                expanded_evidence_subgraph=inputs[self.evidence_key][self.evidence_key][self.expanded_evidence_key],
             )
         }
         if self.return_intermediate_steps:

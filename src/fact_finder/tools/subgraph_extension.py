@@ -18,7 +18,7 @@ class SubgraphExpansion:
     def expand(self, nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         nodes = copy.deepcopy(nodes)
         result = []
-        for entry in nodes: # TODO parallelize
+        for entry in nodes:
             if graph_result_contains_triple(graph_result_entry=entry):
                 triples = get_triples_from_graph_result(graph_result_entry=entry)
                 for triple in triples:

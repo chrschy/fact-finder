@@ -49,6 +49,7 @@ EXAMPLE_1 = "What are the phenotypes associated with cardioacrofacial dysplasia?
 EXAMPLE_2 = "What are the genes responsible for psoriasis?"
 EXAMPLE_3 = "Which diseases involve PINK1?"
 EXAMPLE_4 = "Which drugs could be promising candidates to treat Parkinson?"
+EXAMPLE_5 = "Which drugs to treat ocular hypertension may cause the loss of eyelashes?"
 
 max_width_str = f"max-width: 65%;"
 style = "<style>mark.entity { display: inline-block }</style>"
@@ -200,10 +201,11 @@ def _process_triples(entry, graph_converted: Subgraph, result_ents: list, idx_re
     triples_as_string = ""
     triples = get_triples_from_graph_result(graph_result_entry=entry)
     for triple in triples:
-        triples_as_string += _process_triple(entry=entry, graph_converted=graph_converted, result_ents=result_ents, idx_rel=idx_rel, triple=triple)
+        triples_as_string += _process_triple(
+            entry=entry, graph_converted=graph_converted, result_ents=result_ents, idx_rel=idx_rel, triple=triple
+        )
         idx_rel += 1
     return triples_as_string, idx_rel
-
 
 
 def _process_triple(entry, graph_converted: Subgraph, result_ents: list, idx_rel: int, triple: dict) -> str:
@@ -284,6 +286,12 @@ def request_pipeline(text_data: str):
         results = asyncio.run(call_chains(text_data))
         graph_result: GraphQAChainOutput = results[0]["graph_qa_output"]
         subgraph, triplets = convert_subgraph(graph_result.evidence_sub_graph, graph_result.graph_response)
+        if len(graph_result.expanded_evidence_subgraph) > 0:
+            expanded_subgraph, expanded_triples = convert_subgraph(
+                graph_result.expanded_evidence_subgraph, graph_result.graph_response
+            )
+        else:
+            expanded_subgraph, expanded_triples = None, None
         return {
             "status": "success",
             "query": graph_result.cypher_query,
@@ -294,6 +302,8 @@ def request_pipeline(text_data: str):
             "graph": subgraph,
             "graph_neo4j": graph_result.evidence_sub_graph,
             "graph_summary": asyncio.run(call_summary(triplets))["summary"],
+            "expanded_graph": expanded_subgraph,
+            "expanded_graph_summary": asyncio.run(call_summary(expanded_triples))["summary"],
         }
     except Exception as e:
         print(e)
@@ -310,7 +320,7 @@ def request_pipeline(text_data: str):
         }
 
 
-def generate_graph(graph: Subgraph, send_request=False):
+def generate_graph(graph: Subgraph, send_request=False, enable_dynamics: bool = True):
     net = Network(
         height="530px", width="100%"
     )  # , bgcolor="#222222", font_color="white", select_menu=True, filter_menu=True)
@@ -322,14 +332,17 @@ def generate_graph(graph: Subgraph, send_request=False):
         color = COLORS["answer"] if edge.in_answer else COLORS["edge"]
         net.add_edge(edge.source, edge.target, width=1, title=edge.name, arrowStrikethrough=False, color=color)
 
-    #net.force_atlas_2based()  # barnes_hut()  force_atlas_2based()  hrepulsion()   repulsion()
-    net.repulsion()
-    # net.toggle_physics(False)
-    # net.set_edge_smooth(
-    #     "dynamic"
-    # )  # dynamic, continuous, discrete, diagonalCross, straightCross, horizontal, vertical, curvedCW, curvedCCW, cubicBezier
-    # net.set_options(graph_options)
-    # net.show_buttons()
+    if enable_dynamics:
+        net.force_atlas_2based()  # barnes_hut()  force_atlas_2based()  hrepulsion()   repulsion()
+        net.toggle_physics(True)
+        net.set_edge_smooth(
+            "dynamic"
+        )  # dynamic, continuous, discrete, diagonalCross, straightCross, horizontal, vertical, curvedCW, curvedCCW, cubicBezier
+        net.set_options(graph_options)
+        # net.show_buttons()
+    else:
+        net.repulsion()
+
     html_graph = net.generate_html()
     return html_graph
 
@@ -345,7 +358,7 @@ st.write(
 
 st.write("\n")
 st.subheader("Factual Question-Answering")
-text_option = st.radio("Select Example", ["Insert Query", EXAMPLE_1, EXAMPLE_2, EXAMPLE_3, EXAMPLE_4])
+text_option = st.radio("Select Example", ["Insert Query", EXAMPLE_1, EXAMPLE_2, EXAMPLE_3, EXAMPLE_4, EXAMPLE_5])
 st.write("\n")
 if text_option == EXAMPLE_1:
     text_area_input = st.text_input(PLACEHOLDER_QUERY, EXAMPLE_1)
@@ -355,6 +368,8 @@ elif text_option == EXAMPLE_3:
     text_area_input = st.text_input(PLACEHOLDER_QUERY, EXAMPLE_3)
 elif text_option == EXAMPLE_4:
     text_area_input = st.text_input(PLACEHOLDER_QUERY, EXAMPLE_4)
+elif text_option == EXAMPLE_5:
+    text_area_input = st.text_input(PLACEHOLDER_QUERY, EXAMPLE_5)
 else:
     text_area_input = st.text_input(PLACEHOLDER_QUERY, "")
 
@@ -379,6 +394,13 @@ if st.button("Search") and text_area_input != "":
         components.html(html_graph_req, height=550)
         st.text_area("Graph Summary", value=pipeline_response["graph_summary"], height=180)
         st.write("\n")
+
+        st.caption("\n\nExpanded Relevant Subgraph:")
+        html_graph_req = generate_graph(pipeline_response["expanded_graph"], send_request=True, enable_dynamics=False)
+        components.html(html_graph_req, height=550)
+        st.text_area("Expanded Graph Summary", value=pipeline_response["expanded_graph_summary"], height=180)
+        st.write("\n")
+
         st.caption("\n\nJSON Data:")
         with st.expander("Show JSON"):
             pipeline_response["graph"] = pipeline_response["graph"].model_dump(mode="json")

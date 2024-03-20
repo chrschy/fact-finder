@@ -56,9 +56,9 @@ class SubgraphExtractorChain(Chain):
 
         extracted_nodes = self._query_graph(subgraph_cypher)
         if self.use_subgraph_expansion:
-            extracted_nodes = self.subgraph_expansion.expand(nodes=extracted_nodes)
+            expanded_nodes = self.subgraph_expansion.expand(nodes=extracted_nodes)
         self._log_it("Extracted Nodes:", _run_manager, extracted_nodes)
-        return self._prepare_chain_result(inputs, subgraph_cypher, extracted_nodes)
+        return self._prepare_chain_result(inputs, subgraph_cypher, extracted_nodes, expanded_nodes)
 
     def _query_graph(self, subgraph_cypher) -> List[Dict[str, Any]]:
         try:
@@ -72,10 +72,14 @@ class SubgraphExtractorChain(Chain):
         _run_manager.on_text(subgraph_cypher, color="green", end="\n", verbose=self.verbose)
 
     def _prepare_chain_result(
-        self, inputs: Dict[str, Any], subgraph_cypher: str, extracted_nodes: List[Dict[str, Any]]
+        self,
+        inputs: Dict[str, Any],
+        subgraph_cypher: str,
+        extracted_nodes: List[Dict[str, Any]],
+        expanded_nodes: List[Dict[str, Any]],
     ) -> Dict[str, Any]:
         chain_result = {
-            self.output_key: extracted_nodes,
+            self.output_key: {"extracted_nodes": extracted_nodes, "expanded_nodes": expanded_nodes},
         }
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, []) + [{"subgraph_cypher": subgraph_cypher}]
