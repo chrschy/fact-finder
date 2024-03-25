@@ -1,7 +1,8 @@
 import argparse
 from typing import Dict, List, Tuple
 
-from fact_finder.chains.graph_qa_chain import GraphQAChain, GraphQAChainConfig
+from fact_finder.chains.graph_qa_chain.config import GraphQAChainConfig
+from fact_finder.chains.graph_qa_chain.graph_qa_chain import GraphQAChain
 from fact_finder.chains.graph_summary_chain import GraphSummaryChain
 from fact_finder.config.primekg_predicate_descriptions import PREDICATE_DESCRIPTIONS
 from fact_finder.prompt_templates import (
@@ -60,11 +61,7 @@ def build_chain(model: BaseLanguageModel, args: List[str] = []) -> Chain:
 
 
 def build_chain_summary(model: BaseLanguageModel, args: List[str] = []) -> Chain:
-    return GraphSummaryChain(
-        llm=model,
-        graph_summary_template=SUBGRAPH_SUMMARY_PROMPT,
-        return_intermediate_steps=True
-    )
+    return GraphSummaryChain(llm=model, graph_summary_template=SUBGRAPH_SUMMARY_PROMPT, return_intermediate_steps=True)
 
 
 def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool) -> List[CypherQueryPreprocessor]:

@@ -2,7 +2,8 @@ from typing import Any, Dict, List, Literal
 from unittest.mock import MagicMock
 
 import pytest
-from fact_finder.chains.graph_qa_chain import GraphQAChain, GraphQAChainConfig
+from fact_finder.chains.graph_qa_chain.config import GraphQAChainConfig
+from fact_finder.chains.graph_qa_chain.graph_qa_chain import GraphQAChain
 from langchain.chains.graph_qa.cypher import construct_schema
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models import BaseLanguageModel

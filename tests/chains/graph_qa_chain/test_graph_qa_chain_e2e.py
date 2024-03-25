@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from dotenv import dotenv_values
-from fact_finder.chains.graph_qa_chain import GraphQAChain
+from fact_finder.chains.graph_qa_chain.graph_qa_chain import GraphQAChain
 from fact_finder.prompt_templates import CYPHER_GENERATION_PROMPT, CYPHER_QA_PROMPT
 from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import (
     CypherQueryPreprocessor,

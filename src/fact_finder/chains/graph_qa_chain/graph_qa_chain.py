@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from fact_finder.chains.answer_generation_chain import AnswerGenerationChain
 from fact_finder.chains.combined_graph_rag_qa_chain import CombinedQAChain
@@ -12,21 +12,20 @@ from fact_finder.chains.entity_detection_question_preprocessing_chain import (
     EntityDetectionQuestionPreprocessingChain,
 )
 from fact_finder.chains.graph_chain import GraphChain
+from fact_finder.chains.graph_qa_chain.config import GraphQAChainConfig
+from fact_finder.chains.graph_qa_chain.early_stopping_chain import (
+    GraphQAChainEarlyStopping,
+)
+from fact_finder.chains.graph_qa_chain.output import GraphQAChainOutput
+from fact_finder.chains.graph_qa_chain.output_chain import GraphQAChainOutputPreparation
 from fact_finder.chains.rag.semantic_scholar_chain import SemanticScholarChain
 from fact_finder.chains.subgraph_extractor_chain import SubgraphExtractorChain
-from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import (
-    CypherQueryPreprocessor,
-)
-from fact_finder.tools.entity_detector import EntityDetector
 from fact_finder.tools.semantic_scholar_search_api_wrapper import (
     SemanticScholarSearchApiWrapper,
 )
 from fact_finder.tools.subgraph_extension import SubgraphExpansion
 from langchain.chains.base import Chain
-from langchain_community.graphs import Neo4jGraph
 from langchain_core.callbacks import CallbackManagerForChainRun
-from langchain_core.language_models import BaseLanguageModel
-from langchain_core.prompts import BasePromptTemplate
 from langchain_core.runnables import (
     RunnableConfig,
     RunnableLambda,
@@ -34,68 +33,6 @@ from langchain_core.runnables import (
     RunnableSequence,
     RunnableSerializable,
 )
-from pydantic.v1 import BaseModel, root_validator
-
-
-class GraphQAChainOutput(BaseModel):
-    question: str
-    cypher_query: str
-    graph_response: List[Dict[str, Any]]
-    answer: str
-    evidence_sub_graph: List[Dict[str, Any]]
-    expanded_evidence_subgraph: List[Dict[str, Any]]
-
-
-class GraphQAChainConfig(BaseModel):
-    llm: BaseLanguageModel
-    graph: Neo4jGraph
-    cypher_prompt: BasePromptTemplate
-    answer_generation_prompt: BasePromptTemplate
-    cypher_query_preprocessors: List[CypherQueryPreprocessor]
-    predicate_descriptions: List[Dict[str, str]] = []
-    schema_error_string: str = "SCHEMA_ERROR"
-    return_intermediate_steps: bool = True
-
-    use_entity_detection_preprocessing: bool = False
-    entity_detector: Optional[EntityDetector] = None
-    # The keys of this dict contain the (lower case) type names for which entities can be replaced.
-    # They map to a template explaining the type of an entity (marked via {entity})
-    # Example: "chemical_compounds", "{entity} is a chemical compound."
-    allowed_types_and_description_templates: Dict[str, str] = {}
-
-    use_subgraph_expansion: bool = False
-
-    combine_output_with_sematic_scholar: bool = False
-    semantic_scholar_keyword_prompt: Optional[BasePromptTemplate] = None
-    combined_answer_generation_prompt: Optional[BasePromptTemplate] = None
-
-    @root_validator(allow_reuse=True)
-    def check_entity_detection_preprocessing_settings(cls, values):
-        if values["use_entity_detection_preprocessing"] and values["entity_detector"] is None:
-            raise ValueError("When setting use_entity_detection_preprocessing, an entity_detector has to be provided.")
-        if values["use_entity_detection_preprocessing"] and len(values["allowed_types_and_description_templates"]) == 0:
-            raise ValueError(
-                "When setting use_entity_detection_preprocessing, "
-                "allowed_types_and_description_templates has to be provided."
-            )
-        return values
-
-    @root_validator(allow_reuse=True)
-    def check_semantic_scholar_configured_correctly(cls, values):
-        if values["combine_output_with_sematic_scholar"] and values["semantic_scholar_keyword_prompt"] is None:
-            raise ValueError(
-                "When setting combine_output_with_sematic_scholar, "
-                "a semantic_scholar_keyword_prompt has to be provided."
-            )
-        if values["combine_output_with_sematic_scholar"] and values["combined_answer_generation_prompt"] is None:
-            raise ValueError(
-                "When setting combine_output_with_sematic_scholar, "
-                "combined_answer_generation_prompt has to be provided."
-            )
-        return values
-
-    class Config:
-        arbitrary_types_allowed: bool = True
 
 
 class GraphQAChain(Chain):
@@ -267,103 +204,3 @@ class GraphQAChain(Chain):
 
     def _build_output_chain(self, config: GraphQAChainConfig) -> GraphQAChainOutputPreparation:
         return GraphQAChainOutputPreparation(return_intermediate_steps=config.return_intermediate_steps)
-
-
-class GraphQAChainEarlyStopping(Chain):
-    schema_error_string: str
-    return_intermediate_steps: bool = True
-    question_key: str = "question"  #: :meta private:
-    query_key: str = "cypher_query"  #: :meta private:
-    output_key: str = "graph_qa_output"  #: :meta private:
-    intermediate_steps_key: str = "intermediate_steps"  #: :meta private:
-
-    @property
-    def input_keys(self) -> List[str]:
-        """Return the input keys."""
-        return [self.question_key, self.query_key]
-
-    @property
-    def output_keys(self) -> List[str]:
-        """Return the output keys."""
-        return [self.output_key]
-
-    def _call(
-        self,
-        inputs: Dict[str, Any],
-        run_manager: Optional[CallbackManagerForChainRun] = None,
-    ) -> Dict[str, Any]:
-        answer = inputs[self.query_key][len(self.schema_error_string) :].lstrip(": ")
-        result: Dict[str, Any] = {
-            self.output_key: GraphQAChainOutput(
-                question=inputs[self.question_key],
-                cypher_query="",
-                graph_response=[],
-                answer=answer,
-                evidence_sub_graph=[],
-                expanded_evidence_subgraph=[],
-            )
-        }
-        if self.return_intermediate_steps and self.intermediate_steps_key in inputs:
-            result[self.intermediate_steps_key] = inputs[self.intermediate_steps_key]
-        return result
-
-
-class GraphQAChainOutputPreparation(Chain):
-    return_intermediate_steps: bool = True
-    answer_key: str = "answer"  #: :meta private:
-    question_key: str = "question"  #: :meta private:
-    query_key: str = "preprocessed_cypher_query"  #: :meta private:
-    graph_key: str = "graph_result"  #: :meta private:
-    evidence_key: str = "extracted_nodes"  #: :meta private:
-    expanded_evidence_key: str = "expanded_nodes"  #: :meta private:
-    output_key: str = "graph_qa_output"  #: :meta private:
-    intermediate_steps_key: str = "intermediate_steps"  #: :meta private:
-
-    @property
-    def input_keys(self) -> List[str]:
-        """Return the input keys."""
-        return [self.answer_key, self.evidence_key]
-
-    @property
-    def output_keys(self) -> List[str]:
-        """Return the output keys."""
-        return [self.output_key]
-
-    def _call(
-        self,
-        inputs: Dict[str, Any],
-        run_manager: Optional[CallbackManagerForChainRun] = None,
-    ) -> Dict[str, Any]:
-        result: Dict[str, Any] = {
-            self.output_key: GraphQAChainOutput(
-                question=inputs[self.answer_key][self.question_key],
-                cypher_query=inputs[self.answer_key][self.query_key],
-                graph_response=inputs[self.answer_key][self.graph_key],
-                answer=inputs[self.answer_key][self.answer_key],
-                evidence_sub_graph=inputs[self.evidence_key][self.evidence_key][self.evidence_key],
-                expanded_evidence_subgraph=inputs[self.evidence_key][self.evidence_key][self.expanded_evidence_key],
-            )
-        }
-        if self.return_intermediate_steps:
-            intermediate_steps = list(self._merge_intermediate_steps(inputs))
-            result[self.intermediate_steps_key] = intermediate_steps
-        return result
-
-    def _merge_intermediate_steps(self, inputs: Dict[str, Any]) -> Iterable[Dict[str, Any]]:
-        i1 = iter(inputs[self.answer_key][self.intermediate_steps_key])
-        i2 = iter(inputs[self.evidence_key][self.intermediate_steps_key])
-        i2_store = None
-        try:
-            while True:
-                i1_entry = next(i1)
-                yield i1_entry
-                i2_entry = next(i2)
-                if i1_entry != i2_entry:
-                    i2_store = i2_entry
-                    break
-        except StopIteration:
-            pass
-        yield from i1
-        if i2_store:
-            yield i2_store
-        yield from i2
