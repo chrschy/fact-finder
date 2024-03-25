@@ -1,8 +1,9 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal
 from unittest.mock import MagicMock
 
 import pytest
-from fact_finder.chains.graph_qa_chain import GraphQAChain
+from fact_finder.chains.graph_qa_chain.config import GraphQAChainConfig
+from fact_finder.chains.graph_qa_chain.graph_qa_chain import GraphQAChain
 from langchain.chains.graph_qa.cypher import construct_schema
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models import BaseLanguageModel
@@ -11,41 +12,49 @@ from langchain_core.prompt_values import PromptValue
 from langchain_core.prompts.prompt import PromptTemplate
 
 
-def test_cypher_generation_is_called_with_expected_arguments(question, chain, llm, cypher_prompt):
-    chain.invoke(question)
+def test_cypher_generation_is_called_with_expected_arguments(
+    question: str, chain: GraphQAChain, llm: BaseLanguageModel, cypher_prompt: str
+):
+    chain.invoke({"question": question})
     all_params = [p.args[0][0] for p in llm.generate_prompt.mock_calls]
     assert cypher_prompt in all_params
 
 
-def test_graph_is_called_with_expected_cypher_query(question, chain, graph, cypher_query):
-    chain.invoke(question)
+def test_graph_is_called_with_expected_cypher_query(
+    question: str, chain: GraphQAChain, graph: Neo4jGraph, cypher_query: str
+):
+    chain.invoke({"question": question})
     all_params = [p.args[0] for p in graph.query.mock_calls]
     assert cypher_query in all_params
 
 
-def test_qa_is_called_with_expected_arguments(question, chain, llm, answer_prompt):
-    chain.invoke(question)
+def test_qa_is_called_with_expected_arguments(
+    question: str, chain: GraphQAChain, llm: BaseLanguageModel, answer_prompt: str
+):
+    chain.invoke({"question": question})
     all_params = [p.args[0][0] for p in llm.generate_prompt.mock_calls]
     assert answer_prompt in all_params
 
 
-def test_returned_result_matches_model_output(question, chain, system_answer):
-    assert chain.invoke(question)["graph_qa_output"].answer == system_answer
+def test_returned_result_matches_model_output(question: str, chain: GraphQAChain, system_answer: str):
+    assert chain.invoke({"question": question})["graph_qa_output"].answer == system_answer
 
 
 @pytest.mark.parametrize("cypher_query", ["SCHEMA_ERROR: This is not a cypher query!"], indirect=True)
-def test_invalid_cypher_query_is_returned_directly(question, chain, cypher_query):
-    assert chain.invoke(question)["graph_qa_output"].answer == cypher_query[len("SCHEMA_ERROR: ") :]
+def test_invalid_cypher_query_is_returned_directly(
+    question: str, chain: GraphQAChain, cypher_query: Literal["SCHEMA_ERROR: This is not a cypher query!"]
+):
+    assert chain.invoke({"question": question})["graph_qa_output"].answer == cypher_query[len("SCHEMA_ERROR: ") :]
 
 
 @pytest.fixture
 def chain(
-    cypher_prompt_template,
-    answer_generation_prompt_template,
-    llm,
-    graph,
+    cypher_prompt_template: PromptTemplate,
+    answer_generation_prompt_template: PromptTemplate,
+    llm: BaseLanguageModel,
+    graph: Neo4jGraph,
 ):
-    return GraphQAChain(
+    config = GraphQAChainConfig.construct(
         llm=llm,
         graph=graph,
         cypher_prompt=cypher_prompt_template,
@@ -53,10 +62,11 @@ def chain(
         cypher_query_preprocessors=[],
         return_intermediate_steps=True,
     )
+    return GraphQAChain(config)
 
 
 @pytest.fixture
-def cypher_prompt(cypher_prompt_template, schema, question) -> str:
+def cypher_prompt(cypher_prompt_template: PromptTemplate, schema: str, question: str) -> str:
     return cypher_prompt_template.format_prompt(schema=schema, question=question)
 
 
@@ -68,7 +78,9 @@ def cypher_prompt_template() -> PromptTemplate:
 
 
 @pytest.fixture
-def answer_prompt(answer_generation_prompt_template, query_response, question) -> str:
+def answer_prompt(
+    answer_generation_prompt_template: PromptTemplate, query_response: List[Dict[str, str]], question: str
+) -> str:
     return answer_generation_prompt_template.format_prompt(context=query_response, question=question)
 
 
@@ -100,7 +112,7 @@ def llm(cypher_query: str, system_answer: str) -> BaseLanguageModel:
 
 
 @pytest.fixture(params=["<this is a cypher query>"])
-def cypher_query(request) -> str:
+def cypher_query(request: pytest.FixtureRequest) -> str:
     return request.param
 
 
@@ -119,7 +131,7 @@ def graph(structured_schema: Dict[str, Any], query_response: List[str]) -> Neo4j
 
 
 @pytest.fixture
-def schema(structured_schema) -> str:
+def schema(structured_schema: Dict[str, Any]) -> str:
     return construct_schema(structured_schema, [], [])
 
 

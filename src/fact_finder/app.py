@@ -2,17 +2,20 @@ import asyncio
 import sys
 from typing import Any, Dict, List
 
+import fact_finder.config.primekg_config as graph_config
+import fact_finder.config.simple_config as llm_config
 import streamlit as st
 import streamlit.components.v1 as components
 from dotenv import load_dotenv
+from fact_finder.chains.graph_qa_chain import GraphQAChainOutput
+from fact_finder.utils import (
+    get_triples_from_graph_result,
+    graph_result_contains_triple,
+    load_chat_model,
+)
 from PIL import Image
 from pydantic import BaseModel
 from pyvis.network import Network
-
-import fact_finder.config.primekg_config as graph_config
-import fact_finder.config.simple_config as llm_config
-from fact_finder.chains.graph_qa_chain import GraphQAChainOutput
-from fact_finder.utils import load_chat_model, graph_result_contains_triple, get_triples_from_graph_result
 
 load_dotenv()
 
@@ -395,11 +398,14 @@ if st.button("Search") and text_area_input != "":
         st.text_area("Graph Summary", value=pipeline_response["graph_summary"], height=180)
         st.write("\n")
 
-        st.caption("\n\nExpanded Relevant Subgraph:")
-        html_graph_req = generate_graph(pipeline_response["expanded_graph"], send_request=True, enable_dynamics=False)
-        components.html(html_graph_req, height=550)
-        st.text_area("Expanded Graph Summary", value=pipeline_response["expanded_graph_summary"], height=180)
-        st.write("\n")
+        if pipeline_response["expanded_graph"] is not None:
+            st.caption("\n\nExpanded Relevant Subgraph:")
+            html_graph_req = generate_graph(
+                pipeline_response["expanded_graph"], send_request=True, enable_dynamics=False
+            )
+            components.html(html_graph_req, height=550)
+            st.text_area("Expanded Graph Summary", value=pipeline_response["expanded_graph_summary"], height=180)
+            st.write("\n")
 
         st.caption("\n\nJSON Data:")
         with st.expander("Show JSON"):

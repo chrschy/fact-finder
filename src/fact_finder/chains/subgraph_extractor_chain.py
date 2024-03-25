@@ -1,13 +1,12 @@
 import json
 from typing import Any, Dict, List, Optional
 
+from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
+from fact_finder.tools.subgraph_extension import SubgraphExpansion
 from langchain.chains.base import Chain
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
-
-from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
-from fact_finder.tools.subgraph_extension import SubgraphExpansion
 
 
 class SubgraphExtractorChain(Chain):
@@ -55,8 +54,7 @@ class SubgraphExtractorChain(Chain):
         self._log_it("Subgraph Cypher:", _run_manager, subgraph_cypher)
 
         extracted_nodes = self._query_graph(subgraph_cypher)
-        if self.use_subgraph_expansion:
-            expanded_nodes = self.subgraph_expansion.expand(nodes=extracted_nodes)
+        expanded_nodes = self.subgraph_expansion.expand(nodes=extracted_nodes) if self.use_subgraph_expansion else []
         self._log_it("Extracted Nodes:", _run_manager, extracted_nodes)
         return self._prepare_chain_result(inputs, subgraph_cypher, extracted_nodes, expanded_nodes)
 
