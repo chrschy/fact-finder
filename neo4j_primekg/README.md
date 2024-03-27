@@ -37,6 +37,10 @@ docker run -d --restart=always \
     --volume <abs/path/to/disease/features.tab>:/primekg_data/disease_features.tab:ro \
     --env NEO4J_AUTH=neo4j/opensesame \
     --env NEO4J_server_databases_default__to__read__only=true \
+    --env NEO4J_apoc_export_file_enabled=true \
+    --env NEO4J_apoc_import_file_enabled=true \
+    --env NEO4J_apoc_import_file_use__neo4j__config=true \
+    --env NEO4JLABS_PLUGINS=\[\"apoc\"\] \
     --name neo4j_primekg_service \
     neo4j_primekg:latest
 ```
