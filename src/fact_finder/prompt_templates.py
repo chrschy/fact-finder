@@ -82,13 +82,18 @@ COMBINED_QA_TEMPLATE: str = """You are an assistant that helps to form nice and 
 The information part contains the provided information that you must use to construct an answer.
 The provided information is authoritative, you must never doubt it or try to use your internal knowledge to correct it.
 Make the answer sound as a response to the question. Note that you are provided information from two different sources.
-First, a list of relevant paper abstracts. Second, information extracted from a knowledge graph. Include both parts in your answer.
+First, a list of relevant paper abstracts. Second, information extracted from a knowledge graph.
+The knowledge graph information is always generated as an answer to the question and is always correct.
+Include the information from both parts in your answer.
 If the provided information is a list, include all entries in your response.
 If the provided information is empty, say that you don't know the answer.
 1. Paper abstracts information:
 {abstracts}
 
 2. Knowledge graph information:
+a) Used cypher query:
+{cypher_query}
+b) Query result from graph:
 {graph_answer}
 
 Question: {question}
