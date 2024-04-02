@@ -15,6 +15,10 @@ docker run -d --restart=always \
     --publish=7474:7474 --publish=7687:7687 \
     --env NEO4J_AUTH=neo4j/opensesame \
     --env NEO4J_server_databases_default__to__read__only=true \
+    --env NEO4J_apoc_export_file_enabled=true \
+    --env NEO4J_apoc_import_file_enabled=true \
+    --env NEO4J_apoc_import_file_use__neo4j__config=true \
+    --env NEO4JLABS_PLUGINS=\[\"apoc\"\] \
     --name neo4j_primekg_service \
     neo4j_primekg:latest
 ```
@@ -35,7 +39,12 @@ docker run -d --restart=always \
     --volume <abs/path/to/prime/kg.csv>:/primekg_data/kg.csv:ro \
     --volume <abs/path/to/drug/features.tab>:/primekg_data/drug_features.tab:ro \
     --volume <abs/path/to/disease/features.tab>:/primekg_data/disease_features.tab:ro \
+    --env NEO4J_AUTH=neo4j/opensesame \
     --env NEO4J_server_databases_default__to__read__only=true \
+    --env NEO4J_apoc_export_file_enabled=true \
+    --env NEO4J_apoc_import_file_enabled=true \
+    --env NEO4J_apoc_import_file_use__neo4j__config=true \
+    --env NEO4JLABS_PLUGINS=\[\"apoc\"\] \
     --name neo4j_primekg_service \
     neo4j_primekg:latest
 ```
@@ -44,7 +53,7 @@ docker run -d --restart=always \
 
 These are the steps taken when starting a new Docker container for the image build from the given Dockerfile. These steps are executed by the scripts "import_primekg.sh" and "primekg_to_neo4j_csv.py".
 
-First, the data is downloaded from Harvard Dataverse unless it was linked into the container vie volume. The data in this case is the kg.csv containing the actual graph (in form of all its edges) and the additional features for drug and disease nodes (drug_features.tab and disease_features.tab).
+First, the data is downloaded from Harvard Dataverse unless it was linked into the container via volume. The data in this case is the kg.csv containing the actual graph (in form of all its edges) and the additional features for drug and disease nodes (drug_features.tab and disease_features.tab).
 
 In the next step, the data gets loaded via pandas and some general clean up steps are performed:
 - All string entries are converted to lower case in order to make queries to the graph more robust.

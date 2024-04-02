@@ -9,13 +9,14 @@ from fact_finder.utils import fill_prompt_template
 
 
 class CombinedQAChain(TextSearchQAChain):
+    cypher_query_key: str = "preprocessed_cypher_query"  #: :meta private:
     graph_result_key: str = "graph_result"  #: :meta private:
     output_key: str = "answer"  #: :meta private:
     filled_prompt = ""
 
     @property
     def input_keys(self) -> List[str]:
-        return [self.question_key, self.graph_result_key]
+        return [self.question_key, self.graph_result_key, self.cypher_query_key]
 
     @property
     def output_keys(self) -> List[str]:
@@ -40,6 +41,7 @@ class CombinedQAChain(TextSearchQAChain):
             "abstracts": inputs[self.rag_output_key],
             "graph_answer": inputs[self.graph_result_key],
             "question": inputs[self.question_key],
+            "cypher_query": inputs[self.cypher_query_key],
         }
         result = self.rag_answer_generation_llm_chain(
             inputs=inputs,
