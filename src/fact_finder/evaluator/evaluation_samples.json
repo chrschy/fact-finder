@@ -1,0 +1,9 @@
+[
+  {
+    "question": "Which drugs have pterygium as side effect? Which medicine may cause pterygium?",
+    "answer": "bla",
+    "cypher_query": "MATCH (n:drug)-[s:side_effect]-(g {name:\"pterygium\"}) RETURN distinct n"
+  },
+  {
+  }
+]
