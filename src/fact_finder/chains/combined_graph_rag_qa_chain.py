@@ -5,10 +5,13 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 
+from fact_finder.utils import fill_prompt_template
+
 
 class CombinedQAChain(TextSearchQAChain):
     graph_result_key: str = "graph_result"  #: :meta private:
     output_key: str = "answer"  #: :meta private:
+    filled_prompt = ""
 
     @property
     def input_keys(self) -> List[str]:
@@ -33,11 +36,14 @@ class CombinedQAChain(TextSearchQAChain):
         )
 
     def _generate_answer(self, inputs: Dict[str, Any], run_manager: CallbackManagerForChainRun) -> str:
-        return self.rag_answer_generation_llm_chain(
-            {
-                "abstracts": inputs[self.rag_output_key],
-                "graph_answer": inputs[self.graph_result_key],
-                "question": inputs[self.question_key],
-            },
+        inputs = {
+            "abstracts": inputs[self.rag_output_key],
+            "graph_answer": inputs[self.graph_result_key],
+            "question": inputs[self.question_key],
+        }
+        result = self.rag_answer_generation_llm_chain(
+            inputs=inputs,
             callbacks=run_manager.get_child(),
         )[self.rag_answer_generation_llm_chain.output_key]
+        self.filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.rag_answer_generation_llm_chain)
+        return result
