@@ -16,7 +16,6 @@ class GraphSummaryChain(Chain):
     input_key: str = "sub_graph"  #: :meta private:
     output_key: str = "summary"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"  #: :meta private:
-    filled_prompt: str = ""
 
     @property
     def input_keys(self) -> List[str]:
@@ -46,17 +45,17 @@ class GraphSummaryChain(Chain):
             inputs=inputs,
             callbacks=run_manager.get_child(),
         )[self.graph_summary_llm_chain.output_key]
-        self.filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.graph_summary_llm_chain)
         return self._prepare_chain_result(inputs, answer)
 
     def _prepare_chain_result(self, inputs, answer):
         chain_result: Dict[str, Any] = {self.output_key: answer}
+        filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.graph_summary_llm_chain)
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
             intermediate_steps += [
                 {"question": inputs[self.input_key]},
                 {self.output_key: answer},
-                {f"{self.__class__.__name__}_filled_prompt": self.filled_prompt},
+                {f"{self.__class__.__name__}_filled_prompt": filled_prompt},
             ]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result

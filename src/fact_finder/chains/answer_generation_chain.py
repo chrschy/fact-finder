@@ -16,7 +16,6 @@ class AnswerGenerationChain(Chain):
     graph_result_key: str = "graph_result"  #: :meta private:
     output_key: str = "answer"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
-    filled_prompt: str = ""
 
     def __init__(
         self, llm: BaseLanguageModel, prompt_template: BasePromptTemplate, return_intermediate_steps: bool = True
@@ -49,7 +48,6 @@ class AnswerGenerationChain(Chain):
             inputs=inputs,
             callbacks=run_manager.get_child(),
         )[self.llm_chain.output_key]
-        self.filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.llm_chain)
         self._log_it(run_manager, final_result)
         return final_result
 
@@ -63,6 +61,7 @@ class AnswerGenerationChain(Chain):
         }
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, []) + [{self.output_key: answer}]
-            intermediate_steps.append({f"{self.__class__.__name__}_filled_prompt": self.filled_prompt})
+            filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.llm_chain)
+            intermediate_steps.append({f"{self.__class__.__name__}_filled_prompt": filled_prompt})
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result

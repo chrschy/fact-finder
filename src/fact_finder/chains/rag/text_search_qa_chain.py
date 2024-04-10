@@ -16,7 +16,6 @@ class TextSearchQAChain(Chain):
     question_key: str = "question"  #: :meta private:
     output_key: str = "rag_output"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"  #: :meta private:
-    filled_prompt = ""
 
     @property
     def input_keys(self) -> List[str]:
@@ -51,7 +50,6 @@ class TextSearchQAChain(Chain):
             inputs=inputs,
             callbacks=run_manager.get_child(),
         )[self.rag_answer_generation_llm_chain.output_key]
-        self.filled_prompt = fill_prompt_template(llm_chain=self.rag_answer_generation_llm_chain, inputs=inputs)
         return result
 
     def _build_result(self, inputs: Dict[str, Any], answer: str) -> Dict[str, Any]:
@@ -59,6 +57,7 @@ class TextSearchQAChain(Chain):
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
             intermediate_steps.append(("rag_answer", answer))
-            intermediate_steps.append({f"{self.__class__.__name__}_filled_prompt": self.filled_prompt})
+            filled_prompt = fill_prompt_template(llm_chain=self.rag_answer_generation_llm_chain, inputs=inputs)
+            intermediate_steps.append({f"{self.__class__.__name__}_filled_prompt": filled_prompt})
             result[self.intermediate_steps_key] = intermediate_steps
         return result

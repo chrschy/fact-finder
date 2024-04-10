@@ -12,7 +12,6 @@ class CombinedQAChain(TextSearchQAChain):
     cypher_query_key: str = "preprocessed_cypher_query"  #: :meta private:
     graph_result_key: str = "graph_result"  #: :meta private:
     output_key: str = "answer"  #: :meta private:
-    filled_prompt = ""
 
     @property
     def input_keys(self) -> List[str]:
@@ -47,5 +46,9 @@ class CombinedQAChain(TextSearchQAChain):
             inputs=inputs,
             callbacks=run_manager.get_child(),
         )[self.rag_answer_generation_llm_chain.output_key]
-        self.filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.rag_answer_generation_llm_chain)
         return result
+
+    def _prepare_chain_result(self, inputs: Dict[str, Any], answer: str) -> Dict[str, Any]:
+        # todo
+        filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.rag_answer_generation_llm_chain)
+        raise NotImplementedError
