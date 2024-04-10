@@ -7,7 +7,7 @@ class DifflibScore(Score):
     """
     Finds the longest matching subsequence.
     Then, to the left and right of the longest matching subsequence, it again finds the longest matching subsequence.
-    Ommits "junk" elements such as white spaces.
+    Omits "junk" elements such as white spaces.
     """
 
     def compare(self, text_a: str, text_b: str) -> float:

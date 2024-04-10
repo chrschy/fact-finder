@@ -39,10 +39,12 @@ class Evaluation:
         self.evaluators = evaluators
         self.scores = scores
 
-    def run(self):
+    def run(self, save_as_excel: bool = False):
         chain_results = self.run_chain()
-        evaluation = self.evaluate(chain_results)
-        return evaluation
+        results = self.evaluate(chain_results)
+        if save_as_excel:
+            self.save_as_excel(results)
+        return results
 
     def evaluate(self, chain_results):
         evaluation = {}
@@ -66,12 +68,15 @@ class Evaluation:
         eval_samples = [EvaluationSample(**d) for d in data]
         return eval_samples
 
-    def save_as_excel(self, result: Dict[str, Any], path: str = "hello.xlsx"):
-        df = pd.DataFrame(result)
+    def save_as_excel(self, results: Dict[str, list], path: str = "hello.xlsx"):
+        concat_results = []
+        for i in results.values():
+            concat_results += i
+        df = pd.DataFrame(concat_results)
         df.to_excel(path)
 
 
 if __name__ == "__main__":
     evaluation = Evaluation()
-    results = evaluation.run()
+    results = evaluation.run(save_as_excel=True)
     print(results)
