@@ -17,11 +17,13 @@ except:
 
 
 class Mapper(ABC):
-    def __init__(self, graph: pd.DataFrame) -> None:
+
+    def __init__(self, graph: pd.DataFrame, use_polars: bool = _POLARS_AVAILABLE) -> None:
+        self._use_polars = use_polars
         self._set_column_accessors(graph)
 
     def apply_to_graph(self, graph: pd.DataFrame) -> pd.DataFrame:
-        if _POLARS_AVAILABLE:
+        if self._use_polars:
             col_names = graph.columns
             graph = graph.map_rows(self)
             graph.columns = col_names
@@ -31,7 +33,7 @@ class Mapper(ABC):
         return graph
 
     def __call__(self, row: Union["pd.Series", Tuple[str, ...]]) -> Union["pd.Series", Tuple[str]]:
-        if _POLARS_AVAILABLE:
+        if self._use_polars:
             return self._call_polars(row)
         return self._call_pandas(row)
 
@@ -42,7 +44,7 @@ class Mapper(ABC):
     def _call_pandas(self, row: "pd.Series") -> "pd.Series": ...
 
     def _set_column_accessors(self, df: pd.DataFrame):
-        if _POLARS_AVAILABLE:
+        if self._use_polars:
             self._x_type_idx = df.get_column_index("x_type")
             self._x_name_idx = df.get_column_index("x_name")
             self._x_id_idx = df.get_column_index("x_id")
