@@ -109,6 +109,11 @@ if __name__ == "__main__":
             "expected_cypher": 'MATCH (e:gene_or_protein {name:"f2"})-[ep:expression_present]-(a:anatomy) RETURN a.name',
             "expected_answer": "kidney, liver, fundus of stomach, stomach, multi-cellular organism, anatomical system, material anatomical entity, intestine, large intestine",
         },
+        {
+            "question": "Which drugs are associated with epilepsy?",
+            "expected_cypher": 'MATCH (d:drug)-[:indication]->(dis:disease) WHERE dis.name = "epilepsy" RETURN d.name',
+            "expected_answer": "The drugs associated with epilepsy are phenytoin, valproic acid, lamotrigine, diazepam, clonazepam, fosphenytoin, mephenytoin, neocitrullamon, carbamazepine, phenobarbital, secobarbital, primidone, and lorazepam.",
+        },
     ]
 
     for sample in manual_samples:
