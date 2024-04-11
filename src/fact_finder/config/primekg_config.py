@@ -36,7 +36,7 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts.prompt import PromptTemplate
 
 
-def build_chain(model: BaseLanguageModel, args: List[str] = []) -> Chain:
+def build_chain(model: BaseLanguageModel, combine_output_with_sematic_scholar: bool, args: List[str] = []) -> Chain:
     parsed_args = _parse_primekg_args(args)
     graph = build_neo4j_graph()
     cypher_preprocessors = _build_preprocessors(graph, parsed_args.normalized_graph)
@@ -53,7 +53,7 @@ def build_chain(model: BaseLanguageModel, args: List[str] = []) -> Chain:
         entity_detector=EntityDetector() if parsed_args.use_entity_detection_preprocessing else None,
         allowed_types_and_description_templates=_get_primekg_entity_categories(),
         use_subgraph_expansion=parsed_args.use_subgraph_expansion,
-        combine_output_with_sematic_scholar=parsed_args.combine_output_with_sematic_scholar,
+        combine_output_with_sematic_scholar=combine_output_with_sematic_scholar,
         semantic_scholar_keyword_prompt=KEYWORD_PROMPT,
         combined_answer_generation_prompt=COMBINED_QA_PROMPT,
     )
@@ -96,7 +96,6 @@ def _parse_primekg_args(args: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--normalized_graph", action="store_true")
     parser.add_argument("--use_subgraph_expansion", action="store_true")
-    parser.add_argument("--combine_output_with_sematic_scholar", action="store_true")
     parser.add_argument("--use_entity_detection_preprocessing", action="store_true")
     parsed_args, _ = parser.parse_known_args(args)
     return parsed_args
