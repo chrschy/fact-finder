@@ -221,8 +221,6 @@ if st.button("Search") and text_area_input != "" and len(pipelines_selected) > 0
                 if pipeline_response.graph_prompt_answer != "":
                     st.text_area("Answer Prompt", value=pipeline_response.graph_prompt_answer, height=180)
 
-        # st.write("\n")
-        # st.markdown("#### **Evaluation**")
 
         st.caption("\n\nJSON Data:")
         with st.expander("Show JSON"):

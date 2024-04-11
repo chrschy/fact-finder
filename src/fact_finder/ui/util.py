@@ -36,64 +36,24 @@ class PipelineResponse(BaseModel):
 
 
 async def call_neo4j_rag(message:str, session_state):
-    # try:
     return session_state.neo4j_rag_chain.invoke(message)  # FIXME use ainvoke?
-    # except Exception as e:
-    #     print(e)
-    #     return {"graph_qa_output": GraphQAChainOutput(    
-    #         question="",
-    #         cypher_query="",
-    #         graph_response=[],
-    #         answer="",
-    #         evidence_sub_graph=[],
-    #         expanded_evidence_subgraph=[]
-    #         )
-    #     }
 
 
 async def call_neo4j(message:str, session_state):
-    # try:
     return session_state.neo4j_chain.invoke(message)  # FIXME use ainvoke?
-    # except Exception as e:
-    #     print(e)
-    #     return {"graph_qa_output": GraphQAChainOutput(    
-    #         question="",
-    #         cypher_query="",
-    #         graph_response=[],
-    #         answer="",
-    #         evidence_sub_graph=[],
-    #         expanded_evidence_subgraph=[]
-    #         )
-    #     }
 
 
 async def call_llm(message: str, session_state):
-    try:
-        return session_state.llm_chain.invoke(message)  # FIXME use ainvoke?
-    except Exception as e:
-        print(e)
-        return {"text": ""}
+    return session_state.llm_chain.invoke(message)  # FIXME use ainvoke?
 
 
 async def call_rag(message: str, session_state):
-    # try:
     return session_state.rag_chain.invoke(message)  # FIXME use ainvoke?
-    # except Exception as e:
-    #     print(e)
-    #     return {"rag_output": ""}
 
 
 async def call_summary(sub_graph: str, session_state):
-    try:
-        return session_state.summary_chain.invoke(sub_graph)  # FIXME use ainvoke?
-    except Exception as e:
-        print(e)
-        return {"summary": ""}
+    return session_state.summary_chain.invoke(sub_graph)  # FIXME use ainvoke?
 
-
-# async def call_chains(message: str, pipelines_selected: List[str], session_state):
-    # results = await asyncio.gather(call_neo4j(message, session_state), call_neo4j_rag(message, session_state), call_llm(message, session_state), call_rag(message, session_state))
-    # print(results)
 
 def call_chains(message: str, pipelines_selected: List[str], session_state):
     results = {}
@@ -163,7 +123,6 @@ def convert_intermediate_steps(intermediate_steps):
 
 def request_pipeline(text_data: str, pipelines_selected: List[str], session_state) -> PipelineResponse:
 
-    # results = asyncio.run(call_chains(text_data, pipelines_selected, session_state))
     results = call_chains(text_data, pipelines_selected, session_state)
     graph_result: GraphQAChainOutput = results[PipelineOptions.GRAPH.value]["graph_qa_output"]
     graph_rag_result: GraphQAChainOutput = results[PipelineOptions.GRAPH_DOC.value]["graph_qa_output"]
