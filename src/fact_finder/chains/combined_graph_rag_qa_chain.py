@@ -47,8 +47,3 @@ class CombinedQAChain(TextSearchQAChain):
             callbacks=run_manager.get_child(),
         )[self.rag_answer_generation_llm_chain.output_key]
         return result
-
-    def _prepare_chain_result(self, inputs: Dict[str, Any], answer: str) -> Dict[str, Any]:
-        # todo
-        filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.rag_answer_generation_llm_chain)
-        raise NotImplementedError
