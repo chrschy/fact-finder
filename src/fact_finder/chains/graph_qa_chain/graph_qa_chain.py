@@ -69,7 +69,7 @@ class GraphQAChain(Chain):
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
         config = RunnableConfig(callbacks=_run_manager.get_child())
         chain_result = self.combined_chain.invoke(inputs[self.input_key], config=config)
-        result = {self.output_key: chain_result["graph_qa_output"]}
+        result = {self.output_key: chain_result[self.output_key]}
         if self.return_intermediate_steps:
             result[self.intermediate_steps_key] = chain_result[self.intermediate_steps_key]
         return result
