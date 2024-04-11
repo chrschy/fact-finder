@@ -61,7 +61,10 @@ class AnswerGenerationChain(Chain):
         }
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, []) + [{self.output_key: answer}]
-            filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.llm_chain)
+            filled_prompt = fill_prompt_template(
+                inputs={"question": inputs[self.question_key], "context": inputs[self.graph_result_key]},
+                llm_chain=self.llm_chain,
+            )
             intermediate_steps.append({f"{self.__class__.__name__}_filled_prompt": filled_prompt})
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result

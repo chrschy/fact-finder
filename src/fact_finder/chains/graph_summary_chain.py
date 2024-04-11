@@ -49,7 +49,9 @@ class GraphSummaryChain(Chain):
 
     def _prepare_chain_result(self, inputs, answer):
         chain_result: Dict[str, Any] = {self.output_key: answer}
-        filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.graph_summary_llm_chain)
+        filled_prompt = fill_prompt_template(
+            inputs={"sub_graph": inputs[self.input_key]}, llm_chain=self.graph_summary_llm_chain
+        )
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
             intermediate_steps += [

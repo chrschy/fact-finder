@@ -57,7 +57,10 @@ class TextSearchQAChain(Chain):
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
             intermediate_steps.append(("rag_answer", answer))
-            filled_prompt = fill_prompt_template(llm_chain=self.rag_answer_generation_llm_chain, inputs=inputs)
+            filled_prompt = fill_prompt_template(
+                llm_chain=self.rag_answer_generation_llm_chain,
+                inputs={"context": inputs[self.rag_output_key], "question": inputs[self.question_key]},
+            )
             intermediate_steps.append({f"{self.__class__.__name__}_filled_prompt": filled_prompt})
             result[self.intermediate_steps_key] = intermediate_steps
         return result

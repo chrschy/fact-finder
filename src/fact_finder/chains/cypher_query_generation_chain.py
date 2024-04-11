@@ -92,7 +92,14 @@ class CypherQueryGenerationChain(Chain):
         chain_result = {self.output_key: generated_cypher}
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
-            filled_prompt = fill_prompt_template(llm_chain=self.cypher_generation_chain, inputs=inputs)
+            filled_prompt = fill_prompt_template(
+                llm_chain=self.cypher_generation_chain,
+                inputs={
+                    "question": inputs[self.input_key],
+                    "schema": self.graph_schema,
+                    "predicate_descriptions": self.predicate_descriptions_text,
+                },
+            )
             intermediate_steps += [
                 {"question": inputs[self.input_key]},
                 {self.output_key: generated_cypher},
