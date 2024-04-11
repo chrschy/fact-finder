@@ -1,19 +1,22 @@
-import os
 import asyncio
-from typing import Dict, List, Optional
-from pydantic import BaseModel
+import os
 from enum import Enum
+from typing import Dict, List, Optional
 
-from fact_finder.ui.graph_conversion import convert_subgraph, Subgraph
+from pydantic import BaseModel
+
 from fact_finder.chains.graph_qa_chain import GraphQAChainOutput
+from fact_finder.ui.graph_conversion import Subgraph, convert_subgraph
+
 
 class PipelineOptions(str, Enum):
-    LLM = 'LLM only'
-    GRAPH = 'Graph'
-    DOC = 'Document'
-    GRAPH_DOC = 'Graph+Document'
-    GRAPH_SUM = 'Graph Summary'
-    EVAL = 'Evaluation'
+    LLM = "LLM only"
+    GRAPH = "Graph"
+    DOC = "Document"
+    GRAPH_DOC = "Graph+Document"
+    GRAPH_SUM = "Graph Summary"
+    EVAL = "Evaluation"
+
 
 class PipelineResponse(BaseModel):
     status: str
@@ -35,11 +38,11 @@ class PipelineResponse(BaseModel):
     graph_rag_answer: str
 
 
-async def call_neo4j_rag(message:str, session_state):
+async def call_neo4j_rag(message: str, session_state):
     return session_state.neo4j_rag_chain.invoke(message)  # FIXME use ainvoke?
 
 
-async def call_neo4j(message:str, session_state):
+async def call_neo4j(message: str, session_state):
     return session_state.neo4j_chain.invoke(message)  # FIXME use ainvoke?
 
 
@@ -59,55 +62,61 @@ def call_chains(message: str, pipelines_selected: List[str], session_state):
     results = {}
 
     if PipelineOptions.LLM.value in pipelines_selected:
-        results[PipelineOptions.LLM.value]=asyncio.run(call_llm(message, session_state))
+        results[PipelineOptions.LLM.value] = asyncio.run(call_llm(message, session_state))
     else:
-        results[PipelineOptions.LLM.value]={"text": ""}
+        results[PipelineOptions.LLM.value] = {"text": ""}
 
     if PipelineOptions.GRAPH.value in pipelines_selected:
-        results[PipelineOptions.GRAPH.value]=asyncio.run(call_neo4j(message, session_state))
+        results[PipelineOptions.GRAPH.value] = asyncio.run(call_neo4j(message, session_state))
     else:
-        results[PipelineOptions.GRAPH.value]={"graph_qa_output": GraphQAChainOutput(    
-            question="",
-            cypher_query="",
-            graph_response=[],
-            answer="",
-            evidence_sub_graph=[],
-            expanded_evidence_subgraph=[]
+        results[PipelineOptions.GRAPH.value] = {
+            "graph_qa_output": GraphQAChainOutput(
+                question="",
+                cypher_query="",
+                graph_response=[],
+                answer="",
+                evidence_sub_graph=[],
+                expanded_evidence_subgraph=[],
             )
         }
 
     if PipelineOptions.GRAPH_DOC.value in pipelines_selected:
-        results[PipelineOptions.GRAPH_DOC.value]=asyncio.run(call_neo4j_rag(message, session_state))
+        results[PipelineOptions.GRAPH_DOC.value] = asyncio.run(call_neo4j_rag(message, session_state))
     else:
-        results[PipelineOptions.GRAPH_DOC.value]={"graph_qa_output": GraphQAChainOutput(    
-            question="",
-            cypher_query="",
-            graph_response=[],
-            answer="",
-            evidence_sub_graph=[],
-            expanded_evidence_subgraph=[]
+        results[PipelineOptions.GRAPH_DOC.value] = {
+            "graph_qa_output": GraphQAChainOutput(
+                question="",
+                cypher_query="",
+                graph_response=[],
+                answer="",
+                evidence_sub_graph=[],
+                expanded_evidence_subgraph=[],
             )
         }
 
     if PipelineOptions.DOC.value in pipelines_selected:
-        results[PipelineOptions.DOC.value]=asyncio.run(call_rag(message, session_state))
+        results[PipelineOptions.DOC.value] = asyncio.run(call_rag(message, session_state))
     else:
-        results[PipelineOptions.DOC.value]={"rag_output": ""}
-
+        results[PipelineOptions.DOC.value] = {"rag_output": ""}
 
     if "intermediate_steps" in results[PipelineOptions.GRAPH.value]:
-        results[PipelineOptions.GRAPH.value]["intermediate_steps"] = convert_intermediate_steps(results[PipelineOptions.GRAPH.value]["intermediate_steps"])
+        results[PipelineOptions.GRAPH.value]["intermediate_steps"] = convert_intermediate_steps(
+            results[PipelineOptions.GRAPH.value]["intermediate_steps"]
+        )
 
     if "intermediate_steps" in results[PipelineOptions.GRAPH_DOC.value]:
-        results[PipelineOptions.GRAPH_DOC.value]["intermediate_steps"] = convert_intermediate_steps(results[PipelineOptions.GRAPH_DOC.value]["intermediate_steps"])
+        results[PipelineOptions.GRAPH_DOC.value]["intermediate_steps"] = convert_intermediate_steps(
+            results[PipelineOptions.GRAPH_DOC.value]["intermediate_steps"]
+        )
 
     if "intermediate_steps" in results[PipelineOptions.DOC.value]:
-        results[PipelineOptions.DOC.value]["intermediate_steps"] = convert_intermediate_steps(results[PipelineOptions.DOC.value]["intermediate_steps"])
+        results[PipelineOptions.DOC.value]["intermediate_steps"] = convert_intermediate_steps(
+            results[PipelineOptions.DOC.value]["intermediate_steps"]
+        )
 
     print(results)
 
     return results
-
 
 
 def convert_intermediate_steps(intermediate_steps):
@@ -139,16 +148,44 @@ def request_pipeline(text_data: str, pipelines_selected: List[str], session_stat
         graph_answer=graph_result.answer,
         graph_query=graph_result.cypher_query,
         graph_response=graph_result.graph_response,
-        graph_prompt_cypher=results[PipelineOptions.GRAPH.value]["intermediate_steps"]["CypherQueryGenerationChain_filled_prompt"] if "intermediate_steps" in results[PipelineOptions.GRAPH.value] else "",
-        graph_prompt_answer=results[PipelineOptions.GRAPH.value]["intermediate_steps"]["AnswerGenerationChain_filled_prompt"] if "intermediate_steps" in results[PipelineOptions.GRAPH.value] else "",
+        graph_prompt_cypher=(
+            results[PipelineOptions.GRAPH.value]["intermediate_steps"]["CypherQueryGenerationChain_filled_prompt"]
+            if "intermediate_steps" in results[PipelineOptions.GRAPH.value]
+            else ""
+        ),
+        graph_prompt_answer=(
+            results[PipelineOptions.GRAPH.value]["intermediate_steps"]["AnswerGenerationChain_filled_prompt"]
+            if "intermediate_steps" in results[PipelineOptions.GRAPH.value]
+            else ""
+        ),
         graph_subgraph=subgraph,
         graph_subgraph_neo4j=graph_result.evidence_sub_graph,
-        graph_summary=asyncio.run(call_summary(triplets, session_state))["summary"] if PipelineOptions.GRAPH_SUM.value in pipelines_selected else "",
+        graph_summary=(
+            asyncio.run(call_summary(triplets, session_state))["summary"]
+            if PipelineOptions.GRAPH_SUM.value in pipelines_selected
+            else ""
+        ),
         graph_expanded_subgraph=expanded_subgraph,
-        graph_expanded_summary=asyncio.run(call_summary(expanded_triples, session_state))["summary"] if PipelineOptions.GRAPH_SUM.value in pipelines_selected else "",
+        graph_expanded_summary=(
+            asyncio.run(call_summary(expanded_triples, session_state))["summary"]
+            if PipelineOptions.GRAPH_SUM.value in pipelines_selected
+            else ""
+        ),
         rag_answer=results[PipelineOptions.DOC.value]["rag_output"],
-        rag_keywords=results[PipelineOptions.DOC.value]["intermediate_steps"]["search_keywords"] if "intermediate_steps" in results[PipelineOptions.DOC.value] else "",
-        rag_paragraphs=results[PipelineOptions.DOC.value]["intermediate_steps"]["semantic_scholar_result"] if "intermediate_steps" in results[PipelineOptions.DOC.value] else "",
-        rag_prompt_answer=results[PipelineOptions.DOC.value]["intermediate_steps"]["TextSearchQAChain_filled_prompt"] if "intermediate_steps" in results[PipelineOptions.DOC.value] else "",
-        graph_rag_answer=graph_rag_result.answer
+        rag_keywords=(
+            results[PipelineOptions.DOC.value]["intermediate_steps"]["search_keywords"]
+            if "intermediate_steps" in results[PipelineOptions.DOC.value]
+            else ""
+        ),
+        rag_paragraphs=(
+            results[PipelineOptions.DOC.value]["intermediate_steps"]["semantic_scholar_result"]
+            if "intermediate_steps" in results[PipelineOptions.DOC.value]
+            else ""
+        ),
+        rag_prompt_answer=(
+            results[PipelineOptions.DOC.value]["intermediate_steps"]["TextSearchQAChain_filled_prompt"]
+            if "intermediate_steps" in results[PipelineOptions.DOC.value]
+            else ""
+        ),
+        graph_rag_answer=graph_rag_result.answer,
     )

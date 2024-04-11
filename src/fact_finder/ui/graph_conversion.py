@@ -2,11 +2,9 @@ import asyncio
 import sys
 from typing import Any, Dict, List
 
-from fact_finder.utils import (
-    get_triples_from_graph_result,
-    graph_result_contains_triple,
-)
 from pydantic import BaseModel
+
+from fact_finder.utils import get_triples_from_graph_result, graph_result_contains_triple
 
 
 class Node(BaseModel):
@@ -30,7 +28,6 @@ class Edge(BaseModel):
 class Subgraph(BaseModel):
     nodes: List[Node]
     edges: List[Edge]
-
 
 
 def convert_subgraph(graph: List[Dict[str, Any]], result: List[Dict[str, Any]]) -> (Subgraph, str):
@@ -139,4 +136,3 @@ def _process_nodes_only(entry, graph_converted: Subgraph, result_ents: list) -> 
             except Exception as e:
                 print(e)
     return graph_triplet
-

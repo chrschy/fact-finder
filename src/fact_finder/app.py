@@ -2,18 +2,17 @@ import asyncio
 import sys
 from typing import Any, Dict, List
 
-import fact_finder.config.primekg_config as graph_config
-import fact_finder.config.simple_config as llm_config
 import streamlit as st
 import streamlit.components.v1 as components
 from dotenv import load_dotenv
-from fact_finder.utils import (
-    load_chat_model,
-)
-from fact_finder.ui.util import request_pipeline, PipelineOptions
-from fact_finder.ui.graph_conversion import Subgraph
 from PIL import Image
 from pyvis.network import Network
+
+import fact_finder.config.primekg_config as graph_config
+import fact_finder.config.simple_config as llm_config
+from fact_finder.ui.graph_conversion import Subgraph
+from fact_finder.ui.util import PipelineOptions, request_pipeline
+from fact_finder.utils import load_chat_model
 
 load_dotenv()
 
@@ -114,7 +113,6 @@ def get_html(html: str, legend=False):
     return WRAPPER.format(html)
 
 
-
 def generate_graph(graph: Subgraph, send_request=False, enable_dynamics: bool = True):
     net = Network(
         height="530px", width="100%"
@@ -163,9 +161,22 @@ else:
 
 
 pipelines_selected = st.multiselect(
-    label='Select Pipelines',
-    options=[PipelineOptions.LLM.value, PipelineOptions.GRAPH.value, PipelineOptions.DOC.value, PipelineOptions.GRAPH_DOC.value, PipelineOptions.GRAPH_SUM.value],
-    default=[PipelineOptions.LLM.value, PipelineOptions.GRAPH.value, PipelineOptions.DOC.value, PipelineOptions.GRAPH_DOC.value, PipelineOptions.GRAPH_SUM.value])
+    label="Select Pipelines",
+    options=[
+        PipelineOptions.LLM.value,
+        PipelineOptions.GRAPH.value,
+        PipelineOptions.DOC.value,
+        PipelineOptions.GRAPH_DOC.value,
+        PipelineOptions.GRAPH_SUM.value,
+    ],
+    default=[
+        PipelineOptions.LLM.value,
+        PipelineOptions.GRAPH.value,
+        PipelineOptions.DOC.value,
+        PipelineOptions.GRAPH_DOC.value,
+        PipelineOptions.GRAPH_SUM.value,
+    ],
+)
 
 
 if st.button("Search") and text_area_input != "" and len(pipelines_selected) > 0:
@@ -213,14 +224,15 @@ if st.button("Search") and text_area_input != "" and len(pipelines_selected) > 0
                     )
                     components.html(html_graph_req, height=550)
                     if PipelineOptions.GRAPH_SUM.value in pipelines_selected:
-                        st.text_area("Expanded Graph Summary", value=pipeline_response.graph_expanded_summary, height=180)
+                        st.text_area(
+                            "Expanded Graph Summary", value=pipeline_response.graph_expanded_summary, height=180
+                        )
                     st.write("\n")
 
                 if pipeline_response.graph_prompt_cypher != "":
                     st.text_area("Cypher Prompt", value=pipeline_response.graph_prompt_cypher, height=180)
                 if pipeline_response.graph_prompt_answer != "":
                     st.text_area("Answer Prompt", value=pipeline_response.graph_prompt_answer, height=180)
-
 
         st.caption("\n\nJSON Data:")
         with st.expander("Show JSON"):
