@@ -188,7 +188,8 @@ if st.button("Search") and text_area_input != "" and len(pipelines_selected) > 0
             with st.expander("Show Sources"):
                 st.text_input("Keywords", value=pipeline_response.rag_keywords)
                 st.text_area("Paragraphs", value=pipeline_response.rag_paragraphs, height=180)
-                st.text_area("Prompt", value=pipeline_response.rag_prompt_answer, height=180)
+                if pipeline_response.rag_prompt_answer != "":
+                    st.text_area("Prompt", value=pipeline_response.rag_prompt_answer, height=180)
 
         if PipelineOptions.GRAPH.value in pipelines_selected:
             st.markdown("#### **Graph Retrieval**")
@@ -215,8 +216,10 @@ if st.button("Search") and text_area_input != "" and len(pipelines_selected) > 0
                         st.text_area("Expanded Graph Summary", value=pipeline_response.graph_expanded_summary, height=180)
                     st.write("\n")
 
-                st.text_area("Cypher Prompt", value=pipeline_response.graph_prompt_cypher, height=180)
-                st.text_area("Answer Prompt", value=pipeline_response.graph_prompt_answer, height=180)
+                if pipeline_response.graph_prompt_cypher != "":
+                    st.text_area("Cypher Prompt", value=pipeline_response.graph_prompt_cypher, height=180)
+                if pipeline_response.graph_prompt_answer != "":
+                    st.text_area("Answer Prompt", value=pipeline_response.graph_prompt_answer, height=180)
 
         # st.write("\n")
         # st.markdown("#### **Evaluation**")
