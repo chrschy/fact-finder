@@ -5,6 +5,8 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 
+from fact_finder.utils import fill_prompt_template
+
 
 class CombinedQAChain(TextSearchQAChain):
     cypher_query_key: str = "preprocessed_cypher_query"  #: :meta private:
@@ -34,12 +36,19 @@ class CombinedQAChain(TextSearchQAChain):
         )
 
     def _generate_answer(self, inputs: Dict[str, Any], run_manager: CallbackManagerForChainRun) -> str:
-        return self.rag_answer_generation_llm_chain(
-            {
-                "abstracts": inputs[self.rag_output_key],
-                "graph_answer": inputs[self.graph_result_key],
-                "question": inputs[self.question_key],
-                "cypher_query": inputs[self.cypher_query_key],
-            },
+        inputs = {
+            "abstracts": inputs[self.rag_output_key],
+            "graph_answer": inputs[self.graph_result_key],
+            "question": inputs[self.question_key],
+            "cypher_query": inputs[self.cypher_query_key],
+        }
+        result = self.rag_answer_generation_llm_chain(
+            inputs=inputs,
             callbacks=run_manager.get_child(),
         )[self.rag_answer_generation_llm_chain.output_key]
+        return result
+
+    def _prepare_chain_result(self, inputs: Dict[str, Any], answer: str) -> Dict[str, Any]:
+        # todo
+        filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.rag_answer_generation_llm_chain)
+        raise NotImplementedError
