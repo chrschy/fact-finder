@@ -25,7 +25,6 @@ The following flags are available:
 ```
 --normalized_graph  =  Apply synonym replacement based on the normalized graph to the cypher queries before applying them to the graph. This requires the corresponding api key ($SYNONYM_API_KEY) to be set.
 --use_entity_detection_preprocessing  =  Apply entity detection to the user question before generating the cypher query. The found entities will be replaced by their preferred terms and a string describing their category (e.g. "Psoriasis is a disease.") will be added to the query. This requires the corresponding api key ($SYNONYM_API_KEY) to be set. Also, the normalized graph should be used.
---combine_output_with_sematic_scholar  =  Combine the graph result with the result of a semantic scholar search.
 --use_subgraph_expansion  =  The evidence graph gets expanded through the surrounding neighborhoods.
 ```
 
