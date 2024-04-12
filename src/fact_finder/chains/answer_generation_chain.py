@@ -35,15 +35,11 @@ class AnswerGenerationChain(Chain):
 
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
-        graph_result = inputs[self.graph_result_key]
-        question = inputs[self.question_key]
-        answer = self._run_qa_chain(graph_result, question, _run_manager)
+        answer = self._run_qa_chain(inputs, _run_manager)
         return self._prepare_chain_result(inputs, answer)
 
-    def _run_qa_chain(
-        self, graph_result: List[Dict[str, Any]], question: str, run_manager: CallbackManagerForChainRun
-    ) -> str:
-        inputs = {"question": question, "context": graph_result}
+    def _run_qa_chain(self, inputs: Dict[str, Any], run_manager: CallbackManagerForChainRun) -> str:
+        inputs = self._prepare_chain_input(inputs)
         final_result = self.llm_chain(
             inputs=inputs,
             callbacks=run_manager.get_child(),
@@ -62,9 +58,12 @@ class AnswerGenerationChain(Chain):
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, []) + [{self.output_key: answer}]
             filled_prompt = fill_prompt_template(
-                inputs={"question": inputs[self.question_key], "context": inputs[self.graph_result_key]},
+                inputs=self._prepare_chain_input(inputs),
                 llm_chain=self.llm_chain,
             )
             intermediate_steps.append({f"{self.__class__.__name__}_filled_prompt": filled_prompt})
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
+
+    def _prepare_chain_input(self, inputs: Dict[str, Any]):
+        return {"question": inputs[self.question_key], "context": inputs[self.graph_result_key]}

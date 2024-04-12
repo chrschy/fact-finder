@@ -57,8 +57,7 @@ class CypherQueryGenerationChain(Chain):
         run_manager: Optional[CallbackManagerForChainRun] = None,
     ) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
-        question = inputs[self.input_key]
-        generated_cypher = self._generate_cypher(question, _run_manager)
+        generated_cypher = self._generate_cypher(inputs, _run_manager)
         return self._prepare_chain_result(inputs, generated_cypher)
 
     def _construct_predicate_descriptions_text(self, predicate_descriptions: List[Dict[str, str]]) -> str:
@@ -70,14 +69,9 @@ class CypherQueryGenerationChain(Chain):
             result.append(item_as_text)
         return "\n".join(result)
 
-    def _generate_cypher(self, question: str, run_manager: CallbackManagerForChainRun) -> str:
-        inputs = {
-            "question": question,
-            "schema": self.graph_schema,
-            "predicate_descriptions": self.predicate_descriptions_text,
-        }
+    def _generate_cypher(self, inputs: Dict[str, Any], run_manager: CallbackManagerForChainRun) -> str:
         generated_cypher = self.cypher_generation_chain(
-            inputs=inputs,
+            inputs=self._prepare_chain_input(inputs),
             callbacks=run_manager.get_child(),
         )[self.cypher_generation_chain.output_key]
         generated_cypher = extract_cypher(generated_cypher)
@@ -94,11 +88,7 @@ class CypherQueryGenerationChain(Chain):
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
             filled_prompt = fill_prompt_template(
                 llm_chain=self.cypher_generation_chain,
-                inputs={
-                    "question": inputs[self.input_key],
-                    "schema": self.graph_schema,
-                    "predicate_descriptions": self.predicate_descriptions_text,
-                },
+                inputs=self._prepare_chain_input(inputs),
             )
             intermediate_steps += [
                 {"question": inputs[self.input_key]},
@@ -107,3 +97,10 @@ class CypherQueryGenerationChain(Chain):
             ]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
+
+    def _prepare_chain_input(self, inputs: Dict[str, Any]):
+        return {
+            "question": inputs[self.input_key],
+            "schema": self.graph_schema,
+            "predicate_descriptions": self.predicate_descriptions_text,
+        }
