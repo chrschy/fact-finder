@@ -6,6 +6,8 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 
+from fact_finder.utils import fill_prompt_template
+
 
 class TextSearchQAChain(Chain):
     rag_answer_generation_llm_chain: LLMChain
@@ -43,15 +45,19 @@ class TextSearchQAChain(Chain):
         return self._build_result(inputs, answer)
 
     def _generate_answer(self, inputs: Dict[str, Any], run_manager: CallbackManagerForChainRun) -> str:
-        return self.rag_answer_generation_llm_chain(
-            {"context": inputs[self.rag_output_key], "question": inputs[self.question_key]},
+        inputs = {"context": inputs[self.rag_output_key], "question": inputs[self.question_key]}
+        result = self.rag_answer_generation_llm_chain(
+            inputs=inputs,
             callbacks=run_manager.get_child(),
         )[self.rag_answer_generation_llm_chain.output_key]
+        return result
 
     def _build_result(self, inputs: Dict[str, Any], answer: str) -> Dict[str, Any]:
         result: Dict[str, Any] = {self.output_key: answer}
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
             intermediate_steps.append(("rag_answer", answer))
+            filled_prompt = fill_prompt_template(llm_chain=self.rag_answer_generation_llm_chain, inputs=inputs)
+            intermediate_steps.append({f"{self.__class__.__name__}_filled_prompt": filled_prompt})
             result[self.intermediate_steps_key] = intermediate_steps
         return result

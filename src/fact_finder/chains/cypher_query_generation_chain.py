@@ -7,6 +7,8 @@ from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
 
+from fact_finder.utils import fill_prompt_template
+
 
 class CypherQueryGenerationChain(Chain):
     cypher_generation_chain: LLMChain
@@ -69,12 +71,13 @@ class CypherQueryGenerationChain(Chain):
         return "\n".join(result)
 
     def _generate_cypher(self, question: str, run_manager: CallbackManagerForChainRun) -> str:
+        inputs = {
+            "question": question,
+            "schema": self.graph_schema,
+            "predicate_descriptions": self.predicate_descriptions_text,
+        }
         generated_cypher = self.cypher_generation_chain(
-            {
-                "question": question,
-                "schema": self.graph_schema,
-                "predicate_descriptions": self.predicate_descriptions_text,
-            },
+            inputs=inputs,
             callbacks=run_manager.get_child(),
         )[self.cypher_generation_chain.output_key]
         generated_cypher = extract_cypher(generated_cypher)
@@ -89,6 +92,11 @@ class CypherQueryGenerationChain(Chain):
         chain_result = {self.output_key: generated_cypher}
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
-            intermediate_steps += [{"question": inputs[self.input_key]}, {self.output_key: generated_cypher}]
+            filled_prompt = fill_prompt_template(llm_chain=self.cypher_generation_chain, inputs=inputs)
+            intermediate_steps += [
+                {"question": inputs[self.input_key]},
+                {self.output_key: generated_cypher},
+                {f"{self.__class__.__name__}_filled_prompt": filled_prompt},
+            ]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result

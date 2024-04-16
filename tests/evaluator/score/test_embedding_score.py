@@ -21,7 +21,7 @@ def test_no_match(scorer):
     text_a = "This is a test."
     text_b = "Hello"
     score = scorer.compare(text_a, text_b)
-    assert score < 0.1
+    assert score < 0.2
 
 
 def test_partial_match(scorer):

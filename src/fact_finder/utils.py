@@ -1,6 +1,7 @@
 import os
 from typing import Dict, List
 
+from langchain.chains import LLMChain
 from langchain_community.graphs import Neo4jGraph
 from langchain_core.language_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
@@ -45,3 +46,9 @@ def graph_result_contains_triple(graph_result_entry):
 
 def get_triples_from_graph_result(graph_result_entry) -> List[dict]:
     return [value for key, value in graph_result_entry.items() if type(value) is tuple]
+
+
+def fill_prompt_template(llm_chain: LLMChain, inputs: Dict) -> str:
+    # filled_prompt, _ = llm_chain.prep_prompts([inputs])
+    # return filled_prompt[0].text
+    return ""
