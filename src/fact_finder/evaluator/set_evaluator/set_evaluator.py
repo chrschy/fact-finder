@@ -5,7 +5,7 @@ from fact_finder.evaluator.evaluation_sample import EvaluationSample
 from fact_finder.utils import build_neo4j_graph
 
 
-class SetEvaluator(ABC):
+class SetEvaluator:
     CYPHER_QUERY_TEMPLATE: str = "MATCH (n) WHERE n.index ={idx} RETURN n.name"
 
     def __init__(self):

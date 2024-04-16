@@ -63,7 +63,11 @@ class Evaluation:
         print("Running Chain...")
         for eval_sample in tqdm(self.eval_samples):
             inputs = {"question": eval_sample.question}
-            result = self.chain.invoke(inputs)
+            try:
+                result = self.chain.invoke(inputs)
+            except Exception as e:
+                print(e)
+                continue
             results.append(result)
         return results
 
