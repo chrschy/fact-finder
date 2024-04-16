@@ -12,6 +12,7 @@ from evaluation_sample import EvaluationSample
 from fact_finder.evaluator.evaluator.answer_evaluator import AnswerEvaluator
 from fact_finder.evaluator.evaluator.cypher_query_generation_evaluator import CypherQueryGenerationEvaluator
 from fact_finder.evaluator.evaluator.evaluator import Evaluator
+from fact_finder.evaluator.evaluator.returned_nodes_evaluator import ReturnedNodesEvaluator
 from fact_finder.evaluator.score.bleu_score import BleuScore
 from fact_finder.evaluator.score.difflib_score import DifflibScore
 from fact_finder.evaluator.score.embedding_score import EmbeddingScore
@@ -28,7 +29,7 @@ class Evaluation:
         chain: Chain = None,
         chain_args: List[str] = ["--normalized_graph", "--use_entity_detection_preprocessing"],
         eval_path: str = "evaluation_samples.json",
-        evaluators: List[Evaluator] = [CypherQueryGenerationEvaluator(), AnswerEvaluator()],
+        evaluators: List[Evaluator] = [CypherQueryGenerationEvaluator(), AnswerEvaluator(), ReturnedNodesEvaluator()],
         scores: List[Score] = [BleuScore(), DifflibScore(), EmbeddingScore(), LevenshteinScore()],
     ):
         if not chat_model:
@@ -77,6 +78,8 @@ class Evaluation:
 
 
 if __name__ == "__main__":
-    evaluation = Evaluation()
+    evaluators = [ReturnedNodesEvaluator()]
+    scores = [BleuScore(), DifflibScore(), EmbeddingScore(), LevenshteinScore()]
+    evaluation = Evaluation(evaluators=evaluators, scores=scores)
     results = evaluation.run(save_as_excel=True)
     print(results)
