@@ -34,7 +34,9 @@ class Evaluation:
         if not chat_model:
             self.chat_model = load_chat_model()
         if not chain:
-            self.chain = graph_config.build_chain(self.chat_model, chain_args)
+            self.chain = graph_config.build_chain(
+                model=self.chat_model, combine_output_with_sematic_scholar=True, args=chain_args
+            )
         self.eval_samples = self.eval_samples(eval_path)
         self.evaluators = evaluators
         self.scores = scores
