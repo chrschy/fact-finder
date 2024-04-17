@@ -39,17 +39,17 @@ class GraphSummaryChain(Chain):
         )
 
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
-        graph_triplets = inputs[self.input_key]
-        inputs = {"sub_graph": graph_triplets}
         answer = self.graph_summary_llm_chain(
-            inputs=inputs,
+            inputs=self._prepare_chain_input(inputs),
             callbacks=run_manager.get_child(),
         )[self.graph_summary_llm_chain.output_key]
         return self._prepare_chain_result(inputs, answer)
 
     def _prepare_chain_result(self, inputs, answer):
         chain_result: Dict[str, Any] = {self.output_key: answer}
-        filled_prompt = fill_prompt_template(inputs=inputs, llm_chain=self.graph_summary_llm_chain)
+        filled_prompt = fill_prompt_template(
+            inputs=self._prepare_chain_input(inputs), llm_chain=self.graph_summary_llm_chain
+        )
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
             intermediate_steps += [
@@ -59,3 +59,6 @@ class GraphSummaryChain(Chain):
             ]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
+
+    def _prepare_chain_input(self, inputs: Dict[str, Any]):
+        return {"sub_graph": inputs[self.input_key]}

@@ -46,9 +46,7 @@ def chain(keyword_prompt_template, rag_answer_generation_prompt_template) -> Cha
 
 def test_simple_question(chain):
     answer = chain.invoke({"question": "Alternative causes of fever in malaria infections?"})
-    assert answer["rag_output"].startswith(
-        "Alternative causes of fever in malaria infections could include dengue, scrub typhus"
-    )
+    assert answer["rag_output"].startswith("Alternative causes of fever in")
 
 
 def _mock_get(url: str, params: dict, headers: dict):

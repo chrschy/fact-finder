@@ -42,22 +42,27 @@ class TextSearchQAChain(Chain):
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
         run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
         answer = self._generate_answer(inputs, run_manager)
-        return self._build_result(inputs, answer)
+        return self._prepare_chain_result(inputs, answer)
 
     def _generate_answer(self, inputs: Dict[str, Any], run_manager: CallbackManagerForChainRun) -> str:
-        inputs = {"context": inputs[self.rag_output_key], "question": inputs[self.question_key]}
         result = self.rag_answer_generation_llm_chain(
-            inputs=inputs,
+            inputs=self._prepare_chain_input(inputs),
             callbacks=run_manager.get_child(),
         )[self.rag_answer_generation_llm_chain.output_key]
         return result
 
-    def _build_result(self, inputs: Dict[str, Any], answer: str) -> Dict[str, Any]:
+    def _prepare_chain_result(self, inputs: Dict[str, Any], answer: str) -> Dict[str, Any]:
         result: Dict[str, Any] = {self.output_key: answer}
         if self.return_intermediate_steps:
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
             intermediate_steps.append(("rag_answer", answer))
-            filled_prompt = fill_prompt_template(llm_chain=self.rag_answer_generation_llm_chain, inputs=inputs)
+            filled_prompt = fill_prompt_template(
+                inputs=self._prepare_chain_input(inputs),
+                llm_chain=self.rag_answer_generation_llm_chain,
+            )
             intermediate_steps.append({f"{self.__class__.__name__}_filled_prompt": filled_prompt})
             result[self.intermediate_steps_key] = intermediate_steps
         return result
+
+    def _prepare_chain_input(self, inputs: Dict[str, Any]):
+        return {"context": inputs["semantic_scholar_result"], "question": inputs["question"]}
