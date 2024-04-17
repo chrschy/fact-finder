@@ -65,15 +65,4 @@ class TextSearchQAChain(Chain):
         return result
 
     def _prepare_chain_input(self, inputs: Dict[str, Any]):
-        required_keys = self.rag_answer_generation_llm_chain.input_keys
-        if len(required_keys) == 2:
-            return {"context": inputs["semantic_scholar_result"], "question": inputs["question"]}
-        elif len(required_keys) == 4:
-            return {
-                "abstracts": inputs["semantic_scholar_result"],
-                "cypher_query": inputs["cypher_query"],
-                "graph_answer": inputs["graph_result"],
-                "question": inputs["question"],
-            }
-        else:
-            raise ValueError(f"Invalid Input {inputs}")
+        return {"context": inputs["semantic_scholar_result"], "question": inputs["question"]}
