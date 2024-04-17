@@ -21,10 +21,10 @@ class SetEvaluator:
 
     def evaluate_single(self, sample: EvaluationSample, result: Dict[str, Any]) -> float:
         ids = [node["index"] for node in sample.nodes]
-        names = []
+        names = set()
         for number in ids:
             graph_return = self.graph.query(self.CYPHER_QUERY_TEMPLATE.replace("{idx}", f"{number}"))
-            names.append(graph_return[0]["n.name"])
+            names.add(graph_return[0]["n.name"])
         result_graph_output = result["graph_qa_output"].graph_response
         assert result_graph_output
         result_graph_output_keys = list(result_graph_output[0].keys())

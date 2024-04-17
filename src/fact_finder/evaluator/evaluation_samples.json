@@ -2,7 +2,7 @@
   {
     "question": "Which medications have more off-label uses than approved indications?",
     "cypher_query": "MATCH (d:disease)-[:off_label_use]->(dr:drug)\nWITH dr, COUNT(d) AS offLabelCount\nMATCH (d:disease)-[:indication]->(dr)\nWITH dr, offLabelCount, COUNT(d) AS indicationCount\nWHERE offLabelCount>indicationCount\nRETURN dr.name AS Drug, offLabelCount AS OffLabelUses, indicationCount AS ApprovedIndications",
-    "sub_graph": [
+    "nodes": [
       {
         "index": 14016,
         "name": "Medrysone",
@@ -2909,7 +2909,7 @@
   {
     "question": "Which medications have more off-label uses than approved uses?",
     "cypher_query": "MATCH (d:disease)-[:off_label_use]->(dr:drug)\nWITH dr, COUNT(d) AS offLabelCount\nMATCH (d:disease)-[:indication]->(dr)\nWITH dr, offLabelCount, COUNT(d) AS approvedCount\nWHERE offLabelCount>approvedCount\nRETURN dr.name AS DrugName, offLabelCount AS OffLabelUses, approvedCount AS ApprovedUses",
-    "sub_graph": [
+    "nodes": [
       {
         "index": 14016,
         "name": "Medrysone",
@@ -5816,7 +5816,7 @@
   {
     "question": "Which diseases have only treatments that have no side effects at all?",
     "cypher_query": "MATCH (d:disease)-[:indication]->(dr:drug)\nWHERE NOT EXISTS ((dr)-[:side_effect]->(:effect_or_phenotype))\nRETURN d.name AS DiseaseName",
-    "sub_graph": [
+    "nodes": [
       {
         "index": 16687,
         "name": "Fosinopril"
@@ -13029,7 +13029,7 @@
   {
     "question": "How does Asbestos interact with the human body?",
     "cypher_query": "MATCH (e:exposure {name: \"asbestos\"})-[:interacts_with]->(bp:biological_process)\nRETURN e.name, bp.name",
-    "sub_graph": [
+    "nodes": [
       {
         "index": 39999,
         "name": "inflammatory response"
@@ -13058,7 +13058,7 @@
   {
     "question": "Which exposures are linked to more than 10 diseases?",
     "cypher_query": "MATCH (e:exposure)-[:linked_to]->(d:disease)\nWITH e, COUNT(d) AS diseaseCount\nWHERE diseaseCount>10\nRETURN e.name",
-    "sub_graph": [
+    "nodes": [
       {
         "index": 61848,
         "name": "2,4,5-Trichlorophenoxyacetic Acid"
