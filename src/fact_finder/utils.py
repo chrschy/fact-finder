@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from langchain.chains import LLMChain
 from langchain_community.graphs import Neo4jGraph
@@ -48,7 +48,5 @@ def get_triples_from_graph_result(graph_result_entry) -> List[dict]:
     return [value for key, value in graph_result_entry.items() if type(value) is tuple]
 
 
-def fill_prompt_template(llm_chain: LLMChain, inputs: Dict) -> str:
-    # filled_prompt, _ = llm_chain.prep_prompts([inputs])
-    # return filled_prompt[0].text
-    return ""
+def fill_prompt_template(llm_chain: LLMChain, inputs: Dict[str, Any]) -> str:
+    return llm_chain.prep_prompts([inputs])[0][0].text

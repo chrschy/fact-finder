@@ -36,14 +36,17 @@ class CombinedQAChain(TextSearchQAChain):
         )
 
     def _generate_answer(self, inputs: Dict[str, Any], run_manager: CallbackManagerForChainRun) -> str:
-        inputs = {
-            "abstracts": inputs[self.rag_output_key],
-            "graph_answer": inputs[self.graph_result_key],
-            "question": inputs[self.question_key],
-            "cypher_query": inputs[self.cypher_query_key],
-        }
+        inputs = self._prepare_chain_input(inputs)
         result = self.rag_answer_generation_llm_chain(
             inputs=inputs,
             callbacks=run_manager.get_child(),
         )[self.rag_answer_generation_llm_chain.output_key]
         return result
+
+    def _prepare_chain_input(self, inputs: Dict[str, Any]):
+        return {
+            "abstracts": inputs["semantic_scholar_result"],
+            "cypher_query": inputs["cypher_query"],
+            "graph_answer": inputs["graph_result"],
+            "question": inputs["question"],
+        }
