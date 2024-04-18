@@ -26,6 +26,10 @@ def build_neo4j_graph() -> Neo4jGraph:
     return Neo4jGraph(url=NEO4J_URL, username=NEO4J_USER, password=NEO4J_PW)
 
 
+def get_model_from_env():
+    return os.getenv("LLM", "gpt-4-turbo")
+
+
 def load_chat_model() -> BaseChatModel:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     assert OPENAI_API_KEY is not None, "An OpenAI API key has to be set as environment variable OPENAI_API_KEY."
@@ -37,7 +41,8 @@ def load_chat_model() -> BaseChatModel:
         os.environ["AZURE_OPENAI_API_KEY"] = OPENAI_API_KEY
         os.environ["AZURE_OPENAI_ENDPOINT"] = endpoint
         return AzureChatOpenAI(openai_api_version=api_version, azure_deployment=deployment_name)
-    return ChatOpenAI(model="gpt-4", streaming=False, temperature=0, api_key=OPENAI_API_KEY)
+    model = get_model_from_env()
+    return ChatOpenAI(model=model, streaming=False, temperature=0, api_key=OPENAI_API_KEY)
 
 
 def graph_result_contains_triple(graph_result_entry):

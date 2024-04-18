@@ -53,9 +53,9 @@ class EvalSampleAddition:
             json.dump([x.dict() for x in evaluation_samples], w, indent=4)
 
 
-if __name__ == "__main__":
+def roman_script():
     load_dotenv()
-    eval_sample_addidtion = EvalSampleAddition(
+    eval_sample_addition = EvalSampleAddition(
         graph=build_neo4j_graph(),
         subgraph_extractor=LLMSubGraphExtractor(
             model=load_chat_model(),
@@ -118,10 +118,66 @@ if __name__ == "__main__":
 
     for sample in manual_samples:
 
-        eval_sample_addidtion.add_to_evaluation_sample_json(
+        eval_sample_addition.add_to_evaluation_sample_json(
             question=sample["question"],
             expected_cypher=sample["expected_cypher"],
             source="manual",
             expected_answer=sample["expected_answer"],
             is_answerable=True,
         )
+
+
+if __name__ == "__main__":
+    load_dotenv()
+    manual_samples = [
+        {
+            "question": "In which Anatomical regions is IRAK4 expressed?",
+            "expected_answer": "omental fat pad, cerebral cortex, adipose tissue of the abdominal region, layer, squamous epithelium, nasal cavity epithelium, mammary gland, oviduct, fallopian tube, oral cavity, esophagus, decidua, muscle, connective tissue, tonsil, bone marrow, thymus gland, adrenal gland, prostate gland, peritoneum, corpus callosum, spinal cord, subcutaneous adipose tissue, bronchus, cerebellar cortex, jejunum, duodenum, kidney, small intestine, liver, spleen, heart left ventricle, cardiac ventricle, cardiac atrium, lung, thyroid gland, substantia nigra, cerebellum, placenta, Ammon's horn, neocortex, hypothalamus, telencephalon, mesencephalon, forebrain, temporal lobe",
+            "cypher_query": 'MATCH (g:gene_or_protein {name: "irak4"})-[:expression_present]->(a:anatomy) RETURN a.name',
+        },
+        {
+            "question": "What are the phenotypes associated with cardioacrofacial dysplasia?",
+            "expected_answer": "mandibular prognathia, postaxial foot polydactyly, clinodactyly of the 5th finger, clubbing, hypodontia, left superior vena cava draining to coronary sinus, common atrium, recurrent patellar dislocation, postaxial hand polydactyly, narrow chest, broad forehead, prominent nasal tip, deep philtrum, tented upper lip vermilion, conical tooth, diastema, autosomal dominant inheritance, short philtrum, genu valgum, long thorax, atrioventricular canal defect, hypoplasia of the maxilla, postaxial polydactyly, accessory oral frenulum, overhanging nasal tip, midface retrusion, nail dysplasia, long face, complete atrioventricular canal defect, congenital onset, limb undergrowth",
+            "cypher_query": 'MATCH (d:disease {name: "cardioacrofacial dysplasia"})-[:phenotype_present]->(p:effect_or_phenotype) RETURN p.name',
+        },
+        {
+            "question": "What are the symptoms of cardioacrofacial dysplasia?",
+            "expected_answer": "mandibular prognathia, postaxial foot polydactyly, clinodactyly of the 5th finger, clubbing, hypodontia, left superior vena cava draining to coronary sinus, common atrium, recurrent patellar dislocation, postaxial hand polydactyly, narrow chest, broad forehead, prominent nasal tip, deep philtrum, tented upper lip vermilion, conical tooth, diastema, autosomal dominant inheritance, short philtrum, genu valgum, long thorax, atrioventricular canal defect, hypoplasia of the maxilla, postaxial polydactyly, accessory oral frenulum, overhanging nasal tip, midface retrusion, nail dysplasia, long face, complete atrioventricular canal defect, congenital onset, limb undergrowth",
+            "cypher_query": 'MATCH (d:disease {name: "cardioacrofacial dysplasia"})-[:phenotype_present]->(e:effect_or_phenotype) RETURN e.name',
+        },
+        {
+            "question": "What pathways are involved in distal arthrogryposis?",
+            "expected_answer": ...,
+            "cypher_query": ...,
+        },
+        {
+            "question": ...,
+            "expected_answer": ...,
+            "cypher_query": ...,
+        },
+        {
+            "question": ...,
+            "expected_answer": ...,
+            "cypher_query": ...,
+        },
+        {
+            "question": ...,
+            "expected_answer": ...,
+            "cypher_query": ...,
+        },
+        {
+            "question": ...,
+            "expected_answer": ...,
+            "cypher_query": ...,
+        },
+        {
+            "question": ...,
+            "expected_answer": ...,
+            "cypher_query": ...,
+        },
+        {
+            "question": ...,
+            "expected_answer": ...,
+            "cypher_query": ...,
+        },
+    ]

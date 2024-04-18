@@ -91,5 +91,5 @@ if __name__ == "__main__":
     evaluators = [ReturnedNodesEvaluator()]
     scores = []
     evaluation = Evaluation(evaluators=evaluators, scores=scores, limit_of_samples=6)
-    results = evaluation.run(save_as_excel=True)
+    results = evaluation.run(save_as_excel=False)
     print(results)

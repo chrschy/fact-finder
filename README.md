@@ -8,6 +8,12 @@ Install Dependencies:
 pip install -e .
 ```
 
+Set environment variables:
+
+```
+export LLM="gpt-4-turbo"
+```
+
 Run UI:
 
 ```
