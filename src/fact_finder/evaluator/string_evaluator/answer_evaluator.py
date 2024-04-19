@@ -1,10 +1,10 @@
 from typing import Dict
 
 from fact_finder.evaluator.evaluation_sample import EvaluationSample
-from fact_finder.evaluator.evaluator.evaluator import Evaluator
+from fact_finder.evaluator.string_evaluator.string_evaluator import StringEvaluator
 
 
-class AnswerEvaluator(Evaluator):
+class AnswerStringEvaluator(StringEvaluator):
 
     def expected_response(self, evaluation_sample: EvaluationSample) -> str:
         return evaluation_sample.expected_answer

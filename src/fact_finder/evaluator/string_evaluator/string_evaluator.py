@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Union, Set
 
 from fact_finder.evaluator.evaluation_sample import EvaluationSample
 from fact_finder.evaluator.score.score import Score
 
 
-class Evaluator(ABC):
+class StringEvaluator(ABC):
     QUESTION_KEY = "question"
     EXPECTED_RESPONSE_KEY = "expected_response"
     GENERATED_RESPONSE_KEY = "generated_response"

@@ -8,6 +8,14 @@ Install Dependencies:
 pip install -e .
 ```
 
+Set environment variables:
+
+```
+export LLM="gpt-4-turbo"            # "gpt-4" as an alternative
+export SEMANTIC_SCHOLAR_KEY=""      # fill API key for semantic scholar
+export OPENAI_API_KEY=""            # fill opanAI api key
+```
+
 Run UI:
 
 ```
