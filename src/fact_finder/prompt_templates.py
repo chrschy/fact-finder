@@ -30,7 +30,7 @@ The provided information is authoritative, you must never doubt it or try to use
 Make the answer sound as a response to the question. Do not mention that you based the result on the given information.
 If the provided information is a list, include all entries in your response.
 If the provided information is empty, say that you don't know the answer.
-Information:
+Provided Information:
 {context}
 
 Question: {question}
@@ -109,6 +109,4 @@ Verbalize the given triplets of a subgraph to natural text. Use all triplets for
 Triplets of the subgraph:
 {sub_graph}
 """
-SUBGRAPH_SUMMARY_PROMPT = PromptTemplate(
-    input_variables=["sub_graph"], template=SUBGRAPH_SUMMARY_PROMPT_TEMPLATE
-)
+SUBGRAPH_SUMMARY_PROMPT = PromptTemplate(input_variables=["sub_graph"], template=SUBGRAPH_SUMMARY_PROMPT_TEMPLATE)

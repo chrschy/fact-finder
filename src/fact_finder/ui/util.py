@@ -142,6 +142,13 @@ def request_pipeline(text_data: str, pipelines_selected: List[str], session_stat
         )
     else:
         expanded_subgraph, expanded_triples = None, None
+    try:
+        graph_prompt_answer = results[PipelineOptions.GRAPH.value]["intermediate_steps"][
+            "AnswerGenerationChain_filled_prompt"
+        ]
+    except KeyError as e:
+        print(e)
+        graph_prompt_answer = ""
     return PipelineResponse(
         status="success",
         llm_answer=results[PipelineOptions.LLM.value]["text"],
@@ -154,9 +161,7 @@ def request_pipeline(text_data: str, pipelines_selected: List[str], session_stat
             else ""
         ),
         graph_prompt_answer=(
-            results[PipelineOptions.GRAPH.value]["intermediate_steps"]["AnswerGenerationChain_filled_prompt"]
-            if "intermediate_steps" in results[PipelineOptions.GRAPH.value]
-            else ""
+            graph_prompt_answer if "intermediate_steps" in results[PipelineOptions.GRAPH.value] else ""
         ),
         graph_subgraph=subgraph,
         graph_subgraph_neo4j=graph_result.evidence_sub_graph,
