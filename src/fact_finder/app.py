@@ -205,14 +205,14 @@ if st.button("Search") and text_area_input != "" and len(pipelines_selected) > 0
         if PipelineOptions.GRAPH.value in pipelines_selected:
             st.markdown("#### **Graph Retrieval**")
             st.text_area("Answer using Graph", value=pipeline_response.graph_answer, height=180)
+            st.caption("\n\nRelevant Subgraph:")
+            html_graph_req = generate_graph(pipeline_response.graph_subgraph, send_request=True)
+            components.html(html_graph_req, height=550)
             with st.expander("Show Evidence"):
                 st.caption("\n\nCypher Query:")
                 st.code(pipeline_response.graph_query, language="cypher")
                 st.caption("Cypher Response:")
                 st.code(pipeline_response.graph_response, language="cypher")
-                st.caption("\n\nRelevant Subgraph:")
-                html_graph_req = generate_graph(pipeline_response.graph_subgraph, send_request=True)
-                components.html(html_graph_req, height=550)
                 if PipelineOptions.GRAPH_SUM.value in pipelines_selected:
                     st.text_area("Graph Summary", value=pipeline_response.graph_summary, height=180)
                 st.write("\n")
