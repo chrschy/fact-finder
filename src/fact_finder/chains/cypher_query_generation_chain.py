@@ -1,13 +1,12 @@
 from typing import Any, Dict, List, Optional
 
+from fact_finder.utils import fill_prompt_template
 from langchain.chains import LLMChain
 from langchain.chains.base import Chain
 from langchain.chains.graph_qa.cypher import construct_schema, extract_cypher
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate
-
-from fact_finder.utils import fill_prompt_template
 
 
 class CypherQueryGenerationChain(Chain):
@@ -75,6 +74,8 @@ class CypherQueryGenerationChain(Chain):
             callbacks=run_manager.get_child(),
         )[self.cypher_generation_chain.output_key]
         generated_cypher = extract_cypher(generated_cypher)
+        if generated_cypher.startswith("cypher"):
+            generated_cypher = generated_cypher[6:].strip()
         self._log_it(generated_cypher, run_manager)
         return generated_cypher
 
