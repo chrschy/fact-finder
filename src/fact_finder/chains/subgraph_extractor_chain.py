@@ -15,7 +15,7 @@ class SubgraphExtractorChain(Chain):
     subgraph_expansion: SubgraphExpansion
     use_subgraph_expansion: bool
     return_intermediate_steps: bool
-    input_key: str = "cypher_query"  #: :meta private:
+    input_key: str = "preprocessed_cypher_query"  #: :meta private:
     output_key: str = "extracted_nodes"  #: :meta private:
     intermediate_steps_key: str = "intermediate_steps"
 

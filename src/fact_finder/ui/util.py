@@ -36,6 +36,7 @@ class PipelineResponse(BaseModel):
     rag_paragraphs: str
     rag_prompt_answer: str
     graph_rag_answer: str
+    subgraph_cypher: str
 
 
 async def call_neo4j_rag(message: str, session_state):
@@ -193,4 +194,9 @@ def request_pipeline(text_data: str, pipelines_selected: List[str], session_stat
             else ""
         ),
         graph_rag_answer=graph_rag_result.answer,
+        subgraph_cypher=(
+            results[PipelineOptions.GRAPH.value]["intermediate_steps"]["subgraph_cypher"]
+            if "intermediate_steps" in results[PipelineOptions.GRAPH.value]
+            else ""
+        ),
     )
