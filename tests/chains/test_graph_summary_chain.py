@@ -28,4 +28,4 @@ def graph_summary_chain(graph_summary_template) -> GraphSummaryChain:
 def test_simple_question(graph_summary_chain):
     answer = graph_summary_chain({"sub_graph": "(psoriasis, is a, disease)"})
     print(answer)
-    assert answer["summary"].startswith("Psoriasis is a disease")
+    assert answer["summary"].startswith("Psoriasis is classified as")
