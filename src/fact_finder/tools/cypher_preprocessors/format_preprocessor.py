@@ -99,8 +99,10 @@ class FormatPreprocessor(CypherQueryPreprocessor):
         cypher_query = re.sub(r"\s*(:|-|>|<)\s*", lambda matches: matches.group(1), cypher_query)
         # Retain spaces before property names
         cypher_query = re.sub(r':\s*"', ': "', cypher_query)
-        # Also around equal signs
-        cypher_query = re.sub(r"\s*=\s*", " = ", cypher_query)
+        # Also around equation signs
+        cypher_query = re.sub(r"[^<>]\s*=\s*", " = ", cypher_query)
+        cypher_query = re.sub(r"\s*<=\s*", " <= ", cypher_query)
+        cypher_query = re.sub(r"\s*>=\s*", " >= ", cypher_query)
         return cypher_query
 
 
