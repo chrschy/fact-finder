@@ -100,7 +100,7 @@ class FormatPreprocessor(CypherQueryPreprocessor):
         # Retain spaces before property names
         cypher_query = re.sub(r':\s*"', ': "', cypher_query)
         # Also around equation signs
-        cypher_query = re.sub(r"[^<>]\s*=\s*", " = ", cypher_query)
+        cypher_query = re.sub(r"\s+=\s*", " = ", cypher_query)
         cypher_query = re.sub(r"\s*<=\s*", " <= ", cypher_query)
         cypher_query = re.sub(r"\s*>=\s*", " >= ", cypher_query)
         return cypher_query
