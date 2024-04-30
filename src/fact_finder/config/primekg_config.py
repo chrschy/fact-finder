@@ -12,6 +12,9 @@ from fact_finder.prompt_templates import (
     KEYWORD_PROMPT,
     SUBGRAPH_SUMMARY_PROMPT,
 )
+from fact_finder.tools.cypher_preprocessors.child_to_parent_preprocessor import (
+    ChildToParentPreprocessor,
+)
 from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import (
     CypherQueryPreprocessor,
 )
@@ -72,6 +75,7 @@ def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool) -> Lis
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=wikidata, node_types="exposure"))
     if using_normalized_graph:
         preprocs += _get_synonymized_graph_preprocessors(graph)
+    preprocs.append(ChildToParentPreprocessor(graph, "parent_child", name_property="name"))
     return preprocs
 
 

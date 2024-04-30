@@ -1,7 +1,9 @@
 import re
 import sys
 
-from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import (
+    CypherQueryPreprocessor,
+)
 
 
 class FormatPreprocessor(CypherQueryPreprocessor):
@@ -18,7 +20,7 @@ class FormatPreprocessor(CypherQueryPreprocessor):
         try:
             return self._try_formatting(cypher_query)
         except Exception as e:
-            print(f"Cypher query formating failed: {e}", file=sys.stderr)
+            print(f"Cypher query formatting failed: {e}", file=sys.stderr)
             return cypher_query
 
     def _try_formatting(self, cypher_query: str) -> str:
