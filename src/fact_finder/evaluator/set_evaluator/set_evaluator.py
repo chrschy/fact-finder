@@ -16,16 +16,19 @@ class SetEvaluator:
     ) -> List[float]:
         scores = []
         for sample, result in zip(evaluation_samples, chain_results):
-            scores.append(self.evaluate_single(sample=sample, result=result))
+            score = self.evaluate_single(sample=sample, chain_result=result)
+            scores.append(score)
         return scores
 
-    def evaluate_single(self, sample: EvaluationSample, result: Dict[str, Any]) -> float:
+    def evaluate_single(self, sample: EvaluationSample, chain_result: Dict[str, Any]) -> float:
+        if not chain_result:
+            return 0.0
         ids = [node["index"] for node in sample.nodes]
         names = set()
         for number in ids:
             graph_return = self.graph.query(self.CYPHER_QUERY_TEMPLATE.replace("{idx}", f"{number}"))
             names.add(graph_return[0]["n.name"])
-        result_graph_output = result["graph_qa_output"].graph_response
+        result_graph_output = chain_result["graph_qa_output"].graph_response
         assert result_graph_output
         result_graph_output_keys = list(result_graph_output[0].keys())
         all_scores = {}

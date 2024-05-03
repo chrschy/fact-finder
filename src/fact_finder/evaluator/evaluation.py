@@ -1,4 +1,5 @@
 import json
+import os.path
 from typing import Dict
 from typing import List, Union
 
@@ -17,6 +18,7 @@ from fact_finder.evaluator.score.score import Score
 from fact_finder.evaluator.set_evaluator.returned_nodes_evaluator import ReturnedNodesEvaluator
 from fact_finder.evaluator.set_evaluator.set_evaluator import SetEvaluator
 from fact_finder.evaluator.string_evaluator.string_evaluator import StringEvaluator
+from fact_finder.evaluator.util import load_pickle, save_pickle
 from fact_finder.utils import load_chat_model
 
 
@@ -58,20 +60,23 @@ class Evaluation:
             )
         return evaluation
 
-    def run_chain(self):
+    def run_chain(self, cache_path: str = "cached_results/chain_results.pickle"):
         results = []
         print("Running Chain...")
+        if os.path.exists(cache_path):
+            return load_pickle(cache_path)
         for eval_sample in tqdm(self.eval_samples):
             inputs = {"question": eval_sample.question}
             try:
                 result = self.chain.invoke(inputs)
             except Exception as e:
                 print(e)
-                continue
+                result = {}
             results.append(result)
+        save_pickle(results, cache_path)
         return results
 
-    def eval_samples(self, file_path: str, limit_of_samples: int):
+    def eval_samples(self, file_path: str, limit_of_samples: int = 0):
         with open(file_path) as file:
             data = json.load(file)
         if limit_of_samples > 0:
@@ -90,6 +95,6 @@ class Evaluation:
 if __name__ == "__main__":
     evaluators = [ReturnedNodesEvaluator()]
     scores = []
-    evaluation = Evaluation(evaluators=evaluators, scores=scores, limit_of_samples=6)
+    evaluation = Evaluation(evaluators=evaluators, scores=scores)
     results = evaluation.run(save_as_excel=False)
     print(results)
