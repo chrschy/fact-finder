@@ -1,6 +1,6 @@
 import json
 import os.path
-from typing import Dict
+from typing import Dict, Any
 from typing import List, Union
 
 import pandas as pd
@@ -44,23 +44,23 @@ class Evaluation:
         self.evaluators = evaluators
         self.scores = scores
 
-    def run(self, save_as_excel: bool = False):
-        chain_results = self.run_chain()
+    def run(self, save_as_excel: bool = False, cache_path="cached_results/chain_results.pickle"):
+        chain_results = self.run_chain(cache_path)
         results = self.evaluate(chain_results)
         if save_as_excel:
             self.save_as_excel(results)
         return results
 
-    def evaluate(self, chain_results):
+    def evaluate(self, chain_results) -> Dict[str, Any]:
         evaluation = {}
         print("Evaluating...")
-        for evaluator in tqdm(self.evaluators):
+        for evaluator in self.evaluators:
             evaluation[evaluator.__class__.__name__] = evaluator.evaluate(
                 evaluation_samples=self.eval_samples, chain_results=chain_results, scores=self.scores
             )
         return evaluation
 
-    def run_chain(self, cache_path: str = "cached_results/chain_results.pickle"):
+    def run_chain(self, cache_path: str):
         results = []
         print("Running Chain...")
         if os.path.exists(cache_path):
@@ -84,7 +84,7 @@ class Evaluation:
         eval_samples = [EvaluationSample(**d) for d in data]
         return eval_samples
 
-    def save_as_excel(self, results: Dict[str, list], path: str = "hello.xlsx"):
+    def save_as_excel(self, results: Dict[str, list], path: str = "eval_results.xlsx"):
         concat_results = []
         for i in results.values():
             concat_results += i
@@ -96,5 +96,5 @@ if __name__ == "__main__":
     evaluators = [ReturnedNodesEvaluator()]
     scores = []
     evaluation = Evaluation(evaluators=evaluators, scores=scores)
-    results = evaluation.run(save_as_excel=False)
+    results = evaluation.run(save_as_excel=True, cache_path="cached_results/chain_results.pickle")
     print(results)
