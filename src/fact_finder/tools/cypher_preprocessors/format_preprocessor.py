@@ -1,7 +1,9 @@
 import re
 import sys
 
-from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import CypherQueryPreprocessor
+from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import (
+    CypherQueryPreprocessor,
+)
 
 
 class FormatPreprocessor(CypherQueryPreprocessor):
@@ -18,7 +20,7 @@ class FormatPreprocessor(CypherQueryPreprocessor):
         try:
             return self._try_formatting(cypher_query)
         except Exception as e:
-            print(f"Cypher query formating failed: {e}", file=sys.stderr)
+            print(f"Cypher query formatting failed: {e}", file=sys.stderr)
             return cypher_query
 
     def _try_formatting(self, cypher_query: str) -> str:
@@ -97,8 +99,10 @@ class FormatPreprocessor(CypherQueryPreprocessor):
         cypher_query = re.sub(r"\s*(:|-|>|<)\s*", lambda matches: matches.group(1), cypher_query)
         # Retain spaces before property names
         cypher_query = re.sub(r':\s*"', ': "', cypher_query)
-        # Also around equal signs
-        cypher_query = re.sub(r"\s*=\s*", " = ", cypher_query)
+        # Also around equation signs
+        cypher_query = re.sub(r"\s+=\s*", " = ", cypher_query)
+        cypher_query = re.sub(r"\s*<=\s*", " <= ", cypher_query)
+        cypher_query = re.sub(r"\s*>=\s*", " >= ", cypher_query)
         return cypher_query
 
 

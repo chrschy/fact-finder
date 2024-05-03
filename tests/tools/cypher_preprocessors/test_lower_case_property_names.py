@@ -65,3 +65,19 @@ def test_producing_lower_case_for_multiple_assignments_in_where_clause():
     query2 = 'MATCH (d:disease)-[:linked_to]-(e:exposure) WHERE e.name = "ethanol" AND d.name = "hickup" RETURN d.name'
     processed_query = preproc(query1)
     assert processed_query == query2
+
+
+def test_producing_lower_case_for_one_element_list_in_where_clause():
+    preproc = LowerCasePropertiesCypherQueryPreprocessor()
+    query1 = 'MATCH (d:disease)-[:linked_to]-(e:exposure) WHERE e.name IN ["Ethanol"] RETURN d.name'
+    query2 = 'MATCH (d:disease)-[:linked_to]-(e:exposure) WHERE e.name IN ["ethanol"] RETURN d.name'
+    processed_query = preproc(query1)
+    assert processed_query == query2
+
+
+def test_producing_lower_case_for_multi_element_list_in_where_clause():
+    preproc = LowerCasePropertiesCypherQueryPreprocessor()
+    query1 = 'MATCH (d:disease)-[:linked_to]-(e:exposure) WHERE e.name IN ["Ethanol", "Alcohol", "Wine"] RETURN d.name'
+    query2 = 'MATCH (d:disease)-[:linked_to]-(e:exposure) WHERE e.name IN ["ethanol", "alcohol", "wine"] RETURN d.name'
+    processed_query = preproc(query1)
+    assert processed_query == query2
