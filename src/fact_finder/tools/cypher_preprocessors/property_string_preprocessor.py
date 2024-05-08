@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import List
 
 import regex as re
@@ -7,7 +7,7 @@ from fact_finder.tools.cypher_preprocessors.cypher_query_preprocessor import (
 )
 
 
-class PropertyStringCypherQueryPreprocessor(CypherQueryPreprocessor):
+class PropertyStringCypherQueryPreprocessor(CypherQueryPreprocessor, ABC):
     def __init__(self, property_names: List[str] = [r"[^{:\s]+"]) -> None:
         self._property_names = property_names
 

@@ -1,6 +1,6 @@
 from fact_finder.evaluator.score.score import Score
 from nltk import download, word_tokenize
-from nltk.translate.bleu_score import SmoothingFunction, corpus_bleu, sentence_bleu
+from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
 
 
 class BleuScore(Score):

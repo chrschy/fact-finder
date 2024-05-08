@@ -5,6 +5,7 @@ from fact_finder.chains.graph_qa_chain.output import GraphQAChainOutput
 from fact_finder.evaluator.evaluation_sample import EvaluationSample
 from fact_finder.utils import build_neo4j_graph
 from langchain_community.graphs import Neo4jGraph
+from tqdm import tqdm
 
 
 class SetEvaluator:
@@ -14,23 +15,35 @@ class SetEvaluator:
         self.graph = graph or build_neo4j_graph()
 
     def evaluate(
-        self,
-        evaluation_samples: List[EvaluationSample],
-        chain_results: List[Dict[str, GraphQAChainOutput | Any]],
-        **kwargs,
-    ) -> List[float]:
-        scores = []
-        for sample, result in zip(evaluation_samples, chain_results):
-            scores.append(self.evaluate_sample(sample, result))
-        return scores
+        self, evaluation_samples: List[EvaluationSample], chain_results: List[Dict[str, Any]], **kwargs
+    ) -> List[Dict[str, Any]]:
+        eval_results = []
+        for sample, result in tqdm(zip(evaluation_samples, chain_results)):
+            score = self.evaluate_sample(sample=sample, chain_result=result)
+            eval_result = {
+                "question": sample.question,
+                "expected_cypher": sample.cypher_query,
+                "expected_graph_response": sample.nodes,
+                "expected_answer": sample.expected_answer,
+                "score": score,
+            }
+            try:
+                eval_result["actual_cypher"] = result["graph_qa_output"].cypher_query
+                eval_result["actual_graph_response"] = result["graph_qa_output"].graph_response
+                eval_result["actual_answer"] = result["graph_qa_output"].answer
+            except KeyError:
+                pass
+            eval_results.append(eval_result)
+        return eval_results
 
-    def evaluate_sample(self, sample: EvaluationSample, result: Dict[str, GraphQAChainOutput | Any]) -> float:
+    def evaluate_sample(self, sample: EvaluationSample, chain_result: Dict[str, GraphQAChainOutput | Any]) -> float:
+        if not chain_result:
+            return 0.0
         if "index" in sample.nodes[0]:
-            return self.evaluate_sample_with_single_index(sample=sample, result=result)
-        elif "value" in sample.nodes[0]:
-            return self.evaluate_sample_with_value_result(sample=sample, result=result)
-        else:
-            return self.evaluate_sample_with_tuple_in_label(sample=sample, result=result)
+            return self.evaluate_sample_with_single_index(sample=sample, result=chain_result)
+        if "value" in sample.nodes[0]:
+            return self.evaluate_sample_with_value_result(sample=sample, result=chain_result)
+        return self.evaluate_sample_with_tuple_in_label(sample=sample, result=chain_result)
 
     def evaluate_sample_with_single_index(
         self, sample: EvaluationSample, result: Dict[str, GraphQAChainOutput | Any]

@@ -3,10 +3,9 @@ import os
 from enum import Enum
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel
-
 from fact_finder.chains.graph_qa_chain import GraphQAChainOutput
 from fact_finder.ui.graph_conversion import Subgraph, convert_subgraph
+from pydantic import BaseModel
 
 
 class PipelineOptions(str, Enum):
@@ -115,7 +114,7 @@ def call_chains(message: str, pipelines_selected: List[str], session_state):
             results[PipelineOptions.DOC.value]["intermediate_steps"]
         )
 
-    print(results)
+    # print(results)
 
     return results
 

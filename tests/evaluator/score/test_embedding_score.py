@@ -1,5 +1,4 @@
 import pytest
-
 from fact_finder.evaluator.score.embedding_score import EmbeddingScore
 
 # todo mock the model behaviour
@@ -14,7 +13,7 @@ def test_exact_match(scorer):
     text_a = "This is a test."
     text_b = "This is a test."
     score = scorer.compare(text_a, text_b)
-    assert score == 1.0
+    assert score == pytest.approx(1.0)
 
 
 def test_no_match(scorer):

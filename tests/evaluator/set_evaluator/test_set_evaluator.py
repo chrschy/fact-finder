@@ -48,7 +48,7 @@ def test_evaluate_matching_sample_and_result(
     graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
 ):
     evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result]) == [1.0]
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
 
 
 @pytest.mark.parametrize(
@@ -60,7 +60,7 @@ def test_evaluate_partial_matching_sample_and_result(
     graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
 ):
     evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result]) == [2 / 4]
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 2 / 4
 
 
 @pytest.mark.parametrize(
@@ -72,7 +72,7 @@ def test_evaluate_not_matching_sample_and_result(
     graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
 ):
     evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result]) == [0.0]
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 0.0
 
 
 @pytest.mark.parametrize(
@@ -84,7 +84,7 @@ def test_evaluate_matching_tuple_sample_and_result(
     graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
 ):
     evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result]) == [1.0]
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
 
 
 @pytest.mark.parametrize(
@@ -96,7 +96,7 @@ def test_evaluate_partial_matching_tuple_sample_and_result(
     graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
 ):
     evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result]) == [2 / 4]
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 2 / 4
 
 
 @pytest.mark.parametrize(
@@ -108,7 +108,7 @@ def test_evaluate_not_matching_tuple_sample_and_result(
     graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
 ):
     evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result]) == [0.0]
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 0.0
 
 
 @pytest.mark.parametrize(
@@ -118,7 +118,7 @@ def test_evaluate_with_matching_int_value(
     graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
 ):
     evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result]) == [1.0]
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
 
 
 @pytest.mark.parametrize(
@@ -128,7 +128,7 @@ def test_evaluate_with_matching_float_value(
     graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
 ):
     evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result]) == [1.0]
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
 
 
 @pytest.mark.parametrize(
@@ -138,7 +138,7 @@ def test_evaluate_with_no_matching_int_value(
     graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
 ):
     evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result]) == [0.0]
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 0.0
 
 
 @pytest.fixture

@@ -11,6 +11,18 @@ from fact_finder.evaluator.evaluation_samples import manual_samples
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 from fact_finder.utils import build_neo4j_graph, load_chat_model
 
+import pickle
+
+
+def save_pickle(object: Any, path: str = "filename.pickle"):
+    with open(path, "wb") as handle:
+        pickle.dump(object, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def load_pickle(path: str = "filename.pickle"):
+    with open(path, "rb") as handle:
+        return pickle.load(handle)
+
 
 class EvalSampleAddition:
     """
