@@ -1,5 +1,6 @@
 import json
-from typing import Dict
+import os.path
+from typing import Dict, Any
 from typing import List, Union
 
 import pandas as pd
@@ -17,6 +18,7 @@ from fact_finder.evaluator.score.score import Score
 from fact_finder.evaluator.set_evaluator.returned_nodes_evaluator import ReturnedNodesEvaluator
 from fact_finder.evaluator.set_evaluator.set_evaluator import SetEvaluator
 from fact_finder.evaluator.string_evaluator.string_evaluator import StringEvaluator
+from fact_finder.evaluator.util import load_pickle, save_pickle
 from fact_finder.utils import load_chat_model
 
 
@@ -42,36 +44,39 @@ class Evaluation:
         self.evaluators = evaluators
         self.scores = scores
 
-    def run(self, save_as_excel: bool = False):
-        chain_results = self.run_chain()
+    def run(self, save_as_excel: bool = False, cache_path="cached_results/chain_results.pickle"):
+        chain_results = self.run_chain(cache_path)
         results = self.evaluate(chain_results)
         if save_as_excel:
             self.save_as_excel(results)
         return results
 
-    def evaluate(self, chain_results):
+    def evaluate(self, chain_results) -> Dict[str, Any]:
         evaluation = {}
         print("Evaluating...")
-        for evaluator in tqdm(self.evaluators):
+        for evaluator in self.evaluators:
             evaluation[evaluator.__class__.__name__] = evaluator.evaluate(
                 evaluation_samples=self.eval_samples, chain_results=chain_results, scores=self.scores
             )
         return evaluation
 
-    def run_chain(self):
+    def run_chain(self, cache_path: str):
         results = []
         print("Running Chain...")
+        if os.path.exists(cache_path):
+            return load_pickle(cache_path)
         for eval_sample in tqdm(self.eval_samples):
             inputs = {"question": eval_sample.question}
             try:
                 result = self.chain.invoke(inputs)
             except Exception as e:
                 print(e)
-                continue
+                result = {}
             results.append(result)
+        save_pickle(results, cache_path)
         return results
 
-    def eval_samples(self, file_path: str, limit_of_samples: int):
+    def eval_samples(self, file_path: str, limit_of_samples: int = 0):
         with open(file_path) as file:
             data = json.load(file)
         if limit_of_samples > 0:
@@ -79,7 +84,7 @@ class Evaluation:
         eval_samples = [EvaluationSample(**d) for d in data]
         return eval_samples
 
-    def save_as_excel(self, results: Dict[str, list], path: str = "hello.xlsx"):
+    def save_as_excel(self, results: Dict[str, list], path: str = "eval_results.xlsx"):
         concat_results = []
         for i in results.values():
             concat_results += i
@@ -90,6 +95,6 @@ class Evaluation:
 if __name__ == "__main__":
     evaluators = [ReturnedNodesEvaluator()]
     scores = []
-    evaluation = Evaluation(evaluators=evaluators, scores=scores, limit_of_samples=6)
-    results = evaluation.run(save_as_excel=False)
+    evaluation = Evaluation(evaluators=evaluators, scores=scores)
+    results = evaluation.run(save_as_excel=True, cache_path="cached_results/chain_results.pickle")
     print(results)

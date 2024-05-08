@@ -1,5 +1,5 @@
 from nltk import word_tokenize
-from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction, corpus_bleu
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 from fact_finder.evaluator.score.score import Score
 
