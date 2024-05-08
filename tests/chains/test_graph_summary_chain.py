@@ -6,7 +6,6 @@ from tests.chains.helpers import build_llm_mock
 
 def test_simple_question(graph_summary_chain: GraphSummaryChain):
     answer = graph_summary_chain({"sub_graph": "(psoriasis, is a, disease)"})
-    print(answer)
     assert answer["summary"].startswith("Psoriasis is a disease")
 
 
