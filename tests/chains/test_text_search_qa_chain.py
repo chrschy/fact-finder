@@ -6,9 +6,41 @@ from fact_finder.chains.rag.text_search_qa_chain import TextSearchQAChain
 from fact_finder.tools.semantic_scholar_search_api_wrapper import (
     SemanticScholarSearchApiWrapper,
 )
-from fact_finder.utils import load_chat_model
 from langchain.chains.base import Chain
 from langchain_core.prompts import PromptTemplate
+from tests.chains.helpers import build_llm_mock
+
+
+def test_simple_question(chain: Chain):
+    answer = chain.invoke({"question": "Alternative causes of fever in malaria infections?"})
+    assert answer["rag_output"].startswith("Alternative causes of fever in")
+
+
+@pytest.fixture
+def chain(sematic_scholar_chain: SemanticScholarChain, text_qa_chain: TextSearchQAChain) -> Chain:
+    with patch("requests.Session") as mock_session:
+        mock_session.return_value.get.side_effect = _mock_get
+        yield sematic_scholar_chain | text_qa_chain
+
+
+@pytest.fixture
+def text_qa_chain(
+    rag_answer_generation_prompt_template: PromptTemplate, sematic_scholar_chain: SemanticScholarChain
+) -> TextSearchQAChain:
+    return TextSearchQAChain(
+        llm=build_llm_mock("Alternative causes of fever in malaria infections are..."),
+        rag_answer_generation_template=rag_answer_generation_prompt_template,
+        rag_output_key=sematic_scholar_chain.output_keys[0],
+    )
+
+
+@pytest.fixture
+def sematic_scholar_chain(keyword_prompt_template: PromptTemplate) -> SemanticScholarChain:
+    return SemanticScholarChain(
+        semantic_scholar_search=SemanticScholarSearchApiWrapper(),
+        llm=build_llm_mock("Alternative causes, fever, malaria infections"),
+        keyword_prompt_template=keyword_prompt_template,
+    )
 
 
 @pytest.fixture
@@ -25,28 +57,6 @@ def rag_answer_generation_prompt_template() -> PromptTemplate:
         input_variables=["context", "question"],
         template="You are a helpful assistant. You get a user question in natural language. Given the following context, please answer the given question based only on the context. Do not hallucinate. If you cannot answer based on the context, say 'Dunno'. Context: {context}, Question: {question}",
     )
-
-
-@pytest.fixture
-def chain(keyword_prompt_template, rag_answer_generation_prompt_template) -> Chain:
-    with patch("requests.Session") as mock_session:
-        mock_session.return_value.get.side_effect = _mock_get
-        sematic_scholar_chain = SemanticScholarChain(
-            semantic_scholar_search=SemanticScholarSearchApiWrapper(),
-            llm=load_chat_model(),
-            keyword_prompt_template=keyword_prompt_template,
-        )
-        text_qa_chain = TextSearchQAChain(
-            llm=load_chat_model(),
-            rag_answer_generation_template=rag_answer_generation_prompt_template,
-            rag_output_key=sematic_scholar_chain.output_keys[0],
-        )
-        return sematic_scholar_chain | text_qa_chain
-
-
-def test_simple_question(chain):
-    answer = chain.invoke({"question": "Alternative causes of fever in malaria infections?"})
-    assert answer["rag_output"].startswith("Alternative causes of fever in")
 
 
 def _mock_get(url: str, params: dict, headers: dict):
