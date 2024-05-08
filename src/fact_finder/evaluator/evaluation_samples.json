@@ -21806,5 +21806,3426 @@
                 "index": 8571
             }
         ]
+    },
+    {
+        "question": "What genes play role in prostate cancer?",
+        "cypher_query": "MATCH (d:disease {name: \"prostate carcinoma\"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 34091,
+                "name": "schlap1"
+            },
+            {
+                "index": 34090,
+                "name": "pcat1"
+            },
+            {
+                "index": 34089,
+                "name": "klkp1"
+            },
+            {
+                "index": 21990,
+                "name": "mir21"
+            },
+            {
+                "index": 34088,
+                "name": "mir106a"
+            },
+            {
+                "index": 34087,
+                "name": "sp5"
+            },
+            {
+                "index": 34086,
+                "name": "gstk1"
+            },
+            {
+                "index": 34085,
+                "name": "rgmb"
+            },
+            {
+                "index": 34084,
+                "name": "ttc9c"
+            },
+            {
+                "index": 34083,
+                "name": "neat1"
+            },
+            {
+                "index": 34082,
+                "name": "il27"
+            },
+            {
+                "index": 34081,
+                "name": "rfx6"
+            },
+            {
+                "index": 9171,
+                "name": "jazf1"
+            },
+            {
+                "index": 34080,
+                "name": "unc13d"
+            },
+            {
+                "index": 34008,
+                "name": "arid2"
+            },
+            {
+                "index": 33949,
+                "name": "dab2ip"
+            },
+            {
+                "index": 7449,
+                "name": "igsf5"
+            },
+            {
+                "index": 4418,
+                "name": "pyhin1"
+            },
+            {
+                "index": 34079,
+                "name": "creb3l4"
+            },
+            {
+                "index": 8699,
+                "name": "sesn3"
+            },
+            {
+                "index": 34078,
+                "name": "taf1l"
+            },
+            {
+                "index": 6765,
+                "name": "asz1"
+            },
+            {
+                "index": 34077,
+                "name": "ncoa7"
+            },
+            {
+                "index": 34076,
+                "name": "spata18"
+            },
+            {
+                "index": 34075,
+                "name": "paqr4"
+            },
+            {
+                "index": 7117,
+                "name": "antxr2"
+            },
+            {
+                "index": 34074,
+                "name": "foxp4"
+            },
+            {
+                "index": 13400,
+                "name": "tirap"
+            },
+            {
+                "index": 13707,
+                "name": "chst14"
+            },
+            {
+                "index": 8146,
+                "name": "fbxo44"
+            },
+            {
+                "index": 11415,
+                "name": "ints4"
+            },
+            {
+                "index": 13905,
+                "name": "macir"
+            },
+            {
+                "index": 34073,
+                "name": "znf160"
+            },
+            {
+                "index": 9312,
+                "name": "il17rc"
+            },
+            {
+                "index": 34072,
+                "name": "acrbp"
+            },
+            {
+                "index": 4459,
+                "name": "chd6"
+            },
+            {
+                "index": 401,
+                "name": "gucd1"
+            },
+            {
+                "index": 34071,
+                "name": "pcdh11y"
+            },
+            {
+                "index": 9502,
+                "name": "txndc5"
+            },
+            {
+                "index": 10861,
+                "name": "clptm1l"
+            },
+            {
+                "index": 8090,
+                "name": "cd276"
+            },
+            {
+                "index": 6519,
+                "name": "gstcd"
+            },
+            {
+                "index": 6399,
+                "name": "myh14"
+            },
+            {
+                "index": 12140,
+                "name": "palb2"
+            },
+            {
+                "index": 7441,
+                "name": "tbl1xr1"
+            },
+            {
+                "index": 34070,
+                "name": "steap4"
+            },
+            {
+                "index": 33986,
+                "name": "eps8l3"
+            },
+            {
+                "index": 13867,
+                "name": "hmgn5"
+            },
+            {
+                "index": 12057,
+                "name": "cyp3a43"
+            },
+            {
+                "index": 34069,
+                "name": "ndst4"
+            },
+            {
+                "index": 9975,
+                "name": "sil1"
+            },
+            {
+                "index": 12389,
+                "name": "abcg5"
+            },
+            {
+                "index": 10732,
+                "name": "elac2"
+            },
+            {
+                "index": 34068,
+                "name": "ldah"
+            },
+            {
+                "index": 12354,
+                "name": "aloxe3"
+            },
+            {
+                "index": 34067,
+                "name": "enpp5"
+            },
+            {
+                "index": 4022,
+                "name": "kmt2c"
+            },
+            {
+                "index": 13138,
+                "name": "usp28"
+            },
+            {
+                "index": 1405,
+                "name": "nipal3"
+            },
+            {
+                "index": 11648,
+                "name": "pak6"
+            },
+            {
+                "index": 7784,
+                "name": "smarcad1"
+            },
+            {
+                "index": 13530,
+                "name": "tceal7"
+            },
+            {
+                "index": 5106,
+                "name": "diablo"
+            },
+            {
+                "index": 4088,
+                "name": "pard3"
+            },
+            {
+                "index": 12892,
+                "name": "ash1l"
+            },
+            {
+                "index": 3487,
+                "name": "eaf2"
+            },
+            {
+                "index": 11520,
+                "name": "selenos"
+            },
+            {
+                "index": 6007,
+                "name": "dcaf6"
+            },
+            {
+                "index": 11381,
+                "name": "rnf130"
+            },
+            {
+                "index": 10032,
+                "name": "chd7"
+            },
+            {
+                "index": 6024,
+                "name": "nagk"
+            },
+            {
+                "index": 33981,
+                "name": "stab2"
+            },
+            {
+                "index": 13194,
+                "name": "tbc1d2"
+            },
+            {
+                "index": 34066,
+                "name": "rfk"
+            },
+            {
+                "index": 34065,
+                "name": "adi1"
+            },
+            {
+                "index": 12525,
+                "name": "atad3a"
+            },
+            {
+                "index": 5765,
+                "name": "appl2"
+            },
+            {
+                "index": 8097,
+                "name": "rnf31"
+            },
+            {
+                "index": 2900,
+                "name": "nol8"
+            },
+            {
+                "index": 10434,
+                "name": "casz1"
+            },
+            {
+                "index": 12936,
+                "name": "rnf43"
+            },
+            {
+                "index": 11220,
+                "name": "samd9"
+            },
+            {
+                "index": 12276,
+                "name": "trpm4"
+            },
+            {
+                "index": 34064,
+                "name": "tet2"
+            },
+            {
+                "index": 8131,
+                "name": "il17rd"
+            },
+            {
+                "index": 11101,
+                "name": "pdp1"
+            },
+            {
+                "index": 3747,
+                "name": "cchcr1"
+            },
+            {
+                "index": 8548,
+                "name": "dnajc10"
+            },
+            {
+                "index": 13484,
+                "name": "hao1"
+            },
+            {
+                "index": 6400,
+                "name": "wnt4"
+            },
+            {
+                "index": 6062,
+                "name": "rab4b"
+            },
+            {
+                "index": 1892,
+                "name": "lrp1b"
+            },
+            {
+                "index": 11472,
+                "name": "cdk12"
+            },
+            {
+                "index": 561,
+                "name": "rasd1"
+            },
+            {
+                "index": 11457,
+                "name": "ptrh2"
+            },
+            {
+                "index": 7587,
+                "name": "polk"
+            },
+            {
+                "index": 4305,
+                "name": "zbtb7a"
+            },
+            {
+                "index": 7347,
+                "name": "wac"
+            },
+            {
+                "index": 9078,
+                "name": "pigp"
+            },
+            {
+                "index": 10701,
+                "name": "dcxr"
+            },
+            {
+                "index": 11008,
+                "name": "irak4"
+            },
+            {
+                "index": 9710,
+                "name": "rlim"
+            },
+            {
+                "index": 1203,
+                "name": "cryl1"
+            },
+            {
+                "index": 1673,
+                "name": "itsn2"
+            },
+            {
+                "index": 34063,
+                "name": "col5a3"
+            },
+            {
+                "index": 13222,
+                "name": "nox3"
+            },
+            {
+                "index": 5450,
+                "name": "efemp2"
+            },
+            {
+                "index": 7833,
+                "name": "psmc3ip"
+            },
+            {
+                "index": 12062,
+                "name": "thyn1"
+            },
+            {
+                "index": 6357,
+                "name": "setd2"
+            },
+            {
+                "index": 1418,
+                "name": "klf15"
+            },
+            {
+                "index": 34062,
+                "name": "dhdh"
+            },
+            {
+                "index": 11222,
+                "name": "tnfrsf21"
+            },
+            {
+                "index": 8523,
+                "name": "gnmt"
+            },
+            {
+                "index": 5258,
+                "name": "slc39a1"
+            },
+            {
+                "index": 13481,
+                "name": "tjp3"
+            },
+            {
+                "index": 12712,
+                "name": "plek2"
+            },
+            {
+                "index": 13775,
+                "name": "ehf"
+            },
+            {
+                "index": 366,
+                "name": "lce2b"
+            },
+            {
+                "index": 8658,
+                "name": "phgdh"
+            },
+            {
+                "index": 10358,
+                "name": "zbtb20"
+            },
+            {
+                "index": 6975,
+                "name": "senp6"
+            },
+            {
+                "index": 1287,
+                "name": "clic4"
+            },
+            {
+                "index": 7967,
+                "name": "klk5"
+            },
+            {
+                "index": 2207,
+                "name": "ciz1"
+            },
+            {
+                "index": 10188,
+                "name": "sdf2l1"
+            },
+            {
+                "index": 9536,
+                "name": "tmeff2"
+            },
+            {
+                "index": 4165,
+                "name": "ssbp2"
+            },
+            {
+                "index": 1235,
+                "name": "amacr"
+            },
+            {
+                "index": 9008,
+                "name": "brd4"
+            },
+            {
+                "index": 3326,
+                "name": "sf3b1"
+            },
+            {
+                "index": 6453,
+                "name": "sirt1"
+            },
+            {
+                "index": 8617,
+                "name": "ahcyl2"
+            },
+            {
+                "index": 5898,
+                "name": "jade2"
+            },
+            {
+                "index": 10938,
+                "name": "ehbp1"
+            },
+            {
+                "index": 5356,
+                "name": "mga"
+            },
+            {
+                "index": 11281,
+                "name": "rprd2"
+            },
+            {
+                "index": 6881,
+                "name": "pds5a"
+            },
+            {
+                "index": 3868,
+                "name": "jmjd6"
+            },
+            {
+                "index": 4811,
+                "name": "arl6ip1"
+            },
+            {
+                "index": 1870,
+                "name": "faf2"
+            },
+            {
+                "index": 7429,
+                "name": "erp44"
+            },
+            {
+                "index": 10335,
+                "name": "znf292"
+            },
+            {
+                "index": 134,
+                "name": "spen"
+            },
+            {
+                "index": 1257,
+                "name": "dhx30"
+            },
+            {
+                "index": 2279,
+                "name": "lmtk2"
+            },
+            {
+                "index": 9212,
+                "name": "akap13"
+            },
+            {
+                "index": 6966,
+                "name": "chek2"
+            },
+            {
+                "index": 6169,
+                "name": "pkp3"
+            },
+            {
+                "index": 2950,
+                "name": "lzts1"
+            },
+            {
+                "index": 5133,
+                "name": "baz2a"
+            },
+            {
+                "index": 34061,
+                "name": "adamts8"
+            },
+            {
+                "index": 9437,
+                "name": "il24"
+            },
+            {
+                "index": 11330,
+                "name": "spink5"
+            },
+            {
+                "index": 4363,
+                "name": "erp29"
+            },
+            {
+                "index": 9186,
+                "name": "serinc3"
+            },
+            {
+                "index": 3599,
+                "name": "cbx1"
+            },
+            {
+                "index": 1509,
+                "name": "stard3"
+            },
+            {
+                "index": 8254,
+                "name": "kdelr1"
+            },
+            {
+                "index": 4125,
+                "name": "ralbp1"
+            },
+            {
+                "index": 33945,
+                "name": "adam28"
+            },
+            {
+                "index": 7474,
+                "name": "pgrmc1"
+            },
+            {
+                "index": 1570,
+                "name": "wasf3"
+            },
+            {
+                "index": 8924,
+                "name": "stard10"
+            },
+            {
+                "index": 13321,
+                "name": "celf2"
+            },
+            {
+                "index": 12491,
+                "name": "camkk2"
+            },
+            {
+                "index": 9627,
+                "name": "ivns1abp"
+            },
+            {
+                "index": 10485,
+                "name": "txnrd2"
+            },
+            {
+                "index": 1115,
+                "name": "agr2"
+            },
+            {
+                "index": 6173,
+                "name": "fbln5"
+            },
+            {
+                "index": 4766,
+                "name": "mybbp1a"
+            },
+            {
+                "index": 5930,
+                "name": "ncoa2"
+            },
+            {
+                "index": 10506,
+                "name": "hoxb13"
+            },
+            {
+                "index": 19,
+                "name": "vav3"
+            },
+            {
+                "index": 1219,
+                "name": "olfm1"
+            },
+            {
+                "index": 11421,
+                "name": "spon2"
+            },
+            {
+                "index": 10535,
+                "name": "ndrg1"
+            },
+            {
+                "index": 12509,
+                "name": "tlr6"
+            },
+            {
+                "index": 5593,
+                "name": "cdk2ap2"
+            },
+            {
+                "index": 3901,
+                "name": "abcc4"
+            },
+            {
+                "index": 968,
+                "name": "patj"
+            },
+            {
+                "index": 1391,
+                "name": "pdzk1ip1"
+            },
+            {
+                "index": 4035,
+                "name": "tom1l1"
+            },
+            {
+                "index": 4769,
+                "name": "hdac6"
+            },
+            {
+                "index": 10810,
+                "name": "rec8"
+            },
+            {
+                "index": 2504,
+                "name": "med12"
+            },
+            {
+                "index": 1502,
+                "name": "setdb1"
+            },
+            {
+                "index": 1072,
+                "name": "keap1"
+            },
+            {
+                "index": 6898,
+                "name": "herpud1"
+            },
+            {
+                "index": 5740,
+                "name": "greb1"
+            },
+            {
+                "index": 7754,
+                "name": "ncor1"
+            },
+            {
+                "index": 4962,
+                "name": "bcar1"
+            },
+            {
+                "index": 1262,
+                "name": "ei24"
+            },
+            {
+                "index": 8417,
+                "name": "gdf15"
+            },
+            {
+                "index": 4602,
+                "name": "litaf"
+            },
+            {
+                "index": 10147,
+                "name": "onecut2"
+            },
+            {
+                "index": 9200,
+                "name": "gsto1"
+            },
+            {
+                "index": 11423,
+                "name": "cyp7b1"
+            },
+            {
+                "index": 8224,
+                "name": "grhpr"
+            },
+            {
+                "index": 6115,
+                "name": "zmym3"
+            },
+            {
+                "index": 6079,
+                "name": "zbed1"
+            },
+            {
+                "index": 2589,
+                "name": "cldn9"
+            },
+            {
+                "index": 3770,
+                "name": "mbd2"
+            },
+            {
+                "index": 1417,
+                "name": "cpne3"
+            },
+            {
+                "index": 12123,
+                "name": "aldh1a2"
+            },
+            {
+                "index": 3346,
+                "name": "nrp1"
+            },
+            {
+                "index": 12802,
+                "name": "creg1"
+            },
+            {
+                "index": 2834,
+                "name": "tnfrsf10a"
+            },
+            {
+                "index": 2944,
+                "name": "matn4"
+            },
+            {
+                "index": 9023,
+                "name": "adam9"
+            },
+            {
+                "index": 6996,
+                "name": "tnfsf10"
+            },
+            {
+                "index": 8647,
+                "name": "mbtps1"
+            },
+            {
+                "index": 436,
+                "name": "b4galt4"
+            },
+            {
+                "index": 4408,
+                "name": "eif3h"
+            },
+            {
+                "index": 599,
+                "name": "eif3a"
+            },
+            {
+                "index": 502,
+                "name": "ncoa1"
+            },
+            {
+                "index": 12653,
+                "name": "akr1c3"
+            },
+            {
+                "index": 4163,
+                "name": "uso1"
+            },
+            {
+                "index": 8951,
+                "name": "degs1"
+            },
+            {
+                "index": 13339,
+                "name": "bcas1"
+            },
+            {
+                "index": 12124,
+                "name": "ndst2"
+            },
+            {
+                "index": 10235,
+                "name": "ppfibp2"
+            },
+            {
+                "index": 2630,
+                "name": "cul3"
+            },
+            {
+                "index": 7455,
+                "name": "uxt"
+            },
+            {
+                "index": 1788,
+                "name": "spop"
+            },
+            {
+                "index": 1271,
+                "name": "mad1l1"
+            },
+            {
+                "index": 8012,
+                "name": "h4c8"
+            },
+            {
+                "index": 11429,
+                "name": "h2bc8"
+            },
+            {
+                "index": 7817,
+                "name": "bap1"
+            },
+            {
+                "index": 6019,
+                "name": "arid1a"
+            },
+            {
+                "index": 6295,
+                "name": "ncoa3"
+            },
+            {
+                "index": 6962,
+                "name": "aaas"
+            },
+            {
+                "index": 5202,
+                "name": "kmt2d"
+            },
+            {
+                "index": 1544,
+                "name": "psca"
+            },
+            {
+                "index": 1934,
+                "name": "kat6a"
+            },
+            {
+                "index": 9573,
+                "name": "arhgef5"
+            },
+            {
+                "index": 2655,
+                "name": "usp7"
+            },
+            {
+                "index": 6359,
+                "name": "brpf1"
+            },
+            {
+                "index": 8007,
+                "name": "zfand5"
+            },
+            {
+                "index": 1661,
+                "name": "zbtb16"
+            },
+            {
+                "index": 9875,
+                "name": "zic2"
+            },
+            {
+                "index": 6526,
+                "name": "xrcc1"
+            },
+            {
+                "index": 161,
+                "name": "xpo1"
+            },
+            {
+                "index": 4206,
+                "name": "wnt10b"
+            },
+            {
+                "index": 4348,
+                "name": "vip"
+            },
+            {
+                "index": 1625,
+                "name": "vim"
+            },
+            {
+                "index": 3974,
+                "name": "ezr"
+            },
+            {
+                "index": 749,
+                "name": "vegfa"
+            },
+            {
+                "index": 2017,
+                "name": "vdr"
+            },
+            {
+                "index": 398,
+                "name": "vcp"
+            },
+            {
+                "index": 9264,
+                "name": "kdm6a"
+            },
+            {
+                "index": 8671,
+                "name": "umps"
+            },
+            {
+                "index": 5282,
+                "name": "uck2"
+            },
+            {
+                "index": 33944,
+                "name": "ugt2b17"
+            },
+            {
+                "index": 13576,
+                "name": "ugt2b15"
+            },
+            {
+                "index": 7239,
+                "name": "ucp3"
+            },
+            {
+                "index": 226,
+                "name": "u2af1"
+            },
+            {
+                "index": 3509,
+                "name": "tyms"
+            },
+            {
+                "index": 11133,
+                "name": "tst"
+            },
+            {
+                "index": 843,
+                "name": "traf1"
+            },
+            {
+                "index": 3996,
+                "name": "hsp90b1"
+            },
+            {
+                "index": 9226,
+                "name": "tpt1"
+            },
+            {
+                "index": 3408,
+                "name": "tpd52l1"
+            },
+            {
+                "index": 6317,
+                "name": "tpd52"
+            },
+            {
+                "index": 5180,
+                "name": "tpbg"
+            },
+            {
+                "index": 1785,
+                "name": "tp53"
+            },
+            {
+                "index": 6976,
+                "name": "top2a"
+            },
+            {
+                "index": 2044,
+                "name": "tmsb4x"
+            },
+            {
+                "index": 2660,
+                "name": "tmprss2"
+            },
+            {
+                "index": 331,
+                "name": "tmod1"
+            },
+            {
+                "index": 6772,
+                "name": "tmf1"
+            },
+            {
+                "index": 4594,
+                "name": "tlr5"
+            },
+            {
+                "index": 3259,
+                "name": "tlr4"
+            },
+            {
+                "index": 13345,
+                "name": "timp4"
+            },
+            {
+                "index": 3911,
+                "name": "tgfbr2"
+            },
+            {
+                "index": 2889,
+                "name": "tgfb1"
+            },
+            {
+                "index": 6408,
+                "name": "tgfa"
+            },
+            {
+                "index": 5129,
+                "name": "tert"
+            },
+            {
+                "index": 9471,
+                "name": "terc"
+            },
+            {
+                "index": 3931,
+                "name": "prdx2"
+            },
+            {
+                "index": 950,
+                "name": "tcp1"
+            },
+            {
+                "index": 6002,
+                "name": "tcn2"
+            },
+            {
+                "index": 6073,
+                "name": "hnf1b"
+            },
+            {
+                "index": 5731,
+                "name": "tbx3"
+            },
+            {
+                "index": 34060,
+                "name": "tbxas1"
+            },
+            {
+                "index": 4645,
+                "name": "tap1"
+            },
+            {
+                "index": 543,
+                "name": "map3k7"
+            },
+            {
+                "index": 2619,
+                "name": "surf4"
+            },
+            {
+                "index": 7697,
+                "name": "sult2a1"
+            },
+            {
+                "index": 8637,
+                "name": "sult2b1"
+            },
+            {
+                "index": 1138,
+                "name": "sult1a1"
+            },
+            {
+                "index": 54,
+                "name": "aurka"
+            },
+            {
+                "index": 6695,
+                "name": "sult1e1"
+            },
+            {
+                "index": 729,
+                "name": "stat3"
+            },
+            {
+                "index": 7501,
+                "name": "st14"
+            },
+            {
+                "index": 8067,
+                "name": "ssx2"
+            },
+            {
+                "index": 11769,
+                "name": "ssr2"
+            },
+            {
+                "index": 12537,
+                "name": "srd5a2"
+            },
+            {
+                "index": 13313,
+                "name": "srd5a1"
+            },
+            {
+                "index": 9460,
+                "name": "spock1"
+            },
+            {
+                "index": 12244,
+                "name": "spink1"
+            },
+            {
+                "index": 460,
+                "name": "sox2"
+            },
+            {
+                "index": 4959,
+                "name": "sod2"
+            },
+            {
+                "index": 5773,
+                "name": "smarca1"
+            },
+            {
+                "index": 11881,
+                "name": "slc22a3"
+            },
+            {
+                "index": 1969,
+                "name": "slc12a2"
+            },
+            {
+                "index": 2058,
+                "name": "slc7a1"
+            },
+            {
+                "index": 7713,
+                "name": "slc5a5"
+            },
+            {
+                "index": 2828,
+                "name": "slc4a2"
+            },
+            {
+                "index": 2387,
+                "name": "shbg"
+            },
+            {
+                "index": 1998,
+                "name": "itsn1"
+            },
+            {
+                "index": 6217,
+                "name": "selenop"
+            },
+            {
+                "index": 8581,
+                "name": "cxcl12"
+            },
+            {
+                "index": 8106,
+                "name": "cx3cl1"
+            },
+            {
+                "index": 12232,
+                "name": "acsm3"
+            },
+            {
+                "index": 4024,
+                "name": "vps52"
+            },
+            {
+                "index": 1926,
+                "name": "rxra"
+            },
+            {
+                "index": 6003,
+                "name": "rras"
+            },
+            {
+                "index": 4933,
+                "name": "rps19"
+            },
+            {
+                "index": 5006,
+                "name": "rpn2"
+            },
+            {
+                "index": 1490,
+                "name": "rpl12"
+            },
+            {
+                "index": 827,
+                "name": "rpl11"
+            },
+            {
+                "index": 383,
+                "name": "rpl10"
+            },
+            {
+                "index": 2150,
+                "name": "robo2"
+            },
+            {
+                "index": 5899,
+                "name": "robo1"
+            },
+            {
+                "index": 1062,
+                "name": "rnasel"
+            },
+            {
+                "index": 10959,
+                "name": "rnase4"
+            },
+            {
+                "index": 4772,
+                "name": "rln2"
+            },
+            {
+                "index": 8120,
+                "name": "arid4a"
+            },
+            {
+                "index": 577,
+                "name": "rb1"
+            },
+            {
+                "index": 10169,
+                "name": "rag1"
+            },
+            {
+                "index": 4061,
+                "name": "rad23b"
+            },
+            {
+                "index": 4278,
+                "name": "nectin2"
+            },
+            {
+                "index": 36,
+                "name": "pvr"
+            },
+            {
+                "index": 2236,
+                "name": "ptprk"
+            },
+            {
+                "index": 8086,
+                "name": "ptprc"
+            },
+            {
+                "index": 12079,
+                "name": "pthlh"
+            },
+            {
+                "index": 4425,
+                "name": "ptgs2"
+            },
+            {
+                "index": 177,
+                "name": "pten"
+            },
+            {
+                "index": 12257,
+                "name": "prss8"
+            },
+            {
+                "index": 6940,
+                "name": "prnp"
+            },
+            {
+                "index": 23,
+                "name": "dnajc3"
+            },
+            {
+                "index": 4042,
+                "name": "eif2ak2"
+            },
+            {
+                "index": 866,
+                "name": "mapk3"
+            },
+            {
+                "index": 1016,
+                "name": "prkdc"
+            },
+            {
+                "index": 2947,
+                "name": "prkcz"
+            },
+            {
+                "index": 4128,
+                "name": "prkacb"
+            },
+            {
+                "index": 2698,
+                "name": "ppp3ca"
+            },
+            {
+                "index": 4198,
+                "name": "ppp2r2a"
+            },
+            {
+                "index": 1295,
+                "name": "ppl"
+            },
+            {
+                "index": 1122,
+                "name": "ppara"
+            },
+            {
+                "index": 12120,
+                "name": "pon1"
+            },
+            {
+                "index": 6804,
+                "name": "podxl"
+            },
+            {
+                "index": 1715,
+                "name": "prrx1"
+            },
+            {
+                "index": 10031,
+                "name": "pms1"
+            },
+            {
+                "index": 2584,
+                "name": "pml"
+            },
+            {
+                "index": 538,
+                "name": "plaur"
+            },
+            {
+                "index": 5137,
+                "name": "plau"
+            },
+            {
+                "index": 7716,
+                "name": "pitx3"
+            },
+            {
+                "index": 2140,
+                "name": "pik3r2"
+            },
+            {
+                "index": 43,
+                "name": "pik3r1"
+            },
+            {
+                "index": 7186,
+                "name": "pik3cd"
+            },
+            {
+                "index": 7644,
+                "name": "pik3cb"
+            },
+            {
+                "index": 1641,
+                "name": "pik3ca"
+            },
+            {
+                "index": 12210,
+                "name": "serpinb10"
+            },
+            {
+                "index": 8771,
+                "name": "pgam2"
+            },
+            {
+                "index": 10215,
+                "name": "penk"
+            },
+            {
+                "index": 10900,
+                "name": "serpinf1"
+            },
+            {
+                "index": 2969,
+                "name": "pdzk1"
+            },
+            {
+                "index": 22019,
+                "name": "slc26a4"
+            },
+            {
+                "index": 2448,
+                "name": "pdha1"
+            },
+            {
+                "index": 1873,
+                "name": "pde4d"
+            },
+            {
+                "index": 9108,
+                "name": "pcdh8"
+            },
+            {
+                "index": 169,
+                "name": "pax6"
+            },
+            {
+                "index": 2551,
+                "name": "pawr"
+            },
+            {
+                "index": 8441,
+                "name": "serpine1"
+            },
+            {
+                "index": 852,
+                "name": "p4hb"
+            },
+            {
+                "index": 4465,
+                "name": "ogg1"
+            },
+            {
+                "index": 1906,
+                "name": "nucb2"
+            },
+            {
+                "index": 21994,
+                "name": "npr3"
+            },
+            {
+                "index": 211,
+                "name": "nppa"
+            },
+            {
+                "index": 4857,
+                "name": "cnot3"
+            },
+            {
+                "index": 4497,
+                "name": "nos3"
+            },
+            {
+                "index": 672,
+                "name": "nkx3-1"
+            },
+            {
+                "index": 2363,
+                "name": "ngfr"
+            },
+            {
+                "index": 3191,
+                "name": "nfic"
+            },
+            {
+                "index": 8481,
+                "name": "nfe2l2"
+            },
+            {
+                "index": 4376,
+                "name": "nbn"
+            },
+            {
+                "index": 3175,
+                "name": "naglu"
+            },
+            {
+                "index": 3659,
+                "name": "mycl"
+            },
+            {
+                "index": 25,
+                "name": "myc"
+            },
+            {
+                "index": 1015,
+                "name": "mxi1"
+            },
+            {
+                "index": 12911,
+                "name": "muc4"
+            },
+            {
+                "index": 6175,
+                "name": "mthfr"
+            },
+            {
+                "index": 6745,
+                "name": "mtap"
+            },
+            {
+                "index": 2225,
+                "name": "mt2a"
+            },
+            {
+                "index": 10320,
+                "name": "msr1"
+            },
+            {
+                "index": 14009,
+                "name": "msmb"
+            },
+            {
+                "index": 2803,
+                "name": "msh3"
+            },
+            {
+                "index": 4818,
+                "name": "mpo"
+            },
+            {
+                "index": 9165,
+                "name": "mmp13"
+            },
+            {
+                "index": 3474,
+                "name": "mmp9"
+            },
+            {
+                "index": 6296,
+                "name": "mme"
+            },
+            {
+                "index": 2511,
+                "name": "kmt2a"
+            },
+            {
+                "index": 2423,
+                "name": "mlh1"
+            },
+            {
+                "index": 5692,
+                "name": "mif"
+            },
+            {
+                "index": 67,
+                "name": "met"
+            },
+            {
+                "index": 3314,
+                "name": "map3k1"
+            },
+            {
+                "index": 1552,
+                "name": "mdm2"
+            },
+            {
+                "index": 11114,
+                "name": "mc2r"
+            },
+            {
+                "index": 8982,
+                "name": "mbd1"
+            },
+            {
+                "index": 3982,
+                "name": "m6pr"
+            },
+            {
+                "index": 12733,
+                "name": "epcam"
+            },
+            {
+                "index": 3941,
+                "name": "lrp2"
+            },
+            {
+                "index": 5671,
+                "name": "lpl"
+            },
+            {
+                "index": 6986,
+                "name": "lifr"
+            },
+            {
+                "index": 11523,
+                "name": "lep"
+            },
+            {
+                "index": 4812,
+                "name": "ldhb"
+            },
+            {
+                "index": 3211,
+                "name": "stmn1"
+            },
+            {
+                "index": 6276,
+                "name": "lamc1"
+            },
+            {
+                "index": 6010,
+                "name": "lamb2"
+            },
+            {
+                "index": 2621,
+                "name": "kras"
+            },
+            {
+                "index": 7537,
+                "name": "klk2"
+            },
+            {
+                "index": 1020,
+                "name": "jup"
+            },
+            {
+                "index": 1618,
+                "name": "jak2"
+            },
+            {
+                "index": 1410,
+                "name": "jak1"
+            },
+            {
+                "index": 6487,
+                "name": "itpr1"
+            },
+            {
+                "index": 2515,
+                "name": "itgb3"
+            },
+            {
+                "index": 5086,
+                "name": "irs1"
+            },
+            {
+                "index": 213,
+                "name": "ins"
+            },
+            {
+                "index": 3552,
+                "name": "il18"
+            },
+            {
+                "index": 6117,
+                "name": "il16"
+            },
+            {
+                "index": 2983,
+                "name": "il10"
+            },
+            {
+                "index": 2978,
+                "name": "cxcl8"
+            },
+            {
+                "index": 1533,
+                "name": "il6st"
+            },
+            {
+                "index": 1567,
+                "name": "il6"
+            },
+            {
+                "index": 2617,
+                "name": "il2"
+            },
+            {
+                "index": 4941,
+                "name": "il1rn"
+            },
+            {
+                "index": 7911,
+                "name": "igfbp7"
+            },
+            {
+                "index": 5640,
+                "name": "igfbp6"
+            },
+            {
+                "index": 4098,
+                "name": "igfbp3"
+            },
+            {
+                "index": 2114,
+                "name": "igf2r"
+            },
+            {
+                "index": 5720,
+                "name": "igf1"
+            },
+            {
+                "index": 7212,
+                "name": "idh1"
+            },
+            {
+                "index": 3843,
+                "name": "id3"
+            },
+            {
+                "index": 4968,
+                "name": "icam1"
+            },
+            {
+                "index": 244,
+                "name": "hsp90ab1"
+            },
+            {
+                "index": 138,
+                "name": "hspa1a"
+            },
+            {
+                "index": 8114,
+                "name": "hsd17b3"
+            },
+            {
+                "index": 10592,
+                "name": "hsd17b1"
+            },
+            {
+                "index": 3043,
+                "name": "hsd3b2"
+            },
+            {
+                "index": 10312,
+                "name": "hsd3b1"
+            },
+            {
+                "index": 2927,
+                "name": "hras"
+            },
+            {
+                "index": 2805,
+                "name": "hpn"
+            },
+            {
+                "index": 10034,
+                "name": "hpgd"
+            },
+            {
+                "index": 8177,
+                "name": "hoxd3"
+            },
+            {
+                "index": 4136,
+                "name": "hoxb9"
+            },
+            {
+                "index": 2656,
+                "name": "hnrnph1"
+            },
+            {
+                "index": 8229,
+                "name": "foxa3"
+            },
+            {
+                "index": 106,
+                "name": "foxa1"
+            },
+            {
+                "index": 3192,
+                "name": "hmox1"
+            },
+            {
+                "index": 2271,
+                "name": "hmgb2"
+            },
+            {
+                "index": 497,
+                "name": "hif1a"
+            },
+            {
+                "index": 4951,
+                "name": "hbg2"
+            },
+            {
+                "index": 5416,
+                "name": "hbg1"
+            },
+            {
+                "index": 6627,
+                "name": "gstt1"
+            },
+            {
+                "index": 1497,
+                "name": "gstp1"
+            },
+            {
+                "index": 7557,
+                "name": "gstm3"
+            },
+            {
+                "index": 5176,
+                "name": "gstm1"
+            },
+            {
+                "index": 5215,
+                "name": "gsta1"
+            },
+            {
+                "index": 33,
+                "name": "gsk3b"
+            },
+            {
+                "index": 2981,
+                "name": "grpr"
+            },
+            {
+                "index": 887,
+                "name": "pdia3"
+            },
+            {
+                "index": 509,
+                "name": "nr3c1"
+            },
+            {
+                "index": 208,
+                "name": "grb7"
+            },
+            {
+                "index": 2863,
+                "name": "gpx3"
+            },
+            {
+                "index": 1542,
+                "name": "golga4"
+            },
+            {
+                "index": 3291,
+                "name": "gng5"
+            },
+            {
+                "index": 4796,
+                "name": "gja1"
+            },
+            {
+                "index": 2993,
+                "name": "ghr"
+            },
+            {
+                "index": 10154,
+                "name": "ggt1"
+            },
+            {
+                "index": 3617,
+                "name": "gcnt1"
+            },
+            {
+                "index": 11484,
+                "name": "galnt3"
+            },
+            {
+                "index": 12064,
+                "name": "folh1"
+            },
+            {
+                "index": 5609,
+                "name": "foxo1"
+            },
+            {
+                "index": 7682,
+                "name": "foxc1"
+            },
+            {
+                "index": 3080,
+                "name": "fhit"
+            },
+            {
+                "index": 441,
+                "name": "fgfr4"
+            },
+            {
+                "index": 8592,
+                "name": "fgf10"
+            },
+            {
+                "index": 799,
+                "name": "fgf2"
+            },
+            {
+                "index": 1216,
+                "name": "fbln1"
+            },
+            {
+                "index": 6120,
+                "name": "acsl4"
+            },
+            {
+                "index": 2768,
+                "name": "ezh2"
+            },
+            {
+                "index": 2550,
+                "name": "ewsr1"
+            },
+            {
+                "index": 1398,
+                "name": "etv5"
+            },
+            {
+                "index": 7009,
+                "name": "etv4"
+            },
+            {
+                "index": 9883,
+                "name": "etv3"
+            },
+            {
+                "index": 4302,
+                "name": "etv1"
+            },
+            {
+                "index": 1373,
+                "name": "esr2"
+            },
+            {
+                "index": 375,
+                "name": "esr1"
+            },
+            {
+                "index": 3044,
+                "name": "erg"
+            },
+            {
+                "index": 6528,
+                "name": "erf"
+            },
+            {
+                "index": 1742,
+                "name": "ercc2"
+            },
+            {
+                "index": 3378,
+                "name": "erbb3"
+            },
+            {
+                "index": 822,
+                "name": "erbb2"
+            },
+            {
+                "index": 4369,
+                "name": "ephx1"
+            },
+            {
+                "index": 2297,
+                "name": "ephb2"
+            },
+            {
+                "index": 9199,
+                "name": "emp3"
+            },
+            {
+                "index": 3785,
+                "name": "emp1"
+            },
+            {
+                "index": 525,
+                "name": "ehhadh"
+            },
+            {
+                "index": 15,
+                "name": "egr1"
+            },
+            {
+                "index": 125,
+                "name": "egfr"
+            },
+            {
+                "index": 1014,
+                "name": "egf"
+            },
+            {
+                "index": 2804,
+                "name": "lpar1"
+            },
+            {
+                "index": 2382,
+                "name": "dnmt3b"
+            },
+            {
+                "index": 594,
+                "name": "dnmt1"
+            },
+            {
+                "index": 10598,
+                "name": "dnase1l2"
+            },
+            {
+                "index": 3841,
+                "name": "nqo1"
+            },
+            {
+                "index": 4907,
+                "name": "defb1"
+            },
+            {
+                "index": 6779,
+                "name": "gadd45a"
+            },
+            {
+                "index": 13097,
+                "name": "ace"
+            },
+            {
+                "index": 1807,
+                "name": "dag1"
+            },
+            {
+                "index": 2756,
+                "name": "cyp19a1"
+            },
+            {
+                "index": 3501,
+                "name": "cyp17a1"
+            },
+            {
+                "index": 34059,
+                "name": "cyp11b2"
+            },
+            {
+                "index": 10901,
+                "name": "cyp3a5"
+            },
+            {
+                "index": 8974,
+                "name": "cyp3a4"
+            },
+            {
+                "index": 8212,
+                "name": "cyp2e1"
+            },
+            {
+                "index": 1281,
+                "name": "cyp2c18"
+            },
+            {
+                "index": 12431,
+                "name": "cyp2c19"
+            },
+            {
+                "index": 10412,
+                "name": "cyp2a6"
+            },
+            {
+                "index": 12769,
+                "name": "cyp1b1"
+            },
+            {
+                "index": 201,
+                "name": "cyp1a1"
+            },
+            {
+                "index": 3722,
+                "name": "ctsd"
+            },
+            {
+                "index": 7278,
+                "name": "ctsb"
+            },
+            {
+                "index": 769,
+                "name": "ctnnb1"
+            },
+            {
+                "index": 774,
+                "name": "ctbp2"
+            },
+            {
+                "index": 4650,
+                "name": "cst6"
+            },
+            {
+                "index": 3818,
+                "name": "cst1"
+            },
+            {
+                "index": 11537,
+                "name": "csrp1"
+            },
+            {
+                "index": 3200,
+                "name": "cryab"
+            },
+            {
+                "index": 1350,
+                "name": "crebbp"
+            },
+            {
+                "index": 4168,
+                "name": "cldn7"
+            },
+            {
+                "index": 10877,
+                "name": "cldn3"
+            },
+            {
+                "index": 8665,
+                "name": "slc31a1"
+            },
+            {
+                "index": 1545,
+                "name": "klf6"
+            },
+            {
+                "index": 452,
+                "name": "comt"
+            },
+            {
+                "index": 5295,
+                "name": "col15a1"
+            },
+            {
+                "index": 841,
+                "name": "col5a1"
+            },
+            {
+                "index": 7741,
+                "name": "cnn3"
+            },
+            {
+                "index": 4352,
+                "name": "tpp1"
+            },
+            {
+                "index": 1127,
+                "name": "clu"
+            },
+            {
+                "index": 155,
+                "name": "chd3"
+            },
+            {
+                "index": 2389,
+                "name": "chd1"
+            },
+            {
+                "index": 2783,
+                "name": "cenpf"
+            },
+            {
+                "index": 2104,
+                "name": "cdkn1b"
+            },
+            {
+                "index": 1168,
+                "name": "cdkn1a"
+            },
+            {
+                "index": 3465,
+                "name": "cdh13"
+            },
+            {
+                "index": 13115,
+                "name": "cdh12"
+            },
+            {
+                "index": 2543,
+                "name": "cdh1"
+            },
+            {
+                "index": 1345,
+                "name": "cdc27"
+            },
+            {
+                "index": 5015,
+                "name": "cd9"
+            },
+            {
+                "index": 2295,
+                "name": "ccnh"
+            },
+            {
+                "index": 4435,
+                "name": "ccnd2"
+            },
+            {
+                "index": 8583,
+                "name": "cbr1"
+            },
+            {
+                "index": 3438,
+                "name": "runx1"
+            },
+            {
+                "index": 4487,
+                "name": "cav2"
+            },
+            {
+                "index": 489,
+                "name": "cav1"
+            },
+            {
+                "index": 5349,
+                "name": "casp9"
+            },
+            {
+                "index": 3252,
+                "name": "capns1"
+            },
+            {
+                "index": 5169,
+                "name": "calr"
+            },
+            {
+                "index": 6492,
+                "name": "calca"
+            },
+            {
+                "index": 402,
+                "name": "ddr1"
+            },
+            {
+                "index": 6112,
+                "name": "zfp36l2"
+            },
+            {
+                "index": 80,
+                "name": "brca2"
+            },
+            {
+                "index": 1980,
+                "name": "braf"
+            },
+            {
+                "index": 554,
+                "name": "brca1"
+            },
+            {
+                "index": 1310,
+                "name": "bnip3"
+            },
+            {
+                "index": 3753,
+                "name": "bmpr1b"
+            },
+            {
+                "index": 5422,
+                "name": "bmp7"
+            },
+            {
+                "index": 34058,
+                "name": "bglap"
+            },
+            {
+                "index": 2429,
+                "name": "bcl2"
+            },
+            {
+                "index": 1748,
+                "name": "ccnd1"
+            },
+            {
+                "index": 1139,
+                "name": "bax"
+            },
+            {
+                "index": 4060,
+                "name": "bad"
+            },
+            {
+                "index": 2347,
+                "name": "b2m"
+            },
+            {
+                "index": 9846,
+                "name": "azgp1"
+            },
+            {
+                "index": 395,
+                "name": "atr"
+            },
+            {
+                "index": 8946,
+                "name": "atp7b"
+            },
+            {
+                "index": 3666,
+                "name": "atm"
+            },
+            {
+                "index": 882,
+                "name": "atf3"
+            },
+            {
+                "index": 4584,
+                "name": "zfhx3"
+            },
+            {
+                "index": 13160,
+                "name": "arg2"
+            },
+            {
+                "index": 363,
+                "name": "ar"
+            },
+            {
+                "index": 4676,
+                "name": "faslg"
+            },
+            {
+                "index": 2641,
+                "name": "klk3"
+            },
+            {
+                "index": 4084,
+                "name": "birc5"
+            },
+            {
+                "index": 1726,
+                "name": "apex1"
+            },
+            {
+                "index": 2037,
+                "name": "apc"
+            },
+            {
+                "index": 12108,
+                "name": "aox1"
+            },
+            {
+                "index": 7512,
+                "name": "anxa4"
+            },
+            {
+                "index": 6095,
+                "name": "anxa3"
+            },
+            {
+                "index": 2319,
+                "name": "anxa1"
+            },
+            {
+                "index": 7694,
+                "name": "alox12b"
+            },
+            {
+                "index": 3631,
+                "name": "alox5"
+            },
+            {
+                "index": 7661,
+                "name": "alad"
+            },
+            {
+                "index": 1057,
+                "name": "akt1"
+            },
+            {
+                "index": 5230,
+                "name": "ahr"
+            },
+            {
+                "index": 1494,
+                "name": "adrb2"
+            },
+            {
+                "index": 568,
+                "name": "parp1"
+            },
+            {
+                "index": 8038,
+                "name": "ache"
+            },
+            {
+                "index": 11108,
+                "name": "abr"
+            },
+            {
+                "index": 13075,
+                "name": "abo"
+            },
+            {
+                "index": 6931,
+                "name": "serpina3"
+            },
+            {
+                "index": 6856,
+                "name": "nat2"
+            },
+            {
+                "index": 8829,
+                "name": "nat1"
+            }
+        ]
+    },
+    {
+        "question": "what are the symptoms of atopic dermatitis?",
+        "cypher_query": "MATCH (d:disease {name: \"dermatitis, atopic\"})-[:phenotype_present]->(p:effect_or_phenotype)\nRETURN p.name AS Symptoms",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 22759,
+                "name": "autosomal dominant inheritance"
+            },
+            {
+                "index": 25945,
+                "name": "pruritus"
+            },
+            {
+                "index": 22550,
+                "name": "eczema"
+            },
+            {
+                "index": 87037,
+                "name": "flexural lichenification"
+            },
+            {
+                "index": 22946,
+                "name": "abnormality of metabolism_or_homeostasis"
+            },
+            {
+                "index": 88596,
+                "name": "infra-orbital fold"
+            },
+            {
+                "index": 91605,
+                "name": "keratosis pilaris"
+            },
+            {
+                "index": 84767,
+                "name": "dry skin"
+            },
+            {
+                "index": 22965,
+                "name": "food intolerance"
+            },
+            {
+                "index": 23985,
+                "name": "recurrent skin infections"
+            },
+            {
+                "index": 84789,
+                "name": "facial erythema"
+            },
+            {
+                "index": 22566,
+                "name": "pallor"
+            },
+            {
+                "index": 24369,
+                "name": "atopic dermatitis"
+            }
+        ]
+    },
+    {
+        "question": "Which biomarkers are associated with a diagnosis of atopic dermatitis?",
+        "cypher_query": "MATCH (d:disease {name: \"dermatitis, atopic\"})-[:associated_with]->(gp:gene_or_protein)\nRETURN gp.name AS BiomarkerName",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 35143,
+                "name": "il31"
+            },
+            {
+                "index": 34476,
+                "name": "actl9"
+            },
+            {
+                "index": 13723,
+                "name": "ifnl3"
+            },
+            {
+                "index": 34257,
+                "name": "ccdc80"
+            },
+            {
+                "index": 6414,
+                "name": "il33"
+            },
+            {
+                "index": 22056,
+                "name": "tslp"
+            },
+            {
+                "index": 34610,
+                "name": "card11"
+            },
+            {
+                "index": 10683,
+                "name": "emsy"
+            },
+            {
+                "index": 12287,
+                "name": "znf365"
+            },
+            {
+                "index": 34985,
+                "name": "vnn1"
+            },
+            {
+                "index": 4966,
+                "name": "vnn2"
+            },
+            {
+                "index": 6802,
+                "name": "stat6"
+            },
+            {
+                "index": 12663,
+                "name": "slc11a1"
+            },
+            {
+                "index": 8834,
+                "name": "sele"
+            },
+            {
+                "index": 21984,
+                "name": "ccl24"
+            },
+            {
+                "index": 8540,
+                "name": "ccl22"
+            },
+            {
+                "index": 1521,
+                "name": "ccl17"
+            },
+            {
+                "index": 8415,
+                "name": "ccl11"
+            },
+            {
+                "index": 1944,
+                "name": "ccl5"
+            },
+            {
+                "index": 292,
+                "name": "s100a8"
+            },
+            {
+                "index": 902,
+                "name": "mapk8"
+            },
+            {
+                "index": 1122,
+                "name": "ppara"
+            },
+            {
+                "index": 10862,
+                "name": "ovol1"
+            },
+            {
+                "index": 4340,
+                "name": "cxcl10"
+            },
+            {
+                "index": 3451,
+                "name": "il13"
+            },
+            {
+                "index": 2983,
+                "name": "il10"
+            },
+            {
+                "index": 1567,
+                "name": "il6"
+            },
+            {
+                "index": 4738,
+                "name": "il5"
+            },
+            {
+                "index": 5604,
+                "name": "il4"
+            },
+            {
+                "index": 1004,
+                "name": "il1b"
+            },
+            {
+                "index": 3495,
+                "name": "ifng"
+            },
+            {
+                "index": 7136,
+                "name": "cxcr3"
+            },
+            {
+                "index": 3207,
+                "name": "glb1"
+            },
+            {
+                "index": 5598,
+                "name": "flg"
+            },
+            {
+                "index": 5438,
+                "name": "ccr5"
+            },
+            {
+                "index": 1895,
+                "name": "ccr3"
+            }
+        ]
+    },
+    {
+        "question": "What are the common treatments for moderate to severe psoriasis?",
+        "cypher_query": "MATCH (d:disease {name: \"psoriasis\"})-[:indication]->(drug:drug)\nRETURN drug.name AS Treatment",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 14019,
+                "name": "betamethasone"
+            },
+            {
+                "index": 14023,
+                "name": "triamcinolone"
+            },
+            {
+                "index": 14024,
+                "name": "prednisone"
+            },
+            {
+                "index": 14028,
+                "name": "hydrocortisone"
+            },
+            {
+                "index": 14030,
+                "name": "prednisolone"
+            },
+            {
+                "index": 14042,
+                "name": "hydrocortisone acetate"
+            },
+            {
+                "index": 14112,
+                "name": "etretinate"
+            },
+            {
+                "index": 14194,
+                "name": "methotrexate"
+            },
+            {
+                "index": 14269,
+                "name": "methylprednisolone"
+            },
+            {
+                "index": 14320,
+                "name": "dexamethasone"
+            },
+            {
+                "index": 14520,
+                "name": "allantoin"
+            },
+            {
+                "index": 14585,
+                "name": "ammonia"
+            },
+            {
+                "index": 15003,
+                "name": "cortisone acetate"
+            },
+            {
+                "index": 20166,
+                "name": "risankizumab"
+            },
+            {
+                "index": 15809,
+                "name": "tazarotene"
+            },
+            {
+                "index": 16496,
+                "name": "fumaric acid"
+            },
+            {
+                "index": 18230,
+                "name": "ustekinumab"
+            }
+        ]
+    },
+    {
+        "question": "Which proteins interact with PINK1?",
+        "cypher_query": "MATCH (protein:gene_or_protein)-[:ppi]->(targetProtein:gene_or_protein {name: \"pink1\"})\nRETURN protein.name AS ProteinName",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 7439,
+                "name": "rhot2"
+            },
+            {
+                "index": 2161,
+                "name": "cdc37"
+            },
+            {
+                "index": 244,
+                "name": "hsp90ab1"
+            },
+            {
+                "index": 1098,
+                "name": "rest"
+            },
+            {
+                "index": 1625,
+                "name": "vim"
+            },
+            {
+                "index": 10720,
+                "name": "parl"
+            },
+            {
+                "index": 536,
+                "name": "bcl2l2"
+            },
+            {
+                "index": 2244,
+                "name": "erlin1"
+            },
+            {
+                "index": 2296,
+                "name": "bag5"
+            },
+            {
+                "index": 959,
+                "name": "becn1"
+            },
+            {
+                "index": 5765,
+                "name": "appl2"
+            },
+            {
+                "index": 2375,
+                "name": "prkaa2"
+            },
+            {
+                "index": 9115,
+                "name": "crls1"
+            },
+            {
+                "index": 5209,
+                "name": "nae1"
+            },
+            {
+                "index": 1340,
+                "name": "prkn"
+            },
+            {
+                "index": 1599,
+                "name": "bag2"
+            },
+            {
+                "index": 400,
+                "name": "mcl1"
+            },
+            {
+                "index": 345,
+                "name": "ube2m"
+            },
+            {
+                "index": 3402,
+                "name": "map1b"
+            },
+            {
+                "index": 1916,
+                "name": "immt"
+            },
+            {
+                "index": 2984,
+                "name": "park7"
+            },
+            {
+                "index": 4323,
+                "name": "bcl2l1"
+            },
+            {
+                "index": 7205,
+                "name": "sarm1"
+            },
+            {
+                "index": 918,
+                "name": "hspa1b"
+            },
+            {
+                "index": 728,
+                "name": "rb1cc1"
+            },
+            {
+                "index": 1395,
+                "name": "tgm2"
+            },
+            {
+                "index": 6652,
+                "name": "map1lc3a"
+            },
+            {
+                "index": 157,
+                "name": "nedd8"
+            },
+            {
+                "index": 153,
+                "name": "e2f4"
+            },
+            {
+                "index": 2435,
+                "name": "tollip"
+            },
+            {
+                "index": 2665,
+                "name": "tomm40"
+            },
+            {
+                "index": 6854,
+                "name": "map1lc3b"
+            },
+            {
+                "index": 365,
+                "name": "hsh2d"
+            },
+            {
+                "index": 4664,
+                "name": "cops8"
+            },
+            {
+                "index": 279,
+                "name": "hnf4a"
+            },
+            {
+                "index": 5495,
+                "name": "psmc6"
+            },
+            {
+                "index": 189,
+                "name": "ubc"
+            },
+            {
+                "index": 12162,
+                "name": "camkk1"
+            },
+            {
+                "index": 1739,
+                "name": "hsd17b10"
+            },
+            {
+                "index": 13167,
+                "name": "znf746"
+            },
+            {
+                "index": 2618,
+                "name": "irak1"
+            },
+            {
+                "index": 1016,
+                "name": "prkdc"
+            },
+            {
+                "index": 5641,
+                "name": "irs4"
+            },
+            {
+                "index": 4558,
+                "name": "tuba1a"
+            },
+            {
+                "index": 363,
+                "name": "ar"
+            },
+            {
+                "index": 1866,
+                "name": "snca"
+            },
+            {
+                "index": 2472,
+                "name": "adra2a"
+            },
+            {
+                "index": 771,
+                "name": "mafk"
+            },
+            {
+                "index": 428,
+                "name": "eed"
+            },
+            {
+                "index": 1057,
+                "name": "akt1"
+            },
+            {
+                "index": 12607,
+                "name": "tubb"
+            },
+            {
+                "index": 729,
+                "name": "stat3"
+            },
+            {
+                "index": 175,
+                "name": "psmd2"
+            },
+            {
+                "index": 4126,
+                "name": "psmd1"
+            },
+            {
+                "index": 2043,
+                "name": "hsp90aa1"
+            },
+            {
+                "index": 57159,
+                "name": "pgam5"
+            },
+            {
+                "index": 2152,
+                "name": "hspa4"
+            },
+            {
+                "index": 9586,
+                "name": "rhot1"
+            },
+            {
+                "index": 5947,
+                "name": "sncaip"
+            },
+            {
+                "index": 2219,
+                "name": "tomm20"
+            },
+            {
+                "index": 2541,
+                "name": "mark2"
+            },
+            {
+                "index": 71,
+                "name": "ctcf"
+            },
+            {
+                "index": 33951,
+                "name": "rictor"
+            },
+            {
+                "index": 3216,
+                "name": "kif11"
+            },
+            {
+                "index": 429,
+                "name": "traf6"
+            },
+            {
+                "index": 543,
+                "name": "map3k7"
+            },
+            {
+                "index": 10028,
+                "name": "socs4"
+            },
+            {
+                "index": 5716,
+                "name": "fbxo7"
+            },
+            {
+                "index": 6610,
+                "name": "letm1"
+            },
+            {
+                "index": 6932,
+                "name": "tomm22"
+            },
+            {
+                "index": 3488,
+                "name": "tomm70"
+            },
+            {
+                "index": 4004,
+                "name": "mapkap1"
+            },
+            {
+                "index": 1127,
+                "name": "clu"
+            },
+            {
+                "index": 1201,
+                "name": "dnm1l"
+            }
+        ]
+    },
+    {
+        "question": "Is right ventricle heart failure linked to Rheumatic tricuspid valve regurgitation?",
+        "cypher_query": "MATCH (d1:disease {name: \"symptomatic heart failure\"}), (d2:disease {name: \"tricuspid valve insufficiency\"})\nRETURN EXISTS((d1)-[:linked_to]-(d2)) AS IsLinked",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "value": false
+            }
+        ]
+    },
+    {
+        "question": "What genes play role in Alport syndrome?",
+        "cypher_query": "MATCH (d:disease {name: \"nephritis, hereditary\"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 2132,
+                "name": "coq2"
+            },
+            {
+                "index": 11428,
+                "name": "nphs2"
+            },
+            {
+                "index": 909,
+                "name": "col4a5"
+            },
+            {
+                "index": 11545,
+                "name": "col4a4"
+            },
+            {
+                "index": 209,
+                "name": "myh9"
+            },
+            {
+                "index": 8571,
+                "name": "col4a3"
+            }
+        ]
+    },
+    {
+        "question": "Which drugs are used to treat Alzheimer and what do they act on?",
+        "cypher_query": "MATCH (d:disease {name: \"alzheimer disease\"})-[:indication]->(drug:drug)-[:target]->(target:gene_or_protein)\nRETURN drug.name AS DrugName, target.name AS TargetName",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index0": 20185,
+                "name0": "epicriptine",
+                "index1": 8999,
+                "name1": "drd4"
+            },
+            {
+                "index0": 20185,
+                "name0": "epicriptine",
+                "index1": 8832,
+                "name1": "drd3"
+            },
+            {
+                "index0": 20185,
+                "name0": "epicriptine",
+                "index1": 2401,
+                "name1": "drd2"
+            },
+            {
+                "index0": 20185,
+                "name0": "epicriptine",
+                "index1": 10319,
+                "name1": "drd5"
+            },
+            {
+                "index0": 20185,
+                "name0": "epicriptine",
+                "index1": 3199,
+                "name1": "drd1"
+            },
+            {
+                "index0": 15113,
+                "name0": "galantamine",
+                "index1": 13566,
+                "name1": "chrna7"
+            },
+            {
+                "index0": 15113,
+                "name0": "galantamine",
+                "index1": 341,
+                "name1": "bche"
+            },
+            {
+                "index0": 15113,
+                "name0": "galantamine",
+                "index1": 8038,
+                "name1": "ache"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 58737,
+                "name1": "grin3b"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 33823,
+                "name1": "grin3a"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 10459,
+                "name1": "grin2d"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 9379,
+                "name1": "grin2c"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 2452,
+                "name1": "grin2b"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 10093,
+                "name1": "grin2a"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 8464,
+                "name1": "grin1"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 9375,
+                "name1": "tnfaip6"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 1151,
+                "name1": "nfkb1"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 3972,
+                "name1": "nfkb2"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 341,
+                "name1": "bche"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 1004,
+                "name1": "il1b"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 3417,
+                "name1": "htr2a"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 8038,
+                "name1": "ache"
+            },
+            {
+                "index0": 15126,
+                "name0": "donepezil",
+                "index1": 7801,
+                "name1": "nos1"
+            },
+            {
+                "index0": 15294,
+                "name0": "tacrine",
+                "index1": 6541,
+                "name1": "ces1"
+            },
+            {
+                "index0": 15294,
+                "name0": "tacrine",
+                "index1": 341,
+                "name1": "bche"
+            },
+            {
+                "index0": 15294,
+                "name0": "tacrine",
+                "index1": 8038,
+                "name1": "ache"
+            },
+            {
+                "index0": 17174,
+                "name0": "rivastigmine",
+                "index1": 341,
+                "name1": "bche"
+            },
+            {
+                "index0": 17174,
+                "name0": "rivastigmine",
+                "index1": 8038,
+                "name1": "ache"
+            }
+        ]
+    },
+    {
+        "question": "Based on the topological polar surface area, can any of the medications against atopic dermatitis permate cell membranes?",
+        "cypher_query": "MATCH (d:disease {name: \"dermatitis, atopic\"})-[:indication]->(drug:drug)\nWHERE drug.tpsa <= 140\nRETURN drug.name AS MedicationName, drug.tpsa AS TopologicalPolarSurfaceArea",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 14019,
+                "name": "betamethasone"
+            },
+            {
+                "index": 14020,
+                "name": "fluticasone propionate"
+            },
+            {
+                "index": 14021,
+                "name": "fluocinolone acetonide"
+            },
+            {
+                "index": 14023,
+                "name": "triamcinolone"
+            },
+            {
+                "index": 14024,
+                "name": "prednisone"
+            },
+            {
+                "index": 14026,
+                "name": "flumethasone"
+            },
+            {
+                "index": 14028,
+                "name": "hydrocortisone"
+            },
+            {
+                "index": 14029,
+                "name": "flurandrenolide"
+            },
+            {
+                "index": 14030,
+                "name": "prednisolone"
+            },
+            {
+                "index": 14032,
+                "name": "clobetasol propionate"
+            },
+            {
+                "index": 14033,
+                "name": "fluocinonide"
+            },
+            {
+                "index": 14042,
+                "name": "hydrocortisone acetate"
+            },
+            {
+                "index": 14193,
+                "name": "hydroxyzine"
+            },
+            {
+                "index": 14269,
+                "name": "methylprednisolone"
+            },
+            {
+                "index": 14310,
+                "name": "doxepin"
+            },
+            {
+                "index": 14320,
+                "name": "dexamethasone"
+            },
+            {
+                "index": 14941,
+                "name": "amcinonide"
+            },
+            {
+                "index": 15003,
+                "name": "cortisone acetate"
+            },
+            {
+                "index": 15064,
+                "name": "mometasone furoate"
+            },
+            {
+                "index": 15486,
+                "name": "prednicarbate"
+            },
+            {
+                "index": 15500,
+                "name": "desonide"
+            },
+            {
+                "index": 15583,
+                "name": "halcinonide"
+            },
+            {
+                "index": 15586,
+                "name": "tranilast"
+            },
+            {
+                "index": 20377,
+                "name": "benzoyl peroxide"
+            },
+            {
+                "index": 20437,
+                "name": "ammonium lactate"
+            },
+            {
+                "index": 15791,
+                "name": "crisaborole"
+            },
+            {
+                "index": 16837,
+                "name": "urea"
+            },
+            {
+                "index": 17776,
+                "name": "desoximetasone"
+            }
+        ]
     }
 ]

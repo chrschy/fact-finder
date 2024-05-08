@@ -1,7 +1,6 @@
-from nltk import word_tokenize
-from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-
 from fact_finder.evaluator.score.score import Score
+from nltk import download, word_tokenize
+from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
 
 
 class BleuScore(Score):
@@ -11,6 +10,9 @@ class BleuScore(Score):
     e.g. a bi-gram in a text sequence is two adjacent tokens
     If any count for the different n-grams is 0, the BLEU score is also 0. The smoothing function avoids that.
     """
+
+    def __init__(self) -> None:
+        download("punkt")
 
     def compare(self, text_a: str, text_b: str) -> float:
         tokens_a = word_tokenize(text_a)
