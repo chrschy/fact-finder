@@ -24,6 +24,9 @@ from fact_finder.tools.cypher_preprocessors.format_preprocessor import (
 from fact_finder.tools.cypher_preprocessors.lower_case_properties_cypher_query_preprocessor import (
     LowerCasePropertiesCypherQueryPreprocessor,
 )
+from fact_finder.tools.cypher_preprocessors.size_to_count_preprocessor import (
+    SizeToCountPreprocessor,
+)
 from fact_finder.tools.cypher_preprocessors.synonym_cypher_query_preprocessor import (
     SynonymCypherQueryPreprocessor,
 )
@@ -75,6 +78,7 @@ def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool) -> Lis
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=wikidata, node_types="exposure"))
     if using_normalized_graph:
         preprocs += _get_synonymized_graph_preprocessors(graph)
+    preprocs.append(SizeToCountPreprocessor())
     preprocs.append(ChildToParentPreprocessor(graph, "parent_child", name_property="name"))
     return preprocs
 
