@@ -112,8 +112,7 @@ class GraphQAChain(Chain):
         self, config: GraphQAChainConfig, semantic_scholar_chain: Optional[SemanticScholarChain]
     ) -> Tuple[RunnableSerializable, str]:
         cypher_query_generation_chain = self._build_cypher_query_generation_chain(config)
-        question_input_chain: RunnableSerializable = cypher_query_generation_chain
-        question_input_chain = self._add_question_preprocessing_chain(config, question_input_chain)
+        question_input_chain = self._add_question_preprocessing_chain(config, cypher_query_generation_chain)
         question_input_chain = self._add_parallel_semantic_scholar_chain(
             question_input_chain, semantic_scholar_chain, cypher_query_generation_chain
         )
@@ -129,7 +128,7 @@ class GraphQAChain(Chain):
         )
 
     def _add_question_preprocessing_chain(
-        self, config: GraphQAChainConfig, question_input_chain: RunnableSerializable
+        self, config: GraphQAChainConfig, question_input_chain: CypherQueryGenerationChain
     ) -> RunnableSerializable:
         if config.use_entity_detection_preprocessing:
             assert config.entity_detector is not None
@@ -138,6 +137,7 @@ class GraphQAChain(Chain):
                 allowed_types_and_description_templates=config.allowed_types_and_description_templates,
                 return_intermediate_steps=config.return_intermediate_steps,
             )
+            question_input_chain.input_key = preprocessing_chain.output_key
             return preprocessing_chain | question_input_chain
         return question_input_chain
 
