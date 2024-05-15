@@ -195,7 +195,7 @@ def request_pipeline(text_data: str, pipelines_selected: List[str], session_stat
         graph_rag_answer=graph_rag_result.answer,
         subgraph_cypher=(
             results[PipelineOptions.GRAPH.value]["intermediate_steps"]["subgraph_cypher"]
-            if "intermediate_steps" in results[PipelineOptions.GRAPH.value]
+            if "intermediate_steps" in results[PipelineOptions.GRAPH.value] and "subgraph_cypher" in results[PipelineOptions.GRAPH.value]["intermediate_steps"]
             else ""
         ),
     )
