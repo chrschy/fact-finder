@@ -42,9 +42,6 @@ sample_response3 = [
     {"resultNode": {"name": "1", "index": 1, "id": "id1"}},
     {"resultNode": {"name": "5", "index": 5, "id": "id5"}},
     {"resultNode": {"name": "13", "index": 13, "id": "id13"}},
-    #     [{"resultNode": {"name": "2", "index": 2, "id": "id2"}}],
-    #     [{"resultNode": {"name": "6", "index": 6, "id": "id6"}}],
-    #     [{"resultNode": {"name": "14", "index": 14, "id": "id14"}}],
 ]
 
 
