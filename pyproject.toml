@@ -12,12 +12,14 @@ dependencies = [
     "streamlit",
     "nltk",
     "SPARQLWrapper",
-    "neo4j"
+    "neo4j",
+    "regex"
 ]
 
 [project.optional-dependencies]
 linting = ["pre-commit"]
 tests = ["pytest"]
+evaluation = ["sentence-transformers"]
 
 [project.scripts]
 fact-finder = "fact_finder.__main__:main"

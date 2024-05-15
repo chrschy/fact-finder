@@ -86,11 +86,23 @@ class SetEvaluator:
         if len(result_graph_output) == 0:
             return {"INVALID_KEY": 0.0}
         result_graph_output_keys = list(result_graph_output[0].keys())
-        all_scores = {}
-        for key in result_graph_output_keys:
+        return {
+            key: self._compute_score_for_key(expected_values, result_graph_output, key)
+            for key in result_graph_output_keys
+        }
+
+    def _compute_score_for_key(
+        self, expected_values: Collection[str], result_graph_output: List[Dict[str, Any]], key: str
+    ) -> float:
+        if len(result_graph_output) == 0:
+            return 0.0
+        if isinstance(result_graph_output[0][key], dict) and "name" in result_graph_output[0][key]:
+            # Handle the query returning whole nodes instead of specific properties.
+            # TODO Other properties than "name"?
+            entries = {i[key]["name"] for i in result_graph_output}
+        else:
             entries = {i[key] for i in result_graph_output}
-            all_scores[key] = intersection_over_union(entries, expected_values)
-        return all_scores
+        return intersection_over_union(entries, expected_values)
 
 
 def intersection_over_union(s1: Set[Any], s2: Collection[Any]) -> float:
