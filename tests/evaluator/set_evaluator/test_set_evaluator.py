@@ -38,6 +38,15 @@ sample_response2c = [
     {"name1": "12", "name2": "14", "name3": "0"},
 ]
 
+sample_response3 = [
+    {"resultNode": {"name": "1", "index": 1, "id": "id1"}},
+    {"resultNode": {"name": "5", "index": 5, "id": "id5"}},
+    {"resultNode": {"name": "13", "index": 13, "id": "id13"}},
+    #     [{"resultNode": {"name": "2", "index": 2, "id": "id2"}}],
+    #     [{"resultNode": {"name": "6", "index": 6, "id": "id6"}}],
+    #     [{"resultNode": {"name": "14", "index": 14, "id": "id14"}}],
+]
+
 
 @pytest.mark.parametrize(
     "graph_result,ground_truth_nodes,result_graph_response",
@@ -139,6 +148,18 @@ def test_evaluate_with_no_matching_int_value(
 ):
     evaluator = SetEvaluator(graph)
     assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 0.0
+
+
+@pytest.mark.parametrize(
+    "graph_result,ground_truth_nodes,result_graph_response",
+    [(graph_response1, nodes1, sample_response3)],
+    indirect=True,
+)
+def test_evaluate_with_whole_nodes_in_graph_response(
+    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+):
+    evaluator = SetEvaluator(graph)
+    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
 
 
 @pytest.fixture
