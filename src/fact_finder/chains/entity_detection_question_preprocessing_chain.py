@@ -131,5 +131,6 @@ class EntityDetectionQuestionPreprocessingChain(Chain):
             intermediate_steps = inputs.get(self.intermediate_steps_key, [])
             intermediate_steps += [{"original_question": inputs[self.input_key]}]
             intermediate_steps += [{"entity_results": entity_results}]
+            intermediate_steps += [{self.output_key: new_question}]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
