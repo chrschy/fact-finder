@@ -31,6 +31,9 @@ from fact_finder.tools.cypher_preprocessors.synonym_cypher_query_preprocessor im
     SynonymCypherQueryPreprocessor,
 )
 from fact_finder.tools.entity_detector import EntityDetector
+from fact_finder.tools.synonym_finder.aggregate_state_synonym_finder import (
+    AggregateStateSynonymFinder,
+)
 from fact_finder.tools.synonym_finder.preferred_term_finder import PreferredTermFinder
 from fact_finder.tools.synonym_finder.wiki_data_synonym_finder import (
     WikiDataSynonymFinder,
@@ -93,6 +96,12 @@ def _get_synonymized_graph_preprocessors(graph: Neo4jGraph) -> List[CypherQueryP
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=disease_ent, node_types="disease"))
     anatomy_ent = PreferredTermFinder(["Organs"])
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=anatomy_ent, node_types="anatomy"))
+    state_synonyms = AggregateStateSynonymFinder()
+    preprocs.append(
+        SynonymCypherQueryPreprocessor(
+            graph=graph, synonym_finder=state_synonyms, node_types="drug", search_property_name="aggregate_state"
+        )
+    )
     return preprocs
 
 
