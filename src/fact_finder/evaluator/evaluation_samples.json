@@ -17207,59 +17207,14 @@
     },
     {
         "question": "How many drugs are gaseous?",
-        "cypher_query": "MATCH (d:drug)-[]-(c:category) WHERE c.name =\"Gases\" RETURN COUNT(DISTINCT d)",
+        "cypher_query": "MATCH (d:drug)\nWHERE d.aggregate_state = \"gas\"\nRETURN COUNT(d) AS NumberOfGaseousDrugs",
         "question_is_answerable": true,
         "source": "manual",
-        "expected_answer": "16",
+        "expected_answer": "4",
         "sub_graph": [],
         "nodes": [
             {
-                "index": 39894
-            },
-            {
-                "index": 21417
-            },
-            {
-                "index": 21231
-            },
-            {
-                "index": 20664
-            },
-            {
-                "index": 20571
-            },
-            {
-                "index": 20499
-            },
-            {
-                "index": 20064
-            },
-            {
-                "index": 19502
-            },
-            {
-                "index": 19495
-            },
-            {
-                "index": 19159
-            },
-            {
-                "index": 16035
-            },
-            {
-                "index": 14972
-            },
-            {
-                "index": 14928
-            },
-            {
-                "index": 14634
-            },
-            {
-                "index": 14585
-            },
-            {
-                "index": 14013
+                "value": 4
             }
         ]
     },
