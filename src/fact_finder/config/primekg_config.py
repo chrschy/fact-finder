@@ -1,6 +1,10 @@
 import argparse
+from functools import partial
 from typing import Dict, List, Tuple
 
+from fact_finder.chains.filtered_primekg_question_preprocessing_chain import (
+    FilteredPrimeKGQuestionPreprocessingChain,
+)
 from fact_finder.chains.graph_qa_chain.config import GraphQAChainConfig
 from fact_finder.chains.graph_qa_chain.graph_qa_chain import GraphQAChain
 from fact_finder.chains.graph_summary_chain import GraphSummaryChain
@@ -59,6 +63,7 @@ def build_chain(model: BaseLanguageModel, combine_output_with_sematic_scholar: b
         predicate_descriptions=PREDICATE_DESCRIPTIONS[:10],
         return_intermediate_steps=True,
         use_entity_detection_preprocessing=parsed_args.use_entity_detection_preprocessing,
+        entity_detection_preprocessor_type=partial(FilteredPrimeKGQuestionPreprocessingChain, graph=graph),
         entity_detector=EntityDetector() if parsed_args.use_entity_detection_preprocessing else None,
         allowed_types_and_description_templates=_get_primekg_entity_categories(),
         use_subgraph_expansion=parsed_args.use_subgraph_expansion,

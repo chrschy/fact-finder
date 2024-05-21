@@ -132,7 +132,7 @@ class GraphQAChain(Chain):
     ) -> RunnableSerializable:
         if config.use_entity_detection_preprocessing:
             assert config.entity_detector is not None
-            preprocessing_chain = EntityDetectionQuestionPreprocessingChain(
+            preprocessing_chain = config.entity_detection_preprocessor_type(
                 entity_detector=config.entity_detector,
                 allowed_types_and_description_templates=config.allowed_types_and_description_templates,
                 return_intermediate_steps=config.return_intermediate_steps,
