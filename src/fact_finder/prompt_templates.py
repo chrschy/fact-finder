@@ -110,3 +110,21 @@ Triplets of the subgraph:
 {sub_graph}
 """
 SUBGRAPH_SUMMARY_PROMPT = PromptTemplate(input_variables=["sub_graph"], template=SUBGRAPH_SUMMARY_PROMPT_TEMPLATE)
+
+
+LLM_JUDGE_PROMPT_TEMPLATE: str = """Given the input context, which do you prefer: A or B?
+Evaluate based on the following criteria:
+{criteria}
+Reason step by step and finally, respond with either [[A]] or [[B]] on its own line.
+
+DATA
+----
+input: {input}
+reference: {reference}
+A: {prediction}
+B: {prediction_b}
+---
+Reasoning:
+
+"""
+LLM_JUDGE_PROMPT = PromptTemplate(input_variables=["criteria", "input", "reference", "prediction", "prediction_b"], template=LLM_JUDGE_PROMPT_TEMPLATE)
