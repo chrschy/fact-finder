@@ -50,7 +50,9 @@ sample_response3 = [
     [(graph_response1, nodes1, sample_response1a)],
     indirect=True,
 )
-def test_evaluate_matching_sample_and_result(assert_evaluation_produces_correct_scores):
+def test_evaluate_matching_sample_and_result(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
 
 
@@ -59,7 +61,9 @@ def test_evaluate_matching_sample_and_result(assert_evaluation_produces_correct_
     [(graph_response1, nodes1, sample_response1b)],
     indirect=True,
 )
-def test_evaluate_partial_matching_sample_and_result(assert_evaluation_produces_correct_scores):
+def test_evaluate_partial_matching_sample_and_result(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=2 / 4, precision=2 / 3, recall=2 / 3)
 
 
@@ -68,7 +72,9 @@ def test_evaluate_partial_matching_sample_and_result(assert_evaluation_produces_
     [(graph_response1, nodes1, sample_response1c)],
     indirect=True,
 )
-def test_evaluate_not_matching_sample_and_result(assert_evaluation_produces_correct_scores):
+def test_evaluate_not_matching_sample_and_result(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=0.0, precision=0.0, recall=0.0)
 
 
@@ -77,7 +83,9 @@ def test_evaluate_not_matching_sample_and_result(assert_evaluation_produces_corr
     [(graph_response2, nodes2, sample_response2a)],
     indirect=True,
 )
-def test_evaluate_matching_tuple_sample_and_result(assert_evaluation_produces_correct_scores):
+def test_evaluate_matching_tuple_sample_and_result(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
 
 
@@ -86,7 +94,9 @@ def test_evaluate_matching_tuple_sample_and_result(assert_evaluation_produces_co
     [(graph_response2, nodes2, sample_response2b)],
     indirect=True,
 )
-def test_evaluate_partial_matching_tuple_sample_and_result(assert_evaluation_produces_correct_scores):
+def test_evaluate_partial_matching_tuple_sample_and_result(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=2 / 4, precision=2 / 3, recall=2 / 3)
 
 
@@ -95,28 +105,36 @@ def test_evaluate_partial_matching_tuple_sample_and_result(assert_evaluation_pro
     [(graph_response2, nodes2, sample_response2c)],
     indirect=True,
 )
-def test_evaluate_not_matching_tuple_sample_and_result(assert_evaluation_produces_correct_scores):
+def test_evaluate_not_matching_tuple_sample_and_result(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=0.0, precision=0.0, recall=0.0)
 
 
 @pytest.mark.parametrize(
     "result_graph_response,ground_truth_nodes", [([{"count": 10, "other_count": 4}], [{"value": 10}])], indirect=True
 )
-def test_evaluate_with_matching_int_value(assert_evaluation_produces_correct_scores):
+def test_evaluate_with_matching_int_value(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
 
 
 @pytest.mark.parametrize(
     "result_graph_response,ground_truth_nodes", [([{"mean": 0.4, "var": 0.1}], [{"value": 0.4}])], indirect=True
 )
-def test_evaluate_with_matching_float_value(assert_evaluation_produces_correct_scores):
+def test_evaluate_with_matching_float_value(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
 
 
 @pytest.mark.parametrize(
     "result_graph_response,ground_truth_nodes", [([{"count": 11, "other_count": 4}], [{"value": 10}])], indirect=True
 )
-def test_evaluate_with_no_matching_int_value(assert_evaluation_produces_correct_scores):
+def test_evaluate_with_no_matching_int_value(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=0.0, precision=0.0, recall=0.0)
 
 
@@ -125,7 +143,9 @@ def test_evaluate_with_no_matching_int_value(assert_evaluation_produces_correct_
     [(graph_response1, nodes1, sample_response3)],
     indirect=True,
 )
-def test_evaluate_with_whole_nodes_in_graph_response(assert_evaluation_produces_correct_scores):
+def test_evaluate_with_whole_nodes_in_graph_response(
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
+):
     assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
 
 
