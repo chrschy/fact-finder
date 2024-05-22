@@ -1,6 +1,10 @@
 import argparse
+from functools import partial
 from typing import Dict, List, Tuple
 
+from fact_finder.chains.filtered_primekg_question_preprocessing_chain import (
+    FilteredPrimeKGQuestionPreprocessingChain,
+)
 from fact_finder.chains.graph_qa_chain.config import GraphQAChainConfig
 from fact_finder.chains.graph_qa_chain.graph_qa_chain import GraphQAChain
 from fact_finder.chains.graph_summary_chain import GraphSummaryChain
@@ -31,6 +35,9 @@ from fact_finder.tools.cypher_preprocessors.synonym_cypher_query_preprocessor im
     SynonymCypherQueryPreprocessor,
 )
 from fact_finder.tools.entity_detector import EntityDetector
+from fact_finder.tools.synonym_finder.aggregate_state_synonym_finder import (
+    AggregateStateSynonymFinder,
+)
 from fact_finder.tools.synonym_finder.preferred_term_finder import PreferredTermFinder
 from fact_finder.tools.synonym_finder.wiki_data_synonym_finder import (
     WikiDataSynonymFinder,
@@ -56,6 +63,7 @@ def build_chain(model: BaseLanguageModel, combine_output_with_sematic_scholar: b
         predicate_descriptions=PREDICATE_DESCRIPTIONS[:10],
         return_intermediate_steps=True,
         use_entity_detection_preprocessing=parsed_args.use_entity_detection_preprocessing,
+        entity_detection_preprocessor_type=partial(FilteredPrimeKGQuestionPreprocessingChain, graph=graph),
         entity_detector=EntityDetector() if parsed_args.use_entity_detection_preprocessing else None,
         allowed_types_and_description_templates=_get_primekg_entity_categories(),
         use_subgraph_expansion=parsed_args.use_subgraph_expansion,
@@ -93,6 +101,12 @@ def _get_synonymized_graph_preprocessors(graph: Neo4jGraph) -> List[CypherQueryP
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=disease_ent, node_types="disease"))
     anatomy_ent = PreferredTermFinder(["Organs"])
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=anatomy_ent, node_types="anatomy"))
+    state_synonyms = AggregateStateSynonymFinder()
+    preprocs.append(
+        SynonymCypherQueryPreprocessor(
+            graph=graph, synonym_finder=state_synonyms, node_types="drug", search_property_name="aggregate_state"
+        )
+    )
     return preprocs
 
 

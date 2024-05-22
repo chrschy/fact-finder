@@ -17207,59 +17207,14 @@
     },
     {
         "question": "How many drugs are gaseous?",
-        "cypher_query": "MATCH (d:drug)-[]-(c:category) WHERE c.name =\"Gases\" RETURN COUNT(DISTINCT d)",
+        "cypher_query": "MATCH (d:drug)\nWHERE d.aggregate_state = \"gas\"\nRETURN COUNT(d) AS NumberOfGaseousDrugs",
         "question_is_answerable": true,
         "source": "manual",
-        "expected_answer": "16",
+        "expected_answer": "4",
         "sub_graph": [],
         "nodes": [
             {
-                "index": 39894
-            },
-            {
-                "index": 21417
-            },
-            {
-                "index": 21231
-            },
-            {
-                "index": 20664
-            },
-            {
-                "index": 20571
-            },
-            {
-                "index": 20499
-            },
-            {
-                "index": 20064
-            },
-            {
-                "index": 19502
-            },
-            {
-                "index": 19495
-            },
-            {
-                "index": 19159
-            },
-            {
-                "index": 16035
-            },
-            {
-                "index": 14972
-            },
-            {
-                "index": 14928
-            },
-            {
-                "index": 14634
-            },
-            {
-                "index": 14585
-            },
-            {
-                "index": 14013
+                "value": 4
             }
         ]
     },
@@ -25225,6 +25180,74 @@
             {
                 "index": 17776,
                 "name": "desoximetasone"
+            }
+        ]
+    },
+    {
+        "question": "Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol?",
+        "cypher_query": "MATCH (alcoholDisease:disease)-[:linked_to]->(exposure:exposure {name: \"ethanol\"})\nMATCH (drug:drug)-[:contraindication]->(alcoholDisease)\nMATCH (treatedDisease:disease)-[:indication]->(drug)\nRETURN treatedDisease.name AS DiseaseName",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 32033,
+                "name": "insomnia (disease)"
+            }
+        ]
+    },
+    {
+        "question": "Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol? Include the drug for each treated disease.",
+        "cypher_query": "MATCH (alcoholDisease:disease)-[:linked_to]->(alcoholExposure:exposure {name: \"ethanol\"})\nMATCH (contraindicatedDrug:drug)-[:contraindication]->(alcoholDisease)\nMATCH (treatedDisease:disease)-[:indication]->(contraindicatedDrug)\nRETURN treatedDisease.name AS DiseaseName, contraindicatedDrug.name AS DrugName",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index1": 32033,
+                "name1": "insomnia (disease)",
+                "index2": 15099,
+                "name2": "zolpidem"
+            }
+        ]
+    },
+    {
+        "question": "Which drugs used to treat diseases caused by alcohol may worsen the patient's Anaemia disease?",
+        "cypher_query": "MATCH (alcoholExposure:exposure {name: \"ethanol\"})-[:linked_to]->(diseaseCausedByAlcohol:disease)-[:indication]->(drug:drug)-[:contraindication]->(anemia:disease {name: \"anemia (disease)\"})\nRETURN drug.name AS DrugName",
+        "question_is_answerable": true,
+        "source": "",
+        "expected_answer": "",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 16855,
+                "name": "methylphenidate"
+            },
+            {
+                "index": 15074,
+                "name": "amphetamine"
+            },
+            {
+                "index": 17315,
+                "name": "dexmethylphenidate"
+            },
+            {
+                "index": 15174,
+                "name": "metamfetamine"
+            },
+            {
+                "index": 14275,
+                "name": "doxorubicin"
+            },
+            {
+                "index": 14849,
+                "name": "mechlorethamine"
+            },
+            {
+                "index": 14194,
+                "name": "methotrexate"
             }
         ]
     }

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Protocol, Tuple, runtime_checkable
 
 from fact_finder.tools.entity_detector import EntityDetector
 from langchain.chains.base import Chain
@@ -134,3 +134,14 @@ class EntityDetectionQuestionPreprocessingChain(Chain):
             intermediate_steps += [{self.output_key: new_question}]
             chain_result[self.intermediate_steps_key] = intermediate_steps
         return chain_result
+
+
+@runtime_checkable
+class EntityDetectionQuestionPreprocessingProtocol(Protocol):
+    def __call__(
+        self,
+        *,
+        entity_detector: EntityDetector,
+        allowed_types_and_description_templates: Dict[str, str],
+        return_intermediate_steps: bool = True,
+    ) -> EntityDetectionQuestionPreprocessingChain: ...

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 from unittest.mock import MagicMock
 
 import pytest
@@ -51,10 +51,9 @@ sample_response3 = [
     indirect=True,
 )
 def test_evaluate_matching_sample_and_result(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
+    assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
 
 
 @pytest.mark.parametrize(
@@ -63,10 +62,9 @@ def test_evaluate_matching_sample_and_result(
     indirect=True,
 )
 def test_evaluate_partial_matching_sample_and_result(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 2 / 4
+    assert_evaluation_produces_correct_scores(iou=2 / 4, precision=2 / 3, recall=2 / 3)
 
 
 @pytest.mark.parametrize(
@@ -75,10 +73,9 @@ def test_evaluate_partial_matching_sample_and_result(
     indirect=True,
 )
 def test_evaluate_not_matching_sample_and_result(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 0.0
+    assert_evaluation_produces_correct_scores(iou=0.0, precision=0.0, recall=0.0)
 
 
 @pytest.mark.parametrize(
@@ -87,10 +84,9 @@ def test_evaluate_not_matching_sample_and_result(
     indirect=True,
 )
 def test_evaluate_matching_tuple_sample_and_result(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
+    assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
 
 
 @pytest.mark.parametrize(
@@ -99,10 +95,9 @@ def test_evaluate_matching_tuple_sample_and_result(
     indirect=True,
 )
 def test_evaluate_partial_matching_tuple_sample_and_result(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 2 / 4
+    assert_evaluation_produces_correct_scores(iou=2 / 4, precision=2 / 3, recall=2 / 3)
 
 
 @pytest.mark.parametrize(
@@ -111,40 +106,36 @@ def test_evaluate_partial_matching_tuple_sample_and_result(
     indirect=True,
 )
 def test_evaluate_not_matching_tuple_sample_and_result(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 0.0
+    assert_evaluation_produces_correct_scores(iou=0.0, precision=0.0, recall=0.0)
 
 
 @pytest.mark.parametrize(
     "result_graph_response,ground_truth_nodes", [([{"count": 10, "other_count": 4}], [{"value": 10}])], indirect=True
 )
 def test_evaluate_with_matching_int_value(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
+    assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
 
 
 @pytest.mark.parametrize(
     "result_graph_response,ground_truth_nodes", [([{"mean": 0.4, "var": 0.1}], [{"value": 0.4}])], indirect=True
 )
 def test_evaluate_with_matching_float_value(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
+    assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
 
 
 @pytest.mark.parametrize(
     "result_graph_response,ground_truth_nodes", [([{"count": 11, "other_count": 4}], [{"value": 10}])], indirect=True
 )
 def test_evaluate_with_no_matching_int_value(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 0.0
+    assert_evaluation_produces_correct_scores(iou=0.0, precision=0.0, recall=0.0)
 
 
 @pytest.mark.parametrize(
@@ -153,10 +144,23 @@ def test_evaluate_with_no_matching_int_value(
     indirect=True,
 )
 def test_evaluate_with_whole_nodes_in_graph_response(
-    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+    assert_evaluation_produces_correct_scores: Callable[[float, float, float], None]
 ):
-    evaluator = SetEvaluator(graph)
-    assert evaluator.evaluate([ground_truth], [result])[0]["score"] == 1.0
+    assert_evaluation_produces_correct_scores(iou=1.0, precision=1.0, recall=1.0)
+
+
+@pytest.fixture
+def assert_evaluation_produces_correct_scores(
+    graph: Neo4jGraph, ground_truth: EvaluationSample, result: Dict[str, GraphQAChainOutput]
+) -> Callable[[float, float, float], None]:
+    def run_eval(iou: float, precision: float, recall: float):
+        evaluator = SetEvaluator(graph)
+        eval_res = evaluator.evaluate([ground_truth], [result])[0]
+        assert eval_res["score"] == iou
+        assert eval_res["precision"] == precision
+        assert eval_res["recall"] == recall
+
+    return run_eval
 
 
 @pytest.fixture
