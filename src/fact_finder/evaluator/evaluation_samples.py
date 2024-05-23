@@ -2858,18 +2858,6 @@ manual_samples = [
         ],
     },
     {
-        "question": "How does Asbestos interact with the human body?",
-        "expected_cypher": '\nMATCH (e:exposure {name: "asbestos"})-[:interacts_with]->(bp:biological_process)\nRETURN e.name, bp.name\n',
-        "expected_answer": "",
-        "nodes": [
-            {"index": 39999, "name": "inflammatory response"},
-            {"index": 106754, "name": "cytokine production involved in inflammatory response"},
-            {"index": 106758, "name": "interleukin-6 production"},
-            {"index": 44674, "name": "gene expression"},
-            {"index": 44217, "name": "cellular response to oxidative stress"},
-        ],
-    },
-    {
         "question": "Which drugs have pterygium as side effect?",
         "expected_cypher": 'MATCH (n:drug)-[s:side_effect]-(g {name:"pterygium"}) RETURN distinct n',
         "expected_answer": "brinzolamide",
@@ -3381,7 +3369,7 @@ manual_samples = [
         "expected_cypher": 'MATCH (g {name: "hgf"})-[]-(g2 {name: "kidney"}) RETURN COUNT(g)>0',
         "expected_answer": "Yes.",
         "subgraph_query": 'MATCH (g {name: "hgf"})-[r]-(g2 {name: "kidney"}) RETURN g,r, g2',
-        "nodes": [],  # TODO what would the index values be for a boolean query?
+        "nodes": [{"value": True}],
     },
     {
         "question": "What issues are there with lamotrigine?",
@@ -3571,14 +3559,14 @@ manual_samples = [
         "question": "Does lamotrigine have more side effects than primidone?",
         "expected_cypher": 'MATCH (d:drug {name:"primidone"})-[:side_effect]-(s) MATCH (d2:drug {name:"lamotrigine"})-[:side_effect]-(s2) RETURN COUNT(DISTINCT s2) > COUNT(DISTINCT s)',
         "expected_answer": "Yes",
-        "nodes": [],  # TODO what would the index values be for a boolean query?
+        "nodes": [{"value": True}],
     },
     {
         "question": "Is psoriasis related with atopic dermatitis?",
         "expected_cypher": 'RETURN EXISTS {MATCH (d {name:"atopic dermatitis"})-[]-(d2 {name:"psoriasis"})}',
         "expected_answer": "No",
         "subgraph_query": 'MATCH (d {name:"atopic dermatitis"})-[r]-(d2 {name:"psoriasis"}) RETURN d, r, d2',
-        "nodes": [],  # TODO what would the index values be for a boolean query?
+        "nodes": [{"value": False}],
     },
     {
         "question": "What genes play a role in breast cancer?",
@@ -4098,7 +4086,7 @@ manual_samples = [
         "expected_cypher": 'RETURN NOT EXISTS {MATCH (dr:drug {name:"ibuprofen"})-[:contraindication]-(c {name:"addison disease"}) }',
         "expected_answer": "No",
         "subgraph_query": 'MATCH (dr:drug {name:"ibuprofen"})-[c:contraindication]-(a {name:"addison disease"}) RETURN dr, c, a',
-        "nodes": [{"index": 14287}, {"index": 30813}],  # TODO what would the index values be for a boolean query?
+        "nodes": [{"value": False}],
     },
     {
         "question": "Which off label medicaments for epilepsie have a clogp value below 0?",
@@ -5873,13 +5861,13 @@ manual_samples = [
         "question": "Is cor pulmonale linked to Chronic congestive heart failure?",
         "expected_answer": "Yes",
         "expected_cypher": 'MATCH (d1:disease {name: "cor pulmonale"})-[:parent_child]->(d2:disease {name: "congestive heart failure"})\nRETURN COUNT(d1) > 0',
-        "nodes": [],  # TODO what would the index values be for a boolean query?
+        "nodes": [{"value": True}],
     },
     {
         "question": "Is ADORA1 druggable?",
         "expected_answer": "Yes",
         "expected_cypher": 'MATCH (g:gene_or_protein {name: "adora1"})-[:target]->(d:drug)\nRETURN COUNT(g) > 0',
-        "nodes": [],  # TODO what would the index values be for a boolean query?
+        "nodes": [{"value": True}],
     },
     {
         "question": "When the Lenvatinib is expected to be used?",
@@ -6003,7 +5991,7 @@ manual_samples = [
         "question": "Is PPARG a known target for heart failure?",
         "expected_answer": "Yes",
         "expected_cypher": 'MATCH (d:disease {name: "heart failure"})-[:associated_with]->(g:gene_or_protein {name: "pparg"})\nRETURN COUNT(d)>0',
-        "nodes": [],  # TODO what would the index values be for a boolean query?
+        "nodes": [{"value": True}],
     },
     {
         "question": "What is cardiomyopathy?",
