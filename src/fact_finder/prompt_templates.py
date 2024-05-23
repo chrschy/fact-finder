@@ -112,19 +112,45 @@ Triplets of the subgraph:
 SUBGRAPH_SUMMARY_PROMPT = PromptTemplate(input_variables=["sub_graph"], template=SUBGRAPH_SUMMARY_PROMPT_TEMPLATE)
 
 
-LLM_JUDGE_PROMPT_TEMPLATE: str = """Given the input context, which do you prefer: A or B?
+LLM_JUDGE_PAIRWISE_PROMPT_TEMPLATE: str = """You are given the role of a judge for factual question answering. Act like a biomedical researcher who attaches great importance to the quality of the answers.
+Given the input question and a factual reference, which response of two AI assistants do you prefer: A or B?
 Evaluate based on the following criteria:
 {criteria}
+Avoid any position biases and ensure that the order in which the responses were presented does not influence your decision. Do not allow the length of the responses to influence your evaluation. Be as objective as possible.
 Reason step by step and finally, respond with either [[A]] or [[B]] on its own line.
 
 DATA
 ----
 input: {input}
 reference: {reference}
-A: {prediction}
-B: {prediction_b}
+answer assistant A: {prediction}
+answer assistant B: {prediction_b}
 ---
 Reasoning:
 
 """
-LLM_JUDGE_PROMPT = PromptTemplate(input_variables=["criteria", "input", "reference", "prediction", "prediction_b"], template=LLM_JUDGE_PROMPT_TEMPLATE)
+LLM_JUDGE_PAIRWISE_PROMPT = PromptTemplate(input_variables=["criteria", "input", "reference", "prediction", "prediction_b"], template=LLM_JUDGE_PAIRWISE_PROMPT_TEMPLATE)
+
+
+LLM_JUDGE_SCORE_PROMPT_TEMPLATE: str = """You are given the role of a judge for factual question answering. Act like a biomedical researcher who attaches great importance to the quality of the answers.
+Given the input question, a factual reference and a hypothesis answer, determine if the hypothesis answer meets the following criteria:
+{criteria}
+Reason step by step and finally, respond with either [[1]] if the hypothesis answer meets the criteria or [[0]] if not on its own line.
+
+DATA
+----
+input: {input}
+reference: {reference}
+hypothesis answer: {prediction}
+---
+Reasoning:
+
+"""
+LLM_JUDGE_SCORE_PROMPT = PromptTemplate(input_variables=["criteria", "input", "reference", "prediction"], template=LLM_JUDGE_SCORE_PROMPT_TEMPLATE)
+
+LLM_JUDGE_CRITERIA_CORRECTNESS = {
+    "correctness": "The submission is considered to be correct, if the answer only contains facts from the reference and there are no hallucinations."
+}
+LLM_JUDGE_CRITERIA_COMPLETENESS = {
+    "completeness": "The submission is considered to be complete, if the answer contains all facts provided by the reference and no facts are missing."
+}
