@@ -15,7 +15,6 @@ from fact_finder.evaluator.score.difflib_score import DifflibScore
 from fact_finder.evaluator.score.embedding_score import EmbeddingScore
 from fact_finder.evaluator.score.levenshtein_score import LevenshteinScore
 from fact_finder.evaluator.score.score import Score
-from fact_finder.evaluator.set_evaluator.returned_nodes_evaluator import ReturnedNodesEvaluator
 from fact_finder.evaluator.set_evaluator.set_evaluator import SetEvaluator
 from fact_finder.evaluator.string_evaluator.string_evaluator import StringEvaluator
 from fact_finder.evaluator.util import load_pickle, save_pickle
@@ -93,7 +92,7 @@ class Evaluation:
 
 
 if __name__ == "__main__":
-    evaluators = [ReturnedNodesEvaluator()]
+    evaluators = [SetEvaluator()]
     scores = []
     evaluation = Evaluation(evaluators=evaluators, scores=scores)
     results = evaluation.run(save_as_excel=True, cache_path="cached_results/chain_results.pickle")

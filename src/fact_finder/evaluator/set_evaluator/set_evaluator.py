@@ -37,7 +37,8 @@ class SetEvaluator:
         return eval_results
 
     def evaluate_sample(self, sample: EvaluationSample, chain_result: Dict[str, GraphQAChainOutput | Any]) -> float:
-        if not chain_result:
+        if not chain_result or not sample.nodes:
+            print("No chain result or no nodes.")
             return 0.0
         if "index" in sample.nodes[0]:
             return self.evaluate_sample_with_single_index(sample=sample, result=chain_result)

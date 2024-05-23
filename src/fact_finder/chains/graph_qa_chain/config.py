@@ -32,6 +32,7 @@ class GraphQAChainConfig(BaseModel):
     combine_output_with_sematic_scholar: bool = False
     semantic_scholar_keyword_prompt: Optional[BasePromptTemplate] = None
     combined_answer_generation_prompt: Optional[BasePromptTemplate] = None
+    top_k: int = 2000  # todo change back when not evaluating
 
     @root_validator(allow_reuse=True)
     def check_entity_detection_preprocessing_settings(cls, values):
