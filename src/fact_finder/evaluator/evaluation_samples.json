@@ -21763,10 +21763,679 @@
         ]
     },
     {
+        "question": "Are there any genes associated with an increased risk of psoriasis?",
+        "cypher_query": "MATCH (d:disease {name: \"psoriasis\"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "Genes that are associated with psoriasis are hla-e, hla-a, lce3c, lce3b, hcar2, ifnlr1, il23r, ap1s3, znf816, tagap, zc3h12c, lce3d, card14, csmd1, ifih1, rnf114, vnn3, fbxl19, erap1, il23a, cyp2s1, il36rn, ddx58, traf3ip2, carm1, tnip1, pttg1, vnn1, vnn2, vegfa, tyk2, tp53, tnfaip3, tnf, tgfa, stat3, sod2, s100a7, ren, rel, pparg, serpinb8, pcna, nos2, nfkbia, mki67, il13, il12b, il6, il4, il1b, hla-c, gjb2, csf2, crp, cp, runx3, cat and apoe.",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 2283,
+                "name": "hla-e"
+            },
+            {
+                "index": 4827,
+                "name": "hla-a"
+            },
+            {
+                "index": 4840,
+                "name": "lce3c"
+            },
+            {
+                "index": 5996,
+                "name": "lce3b"
+            },
+            {
+                "index": 22078,
+                "name": "hcar2"
+            },
+            {
+                "index": 11097,
+                "name": "ifnlr1"
+            },
+            {
+                "index": 34778,
+                "name": "il23r"
+            },
+            {
+                "index": 34990,
+                "name": "ap1s3"
+            },
+            {
+                "index": 10174,
+                "name": "znf816"
+            },
+            {
+                "index": 34814,
+                "name": "tagap"
+            },
+            {
+                "index": 34989,
+                "name": "zc3h12c"
+            },
+            {
+                "index": 4299,
+                "name": "lce3d"
+            },
+            {
+                "index": 13745,
+                "name": "card14"
+            },
+            {
+                "index": 33805,
+                "name": "csmd1"
+            },
+            {
+                "index": 12076,
+                "name": "ifih1"
+            },
+            {
+                "index": 2197,
+                "name": "rnf114"
+            },
+            {
+                "index": 34988,
+                "name": "vnn3"
+            },
+            {
+                "index": 6036,
+                "name": "fbxl19"
+            },
+            {
+                "index": 10192,
+                "name": "erap1"
+            },
+            {
+                "index": 7573,
+                "name": "il23a"
+            },
+            {
+                "index": 2124,
+                "name": "cyp2s1"
+            },
+            {
+                "index": 4304,
+                "name": "il36rn"
+            },
+            {
+                "index": 8758,
+                "name": "ddx58"
+            },
+            {
+                "index": 2893,
+                "name": "traf3ip2"
+            },
+            {
+                "index": 4477,
+                "name": "carm1"
+            },
+            {
+                "index": 3478,
+                "name": "tnip1"
+            },
+            {
+                "index": 11077,
+                "name": "pttg1"
+            },
+            {
+                "index": 34985,
+                "name": "vnn1"
+            },
+            {
+                "index": 4966,
+                "name": "vnn2"
+            },
+            {
+                "index": 749,
+                "name": "vegfa"
+            },
+            {
+                "index": 6428,
+                "name": "tyk2"
+            },
+            {
+                "index": 1785,
+                "name": "tp53"
+            },
+            {
+                "index": 3647,
+                "name": "tnfaip3"
+            },
+            {
+                "index": 2329,
+                "name": "tnf"
+            },
+            {
+                "index": 6408,
+                "name": "tgfa"
+            },
+            {
+                "index": 729,
+                "name": "stat3"
+            },
+            {
+                "index": 4959,
+                "name": "sod2"
+            },
+            {
+                "index": 2934,
+                "name": "s100a7"
+            },
+            {
+                "index": 11136,
+                "name": "ren"
+            },
+            {
+                "index": 1064,
+                "name": "rel"
+            },
+            {
+                "index": 989,
+                "name": "pparg"
+            },
+            {
+                "index": 8980,
+                "name": "serpinb8"
+            },
+            {
+                "index": 139,
+                "name": "pcna"
+            },
+            {
+                "index": 373,
+                "name": "nos2"
+            },
+            {
+                "index": 1931,
+                "name": "nfkbia"
+            },
+            {
+                "index": 1782,
+                "name": "mki67"
+            },
+            {
+                "index": 3451,
+                "name": "il13"
+            },
+            {
+                "index": 6168,
+                "name": "il12b"
+            },
+            {
+                "index": 1567,
+                "name": "il6"
+            },
+            {
+                "index": 5604,
+                "name": "il4"
+            },
+            {
+                "index": 1004,
+                "name": "il1b"
+            },
+            {
+                "index": 3564,
+                "name": "hla-c"
+            },
+            {
+                "index": 642,
+                "name": "gjb2"
+            },
+            {
+                "index": 3231,
+                "name": "csf2"
+            },
+            {
+                "index": 2384,
+                "name": "crp"
+            },
+            {
+                "index": 4184,
+                "name": "cp"
+            },
+            {
+                "index": 6331,
+                "name": "runx3"
+            },
+            {
+                "index": 2797,
+                "name": "cat"
+            },
+            {
+                "index": 3879,
+                "name": "apoe"
+            }
+        ]
+    },
+    {
+        "question": "Is cor pulmonale linked to Chronic congestive heart failure?",
+        "cypher_query": "MATCH (d1:disease {name: \"cor pulmonale\"})-[:parent_child]->(d2:disease {name: \"congestive heart failure\"})\nRETURN COUNT(d1) > 0",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "Yes",
+        "sub_graph": [],
+        "nodes": []
+    },
+    {
+        "question": "Is ADORA1 druggable?",
+        "cypher_query": "MATCH (g:gene_or_protein {name: \"adora1\"})-[:target]->(d:drug)\nRETURN COUNT(g) > 0",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "Yes",
+        "sub_graph": [],
+        "nodes": []
+    },
+    {
+        "question": "When the Lenvatinib is expected to be used?",
+        "cypher_query": "MATCH (drug:drug {name: \"lenvatinib\"})-[:indication]->(disease:disease)\nRETURN disease.name AS DiseaseName",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "The drug Lenvatinib can be used for papillary renal cell carcinoma, papillary adenocarcinoma, thyroid cancer, nonmedullary, thyroid gland carcinoma, clear cell renal carcinoma, renal cell carcinoma, renal cell adenocarcinoma or nonpapillary renal cell carcinoma.",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 28455,
+                "name": "papillary renal cell carcinoma"
+            },
+            {
+                "index": 37130,
+                "name": "papillary adenocarcinoma"
+            },
+            {
+                "index": 29339,
+                "name": "thyroid cancer, nonmedullary"
+            },
+            {
+                "index": 30749,
+                "name": "thyroid gland carcinoma"
+            },
+            {
+                "index": 36937,
+                "name": "clear cell renal carcinoma"
+            },
+            {
+                "index": 33643,
+                "name": "renal cell carcinoma (disease)"
+            },
+            {
+                "index": 36935,
+                "name": "renal cell adenocarcinoma"
+            },
+            {
+                "index": 28640,
+                "name": "nonpapillary renal cell carcinoma"
+            }
+        ]
+    },
+    {
+        "question": "What genes play role in development of sialuria?",
+        "cypher_query": "MATCH (d:disease {name: \"sialuria\"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "The genes slc17a5 and gne play a role for sialuria.",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 34034,
+                "name": "slc17a5"
+            },
+            {
+                "index": 2963,
+                "name": "gne"
+            }
+        ]
+    },
+    {
+        "question": "What genes are promising targets for cardiomyopathy?",
+        "cypher_query": "MATCH (d:disease {name: \"cardiomyopathy\"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "Promising targets for cardiomyopathy are kat8, myl7, hey2, rassf1, sco2, tp53, tnnt2, tbca, slc9a1, raf1, pomc, nme1, ndufs1, myl4, myl2, myh7, myh6, myc, mybpc3, ins, idh2, hspd1, hspb1, gaa and fasn.",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 5047,
+                "name": "kat8"
+            },
+            {
+                "index": 3084,
+                "name": "myl7"
+            },
+            {
+                "index": 6727,
+                "name": "hey2"
+            },
+            {
+                "index": 631,
+                "name": "rassf1"
+            },
+            {
+                "index": 4984,
+                "name": "sco2"
+            },
+            {
+                "index": 1785,
+                "name": "tp53"
+            },
+            {
+                "index": 11283,
+                "name": "tnnt2"
+            },
+            {
+                "index": 13015,
+                "name": "tbca"
+            },
+            {
+                "index": 2658,
+                "name": "slc9a1"
+            },
+            {
+                "index": 988,
+                "name": "raf1"
+            },
+            {
+                "index": 1760,
+                "name": "pomc"
+            },
+            {
+                "index": 1646,
+                "name": "nme1"
+            },
+            {
+                "index": 1935,
+                "name": "ndufs1"
+            },
+            {
+                "index": 5777,
+                "name": "myl4"
+            },
+            {
+                "index": 1366,
+                "name": "myl2"
+            },
+            {
+                "index": 3679,
+                "name": "myh7"
+            },
+            {
+                "index": 3619,
+                "name": "myh6"
+            },
+            {
+                "index": 25,
+                "name": "myc"
+            },
+            {
+                "index": 878,
+                "name": "mybpc3"
+            },
+            {
+                "index": 213,
+                "name": "ins"
+            },
+            {
+                "index": 9965,
+                "name": "idh2"
+            },
+            {
+                "index": 1455,
+                "name": "hspd1"
+            },
+            {
+                "index": 1606,
+                "name": "hspb1"
+            },
+            {
+                "index": 2465,
+                "name": "gaa"
+            },
+            {
+                "index": 4845,
+                "name": "fasn"
+            }
+        ]
+    },
+    {
+        "question": "What are the side effects of spironolactone?",
+        "cypher_query": "MATCH (drug:drug {name: \"spironolactone\"})-[:side_effect]->(effect:effect_or_phenotype)\nRETURN effect.name AS SideEffect",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "The side effects of spironolactone are breast hypertrophy, abnormality of the gastrointestinal tract, irregular menstruation, vomiting, vasculitis, thrombocytopenia, renal insufficiency, pruritus, nausea, leukopenia, lethargy, hyperkinetic movements, acute kidney injury, hyperkalemia, headache, fever, inflammatory abnormality of the skin, eosinophilia, excessive daytime somnolence, vertigo, confusion, dyssynergia, anaphylactic shock, alopecia of scalp, alopecia and granulocytopenia.",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 88208,
+                "name": "breast hypertrophy"
+            },
+            {
+                "index": 24337,
+                "name": "abnormality of the gastrointestinal tract"
+            },
+            {
+                "index": 26948,
+                "name": "irregular menstruation"
+            },
+            {
+                "index": 23157,
+                "name": "vomiting"
+            },
+            {
+                "index": 23956,
+                "name": "vasculitis"
+            },
+            {
+                "index": 22934,
+                "name": "thrombocytopenia"
+            },
+            {
+                "index": 22939,
+                "name": "renal insufficiency"
+            },
+            {
+                "index": 25945,
+                "name": "pruritus"
+            },
+            {
+                "index": 84409,
+                "name": "nausea"
+            },
+            {
+                "index": 33730,
+                "name": "leukopenia"
+            },
+            {
+                "index": 25520,
+                "name": "lethargy"
+            },
+            {
+                "index": 84401,
+                "name": "hyperkinetic movements"
+            },
+            {
+                "index": 85002,
+                "name": "acute kidney injury"
+            },
+            {
+                "index": 84384,
+                "name": "hyperkalemia"
+            },
+            {
+                "index": 23002,
+                "name": "headache"
+            },
+            {
+                "index": 22952,
+                "name": "fever"
+            },
+            {
+                "index": 22539,
+                "name": "inflammatory abnormality of the skin"
+            },
+            {
+                "index": 26322,
+                "name": "eosinophilia"
+            },
+            {
+                "index": 84853,
+                "name": "excessive daytime somnolence"
+            },
+            {
+                "index": 25201,
+                "name": "vertigo"
+            },
+            {
+                "index": 26162,
+                "name": "confusion"
+            },
+            {
+                "index": 25276,
+                "name": "dyssynergia"
+            },
+            {
+                "index": 27007,
+                "name": "anaphylactic shock"
+            },
+            {
+                "index": 23799,
+                "name": "alopecia of scalp"
+            },
+            {
+                "index": 23073,
+                "name": "alopecia"
+            },
+            {
+                "index": 25569,
+                "name": "granulocytopenia"
+            }
+        ]
+    },
+    {
+        "question": "What genes play role in immunodeficiency?",
+        "cypher_query": "MATCH (d:disease {name: \"immunodeficiency\"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "The genes bcl11b, sh3kbp1, il17ra, bcl10, ripk1, ikbkg, adam17, stat1, relb, pten, pik3r1, pik3cd, irf7, ikbkb, ifngr2, ifngr1, stat2, ifnar2, cd247, cd3e, cd3d and atp6ap1 play role.",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 34430,
+                "name": "bcl11b"
+            },
+            {
+                "index": 910,
+                "name": "sh3kbp1"
+            },
+            {
+                "index": 1564,
+                "name": "il17ra"
+            },
+            {
+                "index": 9436,
+                "name": "bcl10"
+            },
+            {
+                "index": 294,
+                "name": "ripk1"
+            },
+            {
+                "index": 3672,
+                "name": "ikbkg"
+            },
+            {
+                "index": 3820,
+                "name": "adam17"
+            },
+            {
+                "index": 795,
+                "name": "stat1"
+            },
+            {
+                "index": 2403,
+                "name": "relb"
+            },
+            {
+                "index": 177,
+                "name": "pten"
+            },
+            {
+                "index": 43,
+                "name": "pik3r1"
+            },
+            {
+                "index": 7186,
+                "name": "pik3cd"
+            },
+            {
+                "index": 2557,
+                "name": "irf7"
+            },
+            {
+                "index": 973,
+                "name": "ikbkb"
+            },
+            {
+                "index": 4819,
+                "name": "ifngr2"
+            },
+            {
+                "index": 7513,
+                "name": "ifngr1"
+            },
+            {
+                "index": 184,
+                "name": "stat2"
+            },
+            {
+                "index": 1988,
+                "name": "ifnar2"
+            },
+            {
+                "index": 1500,
+                "name": "cd247"
+            },
+            {
+                "index": 1977,
+                "name": "cd3e"
+            },
+            {
+                "index": 7340,
+                "name": "cd3d"
+            },
+            {
+                "index": 8638,
+                "name": "atp6ap1"
+            }
+        ]
+    },
+    {
+        "question": "Is PPARG a known target for heart failure?",
+        "cypher_query": "MATCH (d:disease {name: \"heart failure\"})-[:associated_with]->(g:gene_or_protein {name: \"pparg\"})\nRETURN COUNT(d)>0",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "Yes",
+        "sub_graph": [],
+        "nodes": []
+    },
+    {
+        "question": "What is cardiomyopathy?",
+        "cypher_query": "MATCH (d:disease {name: \"cardiomyopathy\"})\nRETURN d.description AS description",
+        "question_is_answerable": true,
+        "source": "manual",
+        "expected_answer": "Cardiomyopathy is a disease that affects the heart muscle, also known as the myocardium. It can be classified based on its cause into primary or secondary categories. Additionally, it can be described based on the pathophysiology of the lesion, which includes hypertrophic, dilated, or restrictive types. Each type affects the heart in different ways, leading to various symptoms and requiring different treatments.",
+        "sub_graph": [],
+        "nodes": [
+            {
+                "index": 35531,
+                "name": "cardiomyopathy"
+            }
+        ]
+    },
+    {
         "question": "What genes play role in prostate cancer?",
         "cypher_query": "MATCH (d:disease {name: \"prostate carcinoma\"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -24240,7 +24909,7 @@
         "question": "what are the symptoms of atopic dermatitis?",
         "cypher_query": "MATCH (d:disease {name: \"dermatitis, atopic\"})-[:phenotype_present]->(p:effect_or_phenotype)\nRETURN p.name AS Symptoms",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -24302,7 +24971,7 @@
         "question": "Which biomarkers are associated with a diagnosis of atopic dermatitis?",
         "cypher_query": "MATCH (d:disease {name: \"dermatitis, atopic\"})-[:associated_with]->(gp:gene_or_protein)\nRETURN gp.name AS BiomarkerName",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -24456,7 +25125,7 @@
         "question": "What are the common treatments for moderate to severe psoriasis?",
         "cypher_query": "MATCH (d:disease {name: \"psoriasis\"})-[:indication]->(drug:drug)\nRETURN drug.name AS Treatment",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -24534,7 +25203,7 @@
         "question": "Which proteins interact with PINK1?",
         "cypher_query": "MATCH (protein:gene_or_protein)-[:ppi]->(targetProtein:gene_or_protein {name: \"pink1\"})\nRETURN protein.name AS ProteinName",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -24840,7 +25509,7 @@
         "question": "Is right ventricle heart failure linked to Rheumatic tricuspid valve regurgitation?",
         "cypher_query": "MATCH (d1:disease {name: \"symptomatic heart failure\"}), (d2:disease {name: \"tricuspid valve insufficiency\"})\nRETURN EXISTS((d1)-[:linked_to]-(d2)) AS IsLinked",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -24853,7 +25522,7 @@
         "question": "What genes play role in Alport syndrome?",
         "cypher_query": "MATCH (d:disease {name: \"nephritis, hereditary\"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -24887,7 +25556,7 @@
         "question": "Which drugs are used to treat Alzheimer and what do they act on?",
         "cypher_query": "MATCH (d:disease {name: \"alzheimer disease\"})-[:indication]->(drug:drug)-[:target]->(target:gene_or_protein)\nRETURN drug.name AS DrugName, target.name AS TargetName",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -25065,7 +25734,7 @@
         "question": "Based on the topological polar surface area, can any of the medications against atopic dermatitis permate cell membranes?",
         "cypher_query": "MATCH (d:disease {name: \"dermatitis, atopic\"})-[:indication]->(drug:drug)\nWHERE drug.tpsa <= 140\nRETURN drug.name AS MedicationName, drug.tpsa AS TopologicalPolarSurfaceArea",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -25187,7 +25856,7 @@
         "question": "Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol?",
         "cypher_query": "MATCH (alcoholDisease:disease)-[:linked_to]->(exposure:exposure {name: \"ethanol\"})\nMATCH (drug:drug)-[:contraindication]->(alcoholDisease)\nMATCH (treatedDisease:disease)-[:indication]->(drug)\nRETURN treatedDisease.name AS DiseaseName",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -25201,7 +25870,7 @@
         "question": "Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol? Include the drug for each treated disease.",
         "cypher_query": "MATCH (alcoholDisease:disease)-[:linked_to]->(alcoholExposure:exposure {name: \"ethanol\"})\nMATCH (contraindicatedDrug:drug)-[:contraindication]->(alcoholDisease)\nMATCH (treatedDisease:disease)-[:indication]->(contraindicatedDrug)\nRETURN treatedDisease.name AS DiseaseName, contraindicatedDrug.name AS DrugName",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
@@ -25217,7 +25886,7 @@
         "question": "Which drugs used to treat diseases caused by alcohol may worsen the patient's Anaemia disease?",
         "cypher_query": "MATCH (alcoholExposure:exposure {name: \"ethanol\"})-[:linked_to]->(diseaseCausedByAlcohol:disease)-[:indication]->(drug:drug)-[:contraindication]->(anemia:disease {name: \"anemia (disease)\"})\nRETURN drug.name AS DrugName",
         "question_is_answerable": true,
-        "source": "",
+        "source": "manual",
         "expected_answer": "",
         "sub_graph": [],
         "nodes": [
