@@ -130,3 +130,29 @@ def _get_primekg_entity_categories() -> Dict[str, str]:
         "gene": "{entity} is a gene.",
         "organs": "{entity} is a organ.",
     }
+
+
+def build_chain_without_preprocessings_etc(
+    model: BaseLanguageModel, combine_output_with_sematic_scholar: bool, args: List[str] = []
+) -> Chain:
+    parsed_args = _parse_primekg_args(args)
+    graph = build_neo4j_graph()
+    cypher_prompt, answer_generation_prompt = _get_graph_prompt_templates()
+    config = GraphQAChainConfig(
+        llm=model,
+        graph=graph,
+        cypher_prompt=cypher_prompt,
+        answer_generation_prompt=answer_generation_prompt,
+        cypher_query_preprocessors=[],
+        predicate_descriptions=[],
+        return_intermediate_steps=True,
+        use_entity_detection_preprocessing=False,
+        entity_detection_preprocessor_type=None,
+        entity_detector=None,
+        allowed_types_and_description_templates={},
+        use_subgraph_expansion=parsed_args.use_subgraph_expansion,
+        combine_output_with_sematic_scholar=combine_output_with_sematic_scholar,
+        semantic_scholar_keyword_prompt=KEYWORD_PROMPT,
+        combined_answer_generation_prompt=COMBINED_QA_PROMPT,
+    )
+    return GraphQAChain(config)
