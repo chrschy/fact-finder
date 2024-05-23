@@ -10,12 +10,12 @@ from tqdm import tqdm
 
 import fact_finder.config.primekg_config as graph_config
 from fact_finder.evaluator.evaluation_sample import EvaluationSample
+from fact_finder.evaluator.evaluation_samples import manual_samples
 from fact_finder.evaluator.score.bleu_score import BleuScore
 from fact_finder.evaluator.score.difflib_score import DifflibScore
 from fact_finder.evaluator.score.embedding_score import EmbeddingScore
 from fact_finder.evaluator.score.levenshtein_score import LevenshteinScore
 from fact_finder.evaluator.score.score import Score
-from fact_finder.evaluator.set_evaluator.returned_nodes_evaluator import ReturnedNodesEvaluator
 from fact_finder.evaluator.set_evaluator.set_evaluator import SetEvaluator
 from fact_finder.evaluator.string_evaluator.string_evaluator import StringEvaluator
 from fact_finder.evaluator.util import load_pickle, save_pickle
@@ -30,9 +30,8 @@ class Evaluation:
         chat_model: BaseChatModel = None,
         chain: Chain = None,
         chain_args: List[str] = ["--normalized_graph", "--use_entity_detection_preprocessing"],
-        eval_path: str = "evaluation_samples.json",
         scores: List[Score] = [BleuScore(), DifflibScore(), EmbeddingScore(), LevenshteinScore()],
-        limit_of_samples: int = 0,
+        limit_of_samples: int = None,
     ):
         if not chat_model:
             self.chat_model = load_chat_model()
@@ -40,7 +39,7 @@ class Evaluation:
             self.chain = graph_config.build_chain(
                 model=self.chat_model, combine_output_with_sematic_scholar=True, args=chain_args
             )
-        self.eval_samples = self.eval_samples(file_path=eval_path, limit_of_samples=limit_of_samples)
+        self.eval_samples = self.eval_samples(limit_of_samples=limit_of_samples)
         self.evaluators = evaluators
         self.scores = scores
 
@@ -76,12 +75,16 @@ class Evaluation:
         save_pickle(results, cache_path)
         return results
 
-    def eval_samples(self, file_path: str, limit_of_samples: int = 0):
-        with open(file_path) as file:
-            data = json.load(file)
-        if limit_of_samples > 0:
-            data = data[:limit_of_samples]
-        eval_samples = [EvaluationSample(**d) for d in data]
+    def eval_samples(self, limit_of_samples: int = None):
+        eval_samples = []
+        for manual_sample in manual_samples[:limit_of_samples]:
+            eval_sample = EvaluationSample(
+                question=manual_sample["question"],
+                cypher_query=manual_sample["expected_cypher"],
+                expected_answer=manual_sample["expected_answer"],
+                nodes=manual_sample["nodes"],
+            )
+            eval_samples.append(eval_sample)
         return eval_samples
 
     def save_as_excel(self, results: Dict[str, list], path: str = "eval_results.xlsx"):
@@ -93,7 +96,7 @@ class Evaluation:
 
 
 if __name__ == "__main__":
-    evaluators = [ReturnedNodesEvaluator()]
+    evaluators = [SetEvaluator()]
     scores = []
     evaluation = Evaluation(evaluators=evaluators, scores=scores)
     results = evaluation.run(save_as_excel=True, cache_path="cached_results/chain_results.pickle")

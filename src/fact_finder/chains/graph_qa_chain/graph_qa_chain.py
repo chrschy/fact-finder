@@ -174,7 +174,9 @@ class GraphQAChain(Chain):
         )
 
     def _build_graph_chain(self, config: GraphQAChainConfig) -> GraphChain:
-        return GraphChain(graph=config.graph, return_intermediate_steps=config.return_intermediate_steps)
+        return GraphChain(
+            graph=config.graph, return_intermediate_steps=config.return_intermediate_steps, top_k=config.top_k
+        )
 
     def _build_answer_generation_chain(
         self, config: GraphQAChainConfig, semantic_scholar_chain: Optional[SemanticScholarChain]
