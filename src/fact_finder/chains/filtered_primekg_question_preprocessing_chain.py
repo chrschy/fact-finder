@@ -10,7 +10,7 @@ from langchain_community.graphs import Neo4jGraph
 class FilteredPrimeKGQuestionPreprocessingChain(EntityDetectionQuestionPreprocessingChain):
     graph: Neo4jGraph
     _side_effect_exists_cypher_query: str = (
-        'MATCH(node:effect_or_phenotype {name: "{entity_name}"}) RETURN node IS NOT NULL AS exists'
+        'MATCH(node:effect_or_phenotype {name: "{entity_name}"}) RETURN COUNT(node) > 0 AS exists'
     )
 
     def __init__(
