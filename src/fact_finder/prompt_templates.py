@@ -135,7 +135,7 @@ LLM_JUDGE_PAIRWISE_PROMPT = PromptTemplate(input_variables=["criteria", "input",
 LLM_JUDGE_SCORE_PROMPT_TEMPLATE: str = """You are given the role of a judge for factual question answering. Act like a biomedical researcher who attaches great importance to the quality of the answers.
 Given the input question, a factual reference and a hypothesis answer, determine if the hypothesis answer meets the following criteria:
 {criteria}
-Reason step by step and finally, respond with either [[1]] if the hypothesis answer meets the criteria or [[0]] if not on its own line.
+Reason step by step and finally, respond with either [[1]] if the hypothesis answer meets the criteria or [[8]] if not on its own line.
 
 DATA
 ----

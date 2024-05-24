@@ -29,7 +29,7 @@ class LlmJudgeEvaluator:
         llm_chain_args: List[str] = [],
         graph_chain_args: List[str] = ["--normalized_graph", "--use_entity_detection_preprocessing"],
         eval_path: str = "evaluation_samples.json",
-        limit_of_samples: int = 1,
+        limit_of_samples: int = 0,
     ):
         if not chat_model:
             self.chat_model = load_chat_model()
@@ -106,14 +106,15 @@ class LlmJudgeEvaluator:
 
             eval_result = {
                 "question": sample.question,
+                "reference": str(sample.nodes),
                 "expected_answer": sample.expected_answer,
                 "llm_answer": llm_result["text"],
                 "graph_answer": graph_result["graph_qa_output"].answer if "graph_qa_output" in graph_result else "",
                 "cypher_response": graph_result["graph_qa_output"].graph_response if "graph_qa_output" in graph_result else "",
                 "pairwise_correct": llm_judge_pairwise_correct['value'].replace("A", "LLM").replace("B", "GRAPH"),
                 "pairwise_complete": llm_judge_pairwise_complete['value'].replace("A", "LLM").replace("B", "GRAPH"),
-                "score_correct": str(llm_judge_score_correct['score']),
-                "score_complete": str(llm_judge_score_complete['score']),
+                "score_correct": str(llm_judge_score_correct['score']).replace("8", "0"),
+                "score_complete": str(llm_judge_score_complete['score']).replace("8", "0"),
                 "reasoning_pairwise_correct": llm_judge_pairwise_correct['reasoning'],
                 "reasoning_pairwise_complete": llm_judge_pairwise_complete['reasoning'],
                 "reasoning_score_correct": llm_judge_score_correct['reasoning'],
