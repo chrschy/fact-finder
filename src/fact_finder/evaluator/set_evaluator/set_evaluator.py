@@ -49,7 +49,7 @@ class SetEvaluator:
         self, sample: EvaluationSample, result: Dict[str, GraphQAChainOutput | Any]
     ) -> float:
         ids = [node["index"] for node in sample.nodes]
-        names = set(self._query_node_names(ids))
+        names = set(self.query_node_names(ids))
         all_scores = self._get_scores_per_key(names, result)
         return max(all_scores.values())
 
@@ -65,7 +65,7 @@ class SetEvaluator:
     ) -> float:
         tuple_size = max(int(key[len("index") :]) for key in sample.nodes[0] if key.startswith("index")) + 1
         indices = [f"index{i}" for i in range(tuple_size)]
-        ids_per_index = {i: tuple(self._query_node_names(node[i] for node in sample.nodes)) for i in indices}
+        ids_per_index = {i: tuple(self.query_node_names(node[i] for node in sample.nodes)) for i in indices}
         best_graph_result_keys = {
             k: max(spk := self._get_scores_per_key(v, result), key=spk.get) for k, v in ids_per_index.items()
         }
@@ -74,7 +74,7 @@ class SetEvaluator:
         result_tuples = set(tuple(res[best_graph_result_keys[i]] for i in indices) for res in result_graph_output)
         return intersection_over_union(expected_tuples, result_tuples)
 
-    def _query_node_names(self, ids: Iterable[int]) -> Iterable[str]:
+    def query_node_names(self, ids: Iterable[int]) -> Iterable[str]:
         for number in ids:
             graph_return = self.graph.query(self.CYPHER_QUERY_TEMPLATE.replace("{idx}", f"{number}"))
             yield graph_return[0]["n.name"]

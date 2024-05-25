@@ -16,6 +16,7 @@ import fact_finder.config.primekg_config as graph_config
 from fact_finder.evaluator.evaluation_sample import EvaluationSample
 from fact_finder.evaluator.evaluation_samples import manual_samples
 from fact_finder.evaluator.util import load_pickle, save_pickle
+from fact_finder.evaluator.set_evaluator.set_evaluator import SetEvaluator
 from fact_finder.utils import load_chat_model
 
 
@@ -60,6 +61,10 @@ class LlmJudgeEvaluator:
         print("Evaluating...")
         eval_results = []
         for sample, llm_result, graph_result in tqdm(zip(self.eval_samples, llm_chain_results, graph_chain_results)):
+            node_names = sample.nodes
+            if "index" in node_names[0]:
+                node_names = list(SetEvaluator().query_node_names([node["index"] for node in node_names]))
+
             print("\nSAMPLE")
             llm_judge_pairwise_correct = self.evaluator_pairwise_correct.evaluate_string_pairs(
                 prediction=llm_result["text"],
@@ -107,6 +112,7 @@ class LlmJudgeEvaluator:
             eval_result = {
                 "question": sample.question,
                 "reference": str(sample.nodes),
+                "reference_names": str([i for i in node_names]),
                 "expected_answer": sample.expected_answer,
                 "llm_answer": llm_result["text"],
                 "graph_answer": graph_result["graph_qa_output"].answer if "graph_qa_output" in graph_result else "",
