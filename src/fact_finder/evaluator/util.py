@@ -38,7 +38,7 @@ class EvalSampleAddition:
     def add_to_evaluation_sample_json(
         self,
         question: str,
-        expected_cypher: str,
+        cypher_query: str,
         source: str,
         expected_answer: str,
         nodes: List[Dict[str, Any]],
@@ -60,7 +60,7 @@ class EvalSampleAddition:
         sub_graph = []
         sample = EvaluationSample(
             question=question,
-            cypher_query=expected_cypher,
+            cypher_query=cypher_query,
             sub_graph=sub_graph,
             question_is_answerable=is_answerable,
             source=source,
@@ -73,6 +73,7 @@ class EvalSampleAddition:
         with open(self._path_to_json, "r", encoding="utf8") as r:
             json_content = json.load(r)
             evaluation_samples = [EvaluationSample.model_validate(r) for r in json_content]
+        # if an example for that question is already existing, it will be overwritten
         evaluation_samples = [r for r in evaluation_samples if not r.question == sample.question]
         evaluation_samples.append(sample)
         with open(self._path_to_json, "w", encoding="utf8") as w:
@@ -91,10 +92,10 @@ if __name__ == "__main__":
     )
 
     for sample in tqdm.tqdm(manual_samples):
-
+        ...
         eval_sample_addition.add_to_evaluation_sample_json(
             question=sample["question"],
-            expected_cypher=sample["expected_cypher"],
+            cypher_query=sample["expected_cypher"] if "expected_cypher" in sample.keys() else sample["cypher_query"],
             source="manual",
             expected_answer=sample["expected_answer"],
             is_answerable=True,

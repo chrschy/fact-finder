@@ -30,6 +30,12 @@ PREDICATE_DESCRIPTIONS = [
         "definition": "Gene/protein participates in a biological process. (interactions like up/down regulates, is involved in)",
     },
     {
+        "predicate": "is_a",
+        "object": "category",
+        "subject": "drug",
+        "definition": "If we are looking for a specific type of drug that 'is a' or 'can be categorized as', we are looking for this relationship",
+    },
+    {
         "predicate": "parent_child",
         "object": "biological_process",
         "subject": "biological_process",

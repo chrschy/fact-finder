@@ -2,14 +2,21 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
+from langchain.chains.base import Chain
+from langchain_core.callbacks import CallbackManagerForChainRun
+from langchain_core.runnables import (
+    RunnableConfig,
+    RunnableLambda,
+    RunnableParallel,
+    RunnableSequence,
+    RunnableSerializable,
+)
+
 from fact_finder.chains.answer_generation_chain import AnswerGenerationChain
 from fact_finder.chains.combined_graph_rag_qa_chain import CombinedQAChain
 from fact_finder.chains.cypher_query_generation_chain import CypherQueryGenerationChain
 from fact_finder.chains.cypher_query_preprocessors_chain import (
     CypherQueryPreprocessorsChain,
-)
-from fact_finder.chains.entity_detection_question_preprocessing_chain import (
-    EntityDetectionQuestionPreprocessingChain,
 )
 from fact_finder.chains.graph_chain import GraphChain
 from fact_finder.chains.graph_qa_chain.config import GraphQAChainConfig
@@ -24,15 +31,6 @@ from fact_finder.tools.semantic_scholar_search_api_wrapper import (
     SemanticScholarSearchApiWrapper,
 )
 from fact_finder.tools.subgraph_extension import SubgraphExpansion
-from langchain.chains.base import Chain
-from langchain_core.callbacks import CallbackManagerForChainRun
-from langchain_core.runnables import (
-    RunnableConfig,
-    RunnableLambda,
-    RunnableParallel,
-    RunnableSequence,
-    RunnableSerializable,
-)
 
 
 class GraphQAChain(Chain):
@@ -132,7 +130,7 @@ class GraphQAChain(Chain):
     ) -> RunnableSerializable:
         if config.use_entity_detection_preprocessing:
             assert config.entity_detector is not None
-            preprocessing_chain = EntityDetectionQuestionPreprocessingChain(
+            preprocessing_chain = config.entity_detection_preprocessor_type(
                 entity_detector=config.entity_detector,
                 allowed_types_and_description_templates=config.allowed_types_and_description_templates,
                 return_intermediate_steps=config.return_intermediate_steps,
@@ -174,7 +172,9 @@ class GraphQAChain(Chain):
         )
 
     def _build_graph_chain(self, config: GraphQAChainConfig) -> GraphChain:
-        return GraphChain(graph=config.graph, return_intermediate_steps=config.return_intermediate_steps)
+        return GraphChain(
+            graph=config.graph, return_intermediate_steps=config.return_intermediate_steps, top_k=config.top_k
+        )
 
     def _build_answer_generation_chain(
         self, config: GraphQAChainConfig, semantic_scholar_chain: Optional[SemanticScholarChain]
