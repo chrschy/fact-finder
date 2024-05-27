@@ -79,12 +79,12 @@ def test_correct_entity_hint_if_matching_side_effect_found_for_original_name(cha
     assert "E2 is a disease or a effect_or_phenotype." in chain_result
 
 
-@pytest.mark.parametrize("entities,graph_result", [(_DISEASE_ENTITY, (False, True))], indirect=True)
+@pytest.mark.parametrize("entities,graph_result", [(_DISEASE_ENTITY, (False, False, True, False))], indirect=True)
 def test_disease_replaced_if_matching_side_effect_found_for_preferred_name(chain_result: str):
     assert "disease_pref_name" in chain_result and "e2" not in chain_result
 
 
-@pytest.mark.parametrize("entities,graph_result", [(_DISEASE_ENTITY, (False, True))], indirect=True)
+@pytest.mark.parametrize("entities,graph_result", [(_DISEASE_ENTITY, (False, False, True, False))], indirect=True)
 def test_correct_entity_hint_if_matching_side_effect_found_for_preferred_name(chain_result: str):
     assert "Disease_pref_name is a disease or a effect_or_phenotype." in chain_result
 
