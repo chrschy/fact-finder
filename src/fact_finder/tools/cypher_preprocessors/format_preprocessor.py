@@ -24,6 +24,7 @@ class FormatPreprocessor(CypherQueryPreprocessor):
             return cypher_query
 
     def _try_formatting(self, cypher_query: str) -> str:
+        cypher_query = cypher_query.strip().lower()
         cypher_query = self._only_use_double_quotes(cypher_query)
         cypher_query = self._keywords_to_upper_case(cypher_query)
         cypher_query = self._null_and_boolean_literals_to_lower_case(cypher_query)
