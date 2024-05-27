@@ -13,8 +13,11 @@ class PreferredTermFinder(SynonymFinder):
         self._detector = EntityDetector()
         self._allowed_categories = set(map(str.lower, allowed_categories))
 
-    def __call__(self, name: str) -> List[str]:
-        return [r["pref_term"] for r in self._detector(name) if r["sem_type"].lower() in self._allowed_categories]
+    def __call__(self, name: str) -> Iterable[str]:
+        yield name
+        for r in self._detector(name):
+            if r["sem_type"].lower() in self._allowed_categories:
+                yield r["pref_term"]
 
 
 class PreferredTermIdFinder(SynonymFinder):

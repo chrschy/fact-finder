@@ -16,6 +16,9 @@ from fact_finder.prompt_templates import (
     KEYWORD_PROMPT,
     SUBGRAPH_SUMMARY_PROMPT,
 )
+from fact_finder.tools.cypher_preprocessors.always_distinct_preprocessor import (
+    AlwaysDistinctCypherQueryPreprocessor,
+)
 from fact_finder.tools.cypher_preprocessors.child_to_parent_preprocessor import (
     ChildToParentPreprocessor,
 )
@@ -63,7 +66,9 @@ def build_chain(model: BaseLanguageModel, combine_output_with_sematic_scholar: b
         predicate_descriptions=PREDICATE_DESCRIPTIONS[:10],
         return_intermediate_steps=True,
         use_entity_detection_preprocessing=parsed_args.use_entity_detection_preprocessing,
-        entity_detection_preprocessor_type=partial(FilteredPrimeKGQuestionPreprocessingChain, graph=graph),
+        entity_detection_preprocessor_type=partial(
+            FilteredPrimeKGQuestionPreprocessingChain, graph=graph, excluded_entities=["uses"]
+        ),
         entity_detector=EntityDetector() if parsed_args.use_entity_detection_preprocessing else None,
         allowed_types_and_description_templates=_get_primekg_entity_categories(),
         use_subgraph_expansion=parsed_args.use_subgraph_expansion,
@@ -81,6 +86,7 @@ def build_chain_summary(model: BaseLanguageModel, args: List[str] = []) -> Chain
 def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool) -> List[CypherQueryPreprocessor]:
     preprocs: List[CypherQueryPreprocessor] = []
     preprocs.append(FormatPreprocessor())
+    preprocs.append(AlwaysDistinctCypherQueryPreprocessor())
     preprocs.append(LowerCasePropertiesCypherQueryPreprocessor())
     wikidata = WikiDataSynonymFinder()
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=wikidata, node_types="exposure"))
@@ -88,6 +94,7 @@ def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool) -> Lis
         preprocs += _get_synonymized_graph_preprocessors(graph)
     preprocs.append(SizeToCountPreprocessor())
     preprocs.append(ChildToParentPreprocessor(graph, "parent_child", name_property="name"))
+    preprocs.append(LowerCasePropertiesCypherQueryPreprocessor())
     return preprocs
 
 

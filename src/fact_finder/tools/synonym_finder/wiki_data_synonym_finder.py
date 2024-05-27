@@ -1,9 +1,8 @@
 import ssl
 from typing import List
 
-from SPARQLWrapper import JSON, SPARQLWrapper
-
 from fact_finder.tools.synonym_finder.synonym_finder import SynonymFinder
+from SPARQLWrapper import JSON, SPARQLWrapper
 
 
 class WikiDataSynonymFinder(SynonymFinder):
@@ -22,6 +21,8 @@ class WikiDataSynonymFinder(SynonymFinder):
         if not results:
             query = self.__generate_sparql_backwards_query(name)
             results = self.__get_sparql_results(query)
+        if not results:
+            return [name]
         return results
 
     def __get_sparql_results(self, query):

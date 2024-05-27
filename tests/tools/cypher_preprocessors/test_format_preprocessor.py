@@ -1,4 +1,6 @@
-from fact_finder.tools.cypher_preprocessors.format_preprocessor import FormatPreprocessor
+from fact_finder.tools.cypher_preprocessors.format_preprocessor import (
+    FormatPreprocessor,
+)
 
 
 def test_on_empty_string():
@@ -84,7 +86,7 @@ def test_match_formatings_also_work_in_exists_block():
     )
     formated_query = (
         'MATCH (d:disease {name: "psoriasis"})-[:indication]->(drug:drug)\n'
-        'WHERE EXISTS((:disease {name: "psoriatic arthriti\\\'s"})-[:indication]->(drug))\n'
+        'WHERE exists((:disease {name: "psoriatic arthriti\\\'s"})-[:indication]->(drug))\n'
         "RETURN drug.name"
     )
     preprocessor = FormatPreprocessor()
