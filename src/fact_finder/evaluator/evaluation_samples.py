@@ -2019,7 +2019,7 @@ manual_samples = [
         "nodes": [{"index": 15491}],
     },
     {
-        "question": "Which medicine may cause pterygium?",
+        "question": "Which medicine may cause as sideeffect pterygium?",
         "expected_cypher": 'MATCH (n:drug)-[s:side_effect]-(g {name:"pterygium"}) RETURN distinct n',
         "expected_answer": "brinzolamide",
         "subgraph_query": 'MATCH (n:drug)-[s:side_effect]-(g {name:"pterygium"}) RETURN n, g, s',
@@ -3062,10 +3062,9 @@ manual_samples = [
     },
     {
         "question": "Can I use iboprofen in patients with addison disease?",
-        "expected_cypher": 'RETURN NOT EXISTS {MATCH (dr:drug {name:"ibuprofen"})-[:contraindication]-(c {name:"addison disease"}) }',
+        "expected_cypher": 'MATCH (d:disease {name: "addison disease"})-[:contraindication]->(drug:drug {name: "ibuprofen"})\nRETURN DISTINCT drug.name AS DrugName, EXISTS((d)-[:contraindication]->(drug)) AS Contraindicated',
         "expected_answer": "No",
-        "subgraph_query": 'MATCH (dr:drug {name:"ibuprofen"})-[c:contraindication]-(a {name:"addison disease"}) RETURN dr, c, a',
-        "nodes": [{"value": False}],
+        "nodes": [[{'DrugName': 'ibuprofen', 'Contraindicated': True}]],
     },
     {
         "question": "Which off label medicaments for epilepsie have a clogp value below 0?",
