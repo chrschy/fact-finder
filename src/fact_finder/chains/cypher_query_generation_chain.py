@@ -69,8 +69,9 @@ class CypherQueryGenerationChain(Chain):
         return "\n".join(result)
 
     def _generate_cypher(self, inputs: Dict[str, Any], run_manager: CallbackManagerForChainRun) -> str:
+        prepared_inputs = self._prepare_chain_input(inputs)
         generated_cypher = self.cypher_generation_chain(
-            inputs=self._prepare_chain_input(inputs),
+            inputs=prepared_inputs,
             callbacks=run_manager.get_child(),
         )[self.cypher_generation_chain.output_key]
         generated_cypher = extract_cypher(generated_cypher)
