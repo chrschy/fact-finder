@@ -1,4 +1,3 @@
-import json
 import os.path
 from typing import Dict, Any
 from typing import List, Union
@@ -74,7 +73,7 @@ class Evaluation:
                 print(e)
                 result = {}
             results.append(result)
-        # save_pickle(results, cache_path) # todo
+        save_pickle(results, cache_path)
         return results
 
     def eval_samples(self, limit_of_samples: int = None):
@@ -103,8 +102,7 @@ class Evaluation:
 if __name__ == "__main__":
     evaluators = [SetEvaluator()]
     scores = []
-    # sample_idx = [0, 1, 8, 11, 12, 17, 21, 27, 30, 34, 40, 47]  # all
-    sample_idx = [47]  # only now
+    sample_idx = [1, 12, 17, 21, 27, 34, 47]
     evaluation = Evaluation(evaluators=evaluators, scores=scores, idx_list_of_samples=sample_idx)
     results = evaluation.run(save_as_excel=True, cache_path="cached_results/chain_results.pickle")
     print(results)

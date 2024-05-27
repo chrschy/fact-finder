@@ -1,11 +1,9 @@
-import asyncio
 import sys
-from typing import Any, Dict, List
 
 import streamlit as st
 import streamlit.components.v1 as components
-from dotenv import load_dotenv
 from PIL import Image
+from dotenv import load_dotenv
 from pyvis.network import Network
 
 import fact_finder.config.primekg_config as graph_config
