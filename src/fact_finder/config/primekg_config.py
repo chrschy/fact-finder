@@ -92,6 +92,7 @@ def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool) -> Lis
         preprocs += _get_synonymized_graph_preprocessors(graph)
     preprocs.append(SizeToCountPreprocessor())
     preprocs.append(ChildToParentPreprocessor(graph, "parent_child", name_property="name"))
+    preprocs.append(LowerCasePropertiesCypherQueryPreprocessor())
     return preprocs
 
 
