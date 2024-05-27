@@ -37,6 +37,7 @@ class GraphQAChainConfig(BaseModel):
     # Example: "chemical_compounds", "{entity} is a chemical compound."
     allowed_types_and_description_templates: Dict[str, str] = {}
 
+    skip_subgraph_generation: bool = False
     use_subgraph_expansion: bool = False
 
     combine_output_with_sematic_scholar: bool = False
