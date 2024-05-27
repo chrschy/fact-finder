@@ -63,7 +63,7 @@ def build_chain(model: BaseLanguageModel, combine_output_with_sematic_scholar: b
         cypher_prompt=cypher_prompt,
         answer_generation_prompt=answer_generation_prompt,
         cypher_query_preprocessors=cypher_preprocessors,
-        predicate_descriptions=PREDICATE_DESCRIPTIONS[:10],
+        predicate_descriptions=PREDICATE_DESCRIPTIONS[:11],
         return_intermediate_steps=True,
         use_entity_detection_preprocessing=parsed_args.use_entity_detection_preprocessing,
         entity_detection_preprocessor_type=partial(
