@@ -1,5 +1,4 @@
-import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from fact_finder.tools.sub_graph_extractor import LLMSubGraphExtractor
 from fact_finder.tools.subgraph_extension import SubgraphExpansion
@@ -48,26 +47,32 @@ class SubgraphExtractorChain(Chain):
 
     def _call(self, inputs: Dict[str, Any], run_manager: Optional[CallbackManagerForChainRun] = None) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
+        try:
+            subgraph_cypher, extracted_nodes, expanded_nodes = self._try_generating_subgraph(
+                inputs[self.input_key], _run_manager
+            )
+        except Exception as e:
+            self._log_it(f"Error when creating subgraph cypher!", _run_manager, e)
+            subgraph_cypher = subgraph_cypher if "subgraph_cypher" in locals() else ""
+            extracted_nodes = extracted_nodes if "extracted_nodes" in locals() else []
+            expanded_nodes = []
+        return self._prepare_chain_result(inputs, subgraph_cypher, extracted_nodes, expanded_nodes)
 
-        cypher_query = inputs[self.input_key]
+    def _try_generating_subgraph(
+        self, cypher_query: str, _run_manager: CallbackManagerForChainRun
+    ) -> Tuple[str, List[Dict[str, Any]], List[Dict[str, Any]]]:
         subgraph_cypher = self.subgraph_extractor(cypher_query)
         self._log_it("Subgraph Cypher:", _run_manager, subgraph_cypher)
 
-        extracted_nodes = self._query_graph(subgraph_cypher)
+        extracted_nodes = self.graph.query(subgraph_cypher)
         expanded_nodes = self.subgraph_expansion.expand(nodes=extracted_nodes) if self.use_subgraph_expansion else []
         self._log_it("Extracted Nodes:", _run_manager, extracted_nodes)
-        return self._prepare_chain_result(inputs, subgraph_cypher, extracted_nodes, expanded_nodes)
 
-    def _query_graph(self, subgraph_cypher) -> List[Dict[str, Any]]:
-        try:
-            return self.graph.query(subgraph_cypher)
-        except Exception as e:
-            print(f"Sub Graph for {subgraph_cypher} could not be extracted due to {e}")
-        return []
+        return subgraph_cypher, extracted_nodes, expanded_nodes
 
-    def _log_it(self, text: str, _run_manager: CallbackManagerForChainRun, subgraph_cypher: str):
+    def _log_it(self, text: str, _run_manager: CallbackManagerForChainRun, entity: Any):
         _run_manager.on_text(text, end="\n", verbose=self.verbose)
-        _run_manager.on_text(subgraph_cypher, color="green", end="\n", verbose=self.verbose)
+        _run_manager.on_text(entity, color="green", end="\n", verbose=self.verbose)
 
     def _prepare_chain_result(
         self,
