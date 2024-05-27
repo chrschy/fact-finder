@@ -66,7 +66,9 @@ def build_chain(model: BaseLanguageModel, combine_output_with_sematic_scholar: b
         predicate_descriptions=PREDICATE_DESCRIPTIONS[:10],
         return_intermediate_steps=True,
         use_entity_detection_preprocessing=parsed_args.use_entity_detection_preprocessing,
-        entity_detection_preprocessor_type=partial(FilteredPrimeKGQuestionPreprocessingChain, graph=graph),
+        entity_detection_preprocessor_type=partial(
+            FilteredPrimeKGQuestionPreprocessingChain, graph=graph, excluded_entities=["uses"]
+        ),
         entity_detector=EntityDetector() if parsed_args.use_entity_detection_preprocessing else None,
         allowed_types_and_description_templates=_get_primekg_entity_categories(),
         use_subgraph_expansion=parsed_args.use_subgraph_expansion,

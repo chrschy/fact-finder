@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Collection, Dict, List, Set, Tuple
 
 from fact_finder.chains.entity_detection_question_preprocessing_chain import (
     EntityDetectionQuestionPreprocessingChain,
@@ -9,6 +9,7 @@ from langchain_community.graphs import Neo4jGraph
 
 class FilteredPrimeKGQuestionPreprocessingChain(EntityDetectionQuestionPreprocessingChain):
     graph: Neo4jGraph
+    excluded_entities: Set[str]
     _side_effect_exists_cypher_query: str = (
         'MATCH(node:effect_or_phenotype {name: "{entity_name}"}) RETURN COUNT(node) > 0 AS exists'
     )
@@ -20,6 +21,7 @@ class FilteredPrimeKGQuestionPreprocessingChain(EntityDetectionQuestionPreproces
         entity_detector: EntityDetector,
         allowed_types_and_description_templates: Dict[str, str],
         graph: Neo4jGraph,
+        excluded_entities: Collection[str] = [],
         return_intermediate_steps: bool = True,
     ):
         allowed_types_and_description_templates["side_effect"] = "{entity} is a disease or a effect_or_phenotype."
@@ -27,6 +29,7 @@ class FilteredPrimeKGQuestionPreprocessingChain(EntityDetectionQuestionPreproces
             entity_detector=entity_detector,
             allowed_types_and_description_templates=allowed_types_and_description_templates,
             return_intermediate_steps=return_intermediate_steps,
+            excluded_entities=set(e.strip().lower() for e in excluded_entities),
             graph=graph,
         )
 
@@ -37,7 +40,10 @@ class FilteredPrimeKGQuestionPreprocessingChain(EntityDetectionQuestionPreproces
         new_question = ""
         last_index = 0
         for start, end, pref_name, type in entity_results:
-            pref_name, type = self._filter_pref_name_and_type(question[start:end], pref_name, type)
+            original_name = question[start:end]
+            if original_name.strip().lower() in self.excluded_entities:
+                continue
+            pref_name, type = self._filter_pref_name_and_type(original_name, pref_name, type)
             new_question += question[last_index:start] + pref_name
             last_index = end
             entity_type_hints.append(self._create_type_hint(pref_name, type))
