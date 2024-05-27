@@ -41,14 +41,18 @@ class SetEvaluator:
     def evaluate_sample(
         self, sample: EvaluationSample, chain_result: Dict[str, GraphQAChainOutput | Any]
     ) -> Tuple[float, float, float]:
-        if not chain_result:
-            print("No chain result or no nodes.")
+        try:
+            if not chain_result or not chain_result["graph_qa_output"].graph_response:
+                print("No chain result or no nodes.")
+                return 0.0, 0.0, 0.0
+            if "index" in sample.nodes[0]:
+                return self.evaluate_sample_with_single_index(sample=sample, result=chain_result)
+            if "value" in sample.nodes[0]:
+                return self.evaluate_sample_with_value_result(sample=sample, result=chain_result)
+            return self.evaluate_sample_with_tuple_in_label(sample=sample, result=chain_result)
+        except:
+            print("Error")
             return 0.0, 0.0, 0.0
-        if "index" in sample.nodes[0]:
-            return self.evaluate_sample_with_single_index(sample=sample, result=chain_result)
-        if "value" in sample.nodes[0]:
-            return self.evaluate_sample_with_value_result(sample=sample, result=chain_result)
-        return self.evaluate_sample_with_tuple_in_label(sample=sample, result=chain_result)
 
     def evaluate_sample_with_single_index(
         self, sample: EvaluationSample, result: Dict[str, GraphQAChainOutput | Any]
