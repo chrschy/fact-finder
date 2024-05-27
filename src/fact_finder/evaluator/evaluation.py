@@ -28,7 +28,7 @@ class Evaluation:
         evaluators: List[Union[StringEvaluator, SetEvaluator]],
         chat_model: BaseChatModel = None,
         chain: Chain = None,
-        chain_args: List[str] = ["--normalized_graph", "--use_entity_detection_preprocessing"],
+        chain_args: List[str] = ["--normalized_graph"],  # , "--use_entity_detection_preprocessing"],
         scores: List[Score] = [BleuScore(), DifflibScore(), EmbeddingScore(), LevenshteinScore()],
         limit_of_samples: int = None,
         idx_list_of_samples: List[int] = None,
@@ -38,7 +38,7 @@ class Evaluation:
             self.chat_model = load_chat_model()
         if not chain:
             self.chain = graph_config.build_chain(
-                model=self.chat_model, combine_output_with_sematic_scholar=True, args=chain_args
+                model=self.chat_model, combine_output_with_sematic_scholar=False, args=chain_args
             )
         self.eval_samples = self.eval_samples(limit_of_samples=limit_of_samples)
         self.evaluators = evaluators
@@ -102,7 +102,6 @@ class Evaluation:
 if __name__ == "__main__":
     evaluators = [SetEvaluator()]
     scores = []
-    sample_idx = [1, 12, 17, 21, 27, 34, 47]
-    evaluation = Evaluation(evaluators=evaluators, scores=scores, idx_list_of_samples=sample_idx)
+    evaluation = Evaluation(evaluators=evaluators, scores=scores)
     results = evaluation.run(save_as_excel=True, cache_path="cached_results/chain_results.pickle")
     print(results)

@@ -27,7 +27,7 @@ def build_neo4j_graph() -> Neo4jGraph:
 
 
 def get_model_from_env():
-    return os.getenv("LLM", "gpt-4-turbo")
+    return os.getenv("LLM", "gpt-4o")
 
 
 def load_chat_model() -> BaseChatModel:

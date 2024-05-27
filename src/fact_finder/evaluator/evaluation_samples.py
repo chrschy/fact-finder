@@ -3064,7 +3064,7 @@ manual_samples = [
         "question": "Can I use iboprofen in patients with addison disease?",
         "expected_cypher": 'MATCH (d:disease {name: "addison disease"})-[:contraindication]->(drug:drug {name: "ibuprofen"})\nRETURN DISTINCT drug.name AS DrugName, EXISTS((d)-[:contraindication]->(drug)) AS Contraindicated',
         "expected_answer": "No",
-        "nodes": [[{'DrugName': 'ibuprofen', 'Contraindicated': True}]],
+        "nodes": [{"DrugName": "ibuprofen"}, {"value": True}],
     },
     {
         "question": "Which off label medicaments for epilepsie have a clogp value below 0?",
@@ -4696,7 +4696,7 @@ manual_samples = [
     },
     {
         "question": "What are the likely genetic causes of chronic kidney disease?",
-        "cypher_query": 'MATCH (d:disease {name: "chronic kidney disease"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.id AS GeneID, g.name AS GeneName',
+        "expected_cypher": 'MATCH (d:disease {name: "chronic kidney disease"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.id AS GeneID, g.name AS GeneName',
         "expected_answer": "",
         "nodes": [
             {"index": 9723, "name": "il19"},
@@ -4755,7 +4755,7 @@ manual_samples = [
     },
     {
         "question": "What are the likely causes of chronic kidney disease?",
-        "cypher_query": 'MATCH (d:disease {name: "chronic kidney disease"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS Cause\nUNION\nMATCH (disease:disease {name: "chronic kidney disease"})-[:linked_to]->(exposure:exposure)\nRETURN exposure.name AS Cause',
+        "expected_cypher": 'MATCH (d:disease {name: "chronic kidney disease"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS Cause\nUNION\nMATCH (disease:disease {name: "chronic kidney disease"})-[:linked_to]->(exposure:exposure)\nRETURN exposure.name AS Cause',
         "expected_answer": "",
         "nodes": [
             {"index": 9723, "name": "il19"},
