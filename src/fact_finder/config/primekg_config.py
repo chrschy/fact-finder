@@ -16,6 +16,9 @@ from fact_finder.prompt_templates import (
     KEYWORD_PROMPT,
     SUBGRAPH_SUMMARY_PROMPT,
 )
+from fact_finder.tools.cypher_preprocessors.always_distinct_preprocessor import (
+    AlwaysDistinctCypherQueryPreprocessor,
+)
 from fact_finder.tools.cypher_preprocessors.child_to_parent_preprocessor import (
     ChildToParentPreprocessor,
 )
@@ -81,6 +84,7 @@ def build_chain_summary(model: BaseLanguageModel, args: List[str] = []) -> Chain
 def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool) -> List[CypherQueryPreprocessor]:
     preprocs: List[CypherQueryPreprocessor] = []
     preprocs.append(FormatPreprocessor())
+    preprocs.append(AlwaysDistinctCypherQueryPreprocessor())
     preprocs.append(LowerCasePropertiesCypherQueryPreprocessor())
     wikidata = WikiDataSynonymFinder()
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=wikidata, node_types="exposure"))
