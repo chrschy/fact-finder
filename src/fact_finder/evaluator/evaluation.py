@@ -32,7 +32,9 @@ class Evaluation:
         chain_args: List[str] = ["--normalized_graph", "--use_entity_detection_preprocessing"],
         scores: List[Score] = [BleuScore(), DifflibScore(), EmbeddingScore(), LevenshteinScore()],
         limit_of_samples: int = None,
+        idx_list_of_samples: List[int] = None,
     ):
+        self.idx_list_of_samples = idx_list_of_samples
         if not chat_model:
             self.chat_model = load_chat_model()
         if not chain:
@@ -72,17 +74,20 @@ class Evaluation:
                 print(e)
                 result = {}
             results.append(result)
-        save_pickle(results, cache_path)
+        # save_pickle(results, cache_path) # todo
         return results
 
     def eval_samples(self, limit_of_samples: int = None):
         eval_samples = []
-        for manual_sample in manual_samples[:limit_of_samples]:
+        samples = manual_samples
+        if self.idx_list_of_samples:
+            samples = [samples[i] for i in self.idx_list_of_samples]
+        for sample in samples[:limit_of_samples]:
             eval_sample = EvaluationSample(
-                question=manual_sample["question"],
-                cypher_query=manual_sample["expected_cypher"],
-                expected_answer=manual_sample["expected_answer"],
-                nodes=manual_sample["nodes"],
+                question=sample["question"],
+                cypher_query=sample["expected_cypher"],
+                expected_answer=sample["expected_answer"],
+                nodes=sample["nodes"],
             )
             eval_samples.append(eval_sample)
         return eval_samples
@@ -98,6 +103,8 @@ class Evaluation:
 if __name__ == "__main__":
     evaluators = [SetEvaluator()]
     scores = []
-    evaluation = Evaluation(evaluators=evaluators, scores=scores)
+    # sample_idx = [0, 1, 8, 11, 12, 17, 21, 27, 30, 34, 40, 47]  # all
+    sample_idx = [47]  # only now
+    evaluation = Evaluation(evaluators=evaluators, scores=scores, idx_list_of_samples=sample_idx)
     results = evaluation.run(save_as_excel=True, cache_path="cached_results/chain_results.pickle")
     print(results)

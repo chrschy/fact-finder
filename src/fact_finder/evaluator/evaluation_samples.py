@@ -6001,7 +6001,7 @@ manual_samples = [
     },
     {
         "question": "What genes play role in prostate cancer?",
-        "cypher_query": 'MATCH (d:disease {name: "prostate carcinoma"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName',
+        "expected_cypher": 'MATCH (d:disease {name: "prostate carcinoma"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6627,7 +6627,7 @@ manual_samples = [
     },
     {
         "question": "what are the symptoms of atopic dermatitis?",
-        "cypher_query": 'MATCH (d:disease {name: "dermatitis, atopic"})-[:phenotype_present]->(p:effect_or_phenotype)\nRETURN p.name AS Symptoms',
+        "expected_cypher": 'MATCH (d:disease {name: "dermatitis, atopic"})-[:phenotype_present]->(p:effect_or_phenotype)\nRETURN p.name AS Symptoms',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6650,7 +6650,7 @@ manual_samples = [
     },
     {
         "question": "Which biomarkers are associated with a diagnosis of atopic dermatitis?",
-        "cypher_query": 'MATCH (d:disease {name: "dermatitis, atopic"})-[:associated_with]->(gp:gene_or_protein)\nRETURN gp.name AS BiomarkerName',
+        "expected_cypher": 'MATCH (d:disease {name: "dermatitis, atopic"})-[:associated_with]->(gp:gene_or_protein)\nRETURN gp.name AS BiomarkerName',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6696,7 +6696,7 @@ manual_samples = [
     },
     {
         "question": "What are the common treatments for moderate to severe psoriasis?",
-        "cypher_query": 'MATCH (d:disease {name: "psoriasis"})-[:indication]->(drug:drug)\nRETURN drug.name AS Treatment',
+        "expected_cypher": 'MATCH (d:disease {name: "psoriasis"})-[:indication]->(drug:drug)\nRETURN drug.name AS Treatment',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6723,7 +6723,7 @@ manual_samples = [
     },
     {
         "question": "Which proteins interact with PINK1?",
-        "cypher_query": 'MATCH (protein:gene_or_protein)-[:ppi]->(targetProtein:gene_or_protein {name: "pink1"})\nRETURN protein.name AS ProteinName',
+        "expected_cypher": 'MATCH (protein:gene_or_protein)-[:ppi]->(targetProtein:gene_or_protein {name: "pink1"})\nRETURN protein.name AS ProteinName',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6807,7 +6807,7 @@ manual_samples = [
     },
     {
         "question": "Is right ventricle heart failure linked to Rheumatic tricuspid valve regurgitation?",
-        "cypher_query": 'MATCH (d1:disease {name: "symptomatic heart failure"}), (d2:disease {name: "tricuspid valve insufficiency"})\nRETURN EXISTS((d1)-[:linked_to]-(d2)) AS IsLinked',
+        "expected_cypher": 'MATCH (d1:disease {name: "symptomatic heart failure"}), (d2:disease {name: "tricuspid valve insufficiency"})\nRETURN EXISTS((d1)-[:linked_to]-(d2)) AS IsLinked',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6816,7 +6816,7 @@ manual_samples = [
     },
     {
         "question": "What genes play role in Alport syndrome?",
-        "cypher_query": 'MATCH (d:disease {name: "nephritis, hereditary"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName',
+        "expected_cypher": 'MATCH (d:disease {name: "nephritis, hereditary"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.name AS GeneName',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6832,7 +6832,7 @@ manual_samples = [
     },
     {
         "question": "Which drugs are used to treat Alzheimer and what do they act on?",
-        "cypher_query": 'MATCH (d:disease {name: "alzheimer disease"})-[:indication]->(drug:drug)-[:target]->(target:gene_or_protein)\nRETURN drug.name AS DrugName, target.name AS TargetName',
+        "expected_cypher": 'MATCH (d:disease {name: "alzheimer disease"})-[:indication]->(drug:drug)-[:target]->(target:gene_or_protein)\nRETURN drug.name AS DrugName, target.name AS TargetName',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6870,7 +6870,7 @@ manual_samples = [
     },
     {
         "question": "Based on the topological polar surface area, can any of the medications against atopic dermatitis permate cell membranes?",
-        "cypher_query": 'MATCH (d:disease {name: "dermatitis, atopic"})-[:indication]->(drug:drug)\nWHERE drug.tpsa <= 140\nRETURN drug.name AS MedicationName, drug.tpsa AS TopologicalPolarSurfaceArea',
+        "expected_cypher": 'MATCH (d:disease {name: "dermatitis, atopic"})-[:indication]->(drug:drug)\nWHERE drug.tpsa <= 140\nRETURN drug.name AS MedicationName, drug.tpsa AS TopologicalPolarSurfaceArea',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6908,7 +6908,7 @@ manual_samples = [
     },
     {
         "question": "Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol?",
-        "cypher_query": 'MATCH (alcoholDisease:disease)-[:linked_to]->(exposure:exposure {name: "ethanol"})\nMATCH (drug:drug)-[:contraindication]->(alcoholDisease)\nMATCH (treatedDisease:disease)-[:indication]->(drug)\nRETURN treatedDisease.name AS DiseaseName',
+        "expected_cypher": 'MATCH (alcoholDisease:disease)-[:linked_to]->(exposure:exposure {name: "ethanol"})\nMATCH (drug:drug)-[:contraindication]->(alcoholDisease)\nMATCH (treatedDisease:disease)-[:indication]->(drug)\nRETURN treatedDisease.name AS DiseaseName',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6917,7 +6917,7 @@ manual_samples = [
     },
     {
         "question": "Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol? Include the drug for each treated disease.",
-        "cypher_query": 'MATCH (alcoholDisease:disease)-[:linked_to]->(alcoholExposure:exposure {name: "ethanol"})\nMATCH (contraindicatedDrug:drug)-[:contraindication]->(alcoholDisease)\nMATCH (treatedDisease:disease)-[:indication]->(contraindicatedDrug)\nRETURN treatedDisease.name AS DiseaseName, contraindicatedDrug.name AS DrugName',
+        "expected_cypher": 'MATCH (alcoholDisease:disease)-[:linked_to]->(alcoholExposure:exposure {name: "ethanol"})\nMATCH (contraindicatedDrug:drug)-[:contraindication]->(alcoholDisease)\nMATCH (treatedDisease:disease)-[:indication]->(contraindicatedDrug)\nRETURN treatedDisease.name AS DiseaseName, contraindicatedDrug.name AS DrugName',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
@@ -6926,7 +6926,7 @@ manual_samples = [
     },
     {
         "question": "Which drugs used to treat diseases caused by alcohol may worsen the patient's Anaemia disease?",
-        "cypher_query": 'MATCH (alcoholExposure:exposure {name: "ethanol"})-[:linked_to]->(diseaseCausedByAlcohol:disease)-[:indication]->(drug:drug)-[:contraindication]->(anemia:disease {name: "anemia (disease)"})\nRETURN drug.name AS DrugName',
+        "expected_cypher": 'MATCH (alcoholExposure:exposure {name: "ethanol"})-[:linked_to]->(diseaseCausedByAlcohol:disease)-[:indication]->(drug:drug)-[:contraindication]->(anemia:disease {name: "anemia (disease)"})\nRETURN drug.name AS DrugName',
         "question_is_answerable": True,
         "source": "",
         "expected_answer": "",
