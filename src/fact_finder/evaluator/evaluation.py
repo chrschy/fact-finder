@@ -1,13 +1,8 @@
 import os.path
-from typing import Dict, Any
-from typing import List, Union
-
-import pandas as pd
-from langchain.chains.base import Chain
-from langchain_core.language_models import BaseChatModel
-from tqdm import tqdm
+from typing import Any, Dict, List, Union
 
 import fact_finder.config.primekg_config as graph_config
+import pandas as pd
 from fact_finder.evaluator.evaluation_sample import EvaluationSample
 from fact_finder.evaluator.evaluation_samples import manual_samples
 from fact_finder.evaluator.score.bleu_score import BleuScore
@@ -19,6 +14,9 @@ from fact_finder.evaluator.set_evaluator.set_evaluator import SetEvaluator
 from fact_finder.evaluator.string_evaluator.string_evaluator import StringEvaluator
 from fact_finder.evaluator.util import load_pickle, save_pickle
 from fact_finder.utils import load_chat_model
+from langchain.chains.base import Chain
+from langchain_core.language_models import BaseChatModel
+from tqdm import tqdm
 
 
 class Evaluation:
@@ -28,7 +26,11 @@ class Evaluation:
         evaluators: List[Union[StringEvaluator, SetEvaluator]],
         chat_model: BaseChatModel = None,
         chain: Chain = None,
-        chain_args: List[str] = ["--normalized_graph", "--use_entity_detection_preprocessing"],
+        chain_args: List[str] = [
+            "--skip_subgraph_generation",
+            "--normalized_graph",
+            "--use_entity_detection_preprocessing",
+        ],
         scores: List[Score] = [BleuScore(), DifflibScore(), EmbeddingScore(), LevenshteinScore()],
         limit_of_samples: int = None,
         idx_list_of_samples: List[int] = None,

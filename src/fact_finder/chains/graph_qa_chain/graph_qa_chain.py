@@ -2,16 +2,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from langchain.chains.base import Chain
-from langchain_core.callbacks import CallbackManagerForChainRun
-from langchain_core.runnables import (
-    RunnableConfig,
-    RunnableLambda,
-    RunnableParallel,
-    RunnableSequence,
-    RunnableSerializable,
-)
-
 from fact_finder.chains.answer_generation_chain import AnswerGenerationChain
 from fact_finder.chains.combined_graph_rag_qa_chain import CombinedQAChain
 from fact_finder.chains.cypher_query_generation_chain import CypherQueryGenerationChain
@@ -31,6 +21,16 @@ from fact_finder.tools.semantic_scholar_search_api_wrapper import (
     SemanticScholarSearchApiWrapper,
 )
 from fact_finder.tools.subgraph_extension import SubgraphExpansion
+from langchain.chains.base import Chain
+from langchain_core.callbacks import CallbackManagerForChainRun
+from langchain_core.runnables import (
+    Runnable,
+    RunnableConfig,
+    RunnableLambda,
+    RunnableParallel,
+    RunnableSequence,
+    RunnableSerializable,
+)
 
 
 class GraphQAChain(Chain):
@@ -78,9 +78,12 @@ class GraphQAChain(Chain):
         cypher_query_preprocessors_chain = self._build_cypher_query_preprocessors_chain(config)
         graph_chain = self._build_graph_chain(config)
         answer_generation_chain = self._build_answer_generation_chain(config, semantic_scholar_chain)
-        subgraph_extractor_chain = self._subgraph_extractor_chain(config)
         output_chain = self._build_output_chain(config)
 
+        if config.skip_subgraph_generation:
+            subgraph_extractor_chain: Runnable = DummySubgraphGen()
+        else:
+            subgraph_extractor_chain = self._subgraph_extractor_chain(config)
         parallel_subgraph_and_answer = RunnableParallel(
             **{
                 subgraph_extractor_chain.output_key: subgraph_extractor_chain,
@@ -204,3 +207,16 @@ class GraphQAChain(Chain):
 
     def _build_output_chain(self, config: GraphQAChainConfig) -> GraphQAChainOutputPreparation:
         return GraphQAChainOutputPreparation(return_intermediate_steps=config.return_intermediate_steps)
+
+
+class DummySubgraphGen(RunnableLambda):
+    def __init__(self):
+        self.output_key = SubgraphExtractorChain.__fields__["output_key"].default
+        self.intermediate_steps_key = SubgraphExtractorChain.__fields__["intermediate_steps_key"].default
+        super().__init__(self.call)
+
+    def call(self, inputs: Dict[str, Any]) -> Dict[str, Any]:
+        outputs: Dict[str, Any] = {self.output_key: {"extracted_nodes": [], "expanded_nodes": []}}
+        if self.intermediate_steps_key in inputs:
+            outputs[self.intermediate_steps_key] = inputs[self.intermediate_steps_key]
+        return outputs
