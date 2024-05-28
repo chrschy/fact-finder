@@ -28,7 +28,7 @@ class Evaluation:
         evaluators: List[Union[StringEvaluator, SetEvaluator]],
         chat_model: BaseChatModel = None,
         chain: Chain = None,
-        chain_args: List[str] = ["--normalized_graph"],  # , "--use_entity_detection_preprocessing"],
+        chain_args: List[str] = ["--normalized_graph", "--use_entity_detection_preprocessing"],
         scores: List[Score] = [BleuScore(), DifflibScore(), EmbeddingScore(), LevenshteinScore()],
         limit_of_samples: int = None,
         idx_list_of_samples: List[int] = None,
@@ -65,7 +65,8 @@ class Evaluation:
         print("Running Chain...")
         if os.path.exists(cache_path):
             return load_pickle(cache_path)
-        for eval_sample in tqdm(self.eval_samples):
+        eval_samples = self.eval_samples
+        for eval_sample in tqdm(eval_samples):
             inputs = {"question": eval_sample.question}
             try:
                 result = self.chain.invoke(inputs)
