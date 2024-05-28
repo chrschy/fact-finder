@@ -26,26 +26,6 @@ from fact_finder.tools.entity_detector import EntityDetector
 from fact_finder.utils import load_chat_model, build_neo4j_graph
 
 
-keep = ["Which drugs have pterygium as side effect?",
-"Which drugs to treat ocular hypertension may cause the loss of eyelashes?",
-"Which disease does not show in cleft upper lip?",
-"How many proteins are connected to rheumatoid arthritis?",
-"What issues are there with lamotrigine?",
-"Which drugs against epilepsy should not be used by patients with hypertension?",
-"Which disease may a patient presented with fatigue, vomiting and abdominal pain have?",
-"Which drugs can I give my dog with influenza?",
-"Which drug against epilepsy has the lowest clogp value?",
-"What pathways are involved in Breast cancer?",
-"What are the likely genetic causes of chronic kidney disease?",
-"How many biomarkers are associated with a diagnosis of Hereditary Nephritis?",
-"Are there any genes associated with an increased risk of psoriasis?",
-"What is cardiomyopathy?",
-"What genes play role in prostate cancer?",
-"Which proteins interact with PINK1?",
-"Is right ventricle heart failure linked to Rheumatic tricuspid valve regurgitation?",
-"Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol?",
-"Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol? Include the drug for each treated disease."]
-
 QUESTION_WRONG_CYPHER_MAPPING = {
     "Which medications have more off-label uses than approved indications?": 'MATCH (d:disease {name: "chronic kidney disease"})-[:associated_with]->(g:gene_or_protein)\nRETURN g.id AS GeneID, g.name AS GeneName',
     "Which medications have more off-label uses than approved uses?": 'MATCH (e:gene_or_protein {name:"f2"})-[ep:expression_present]-(a:anatomy) RETURN a.name',
@@ -213,11 +193,9 @@ def eval_samples(limit_of_samples: int = None):
 
 if __name__ == "__main__":
     results = []
-    # chain = build_chain(args=["--normalized_graph", "--use_entity_detection_preprocessing"])
-    chain = build_chain(args=["--normalized_graph"])
+    chain = build_chain(args=["--normalized_graph", "--use_entity_detection_preprocessing"])
+    # chain = build_chain(args=["--normalized_graph"])
     samples = eval_samples()
-
-    # samples = [x for x in samples if x.question in keep]
 
     for sample in tqdm.tqdm(samples):
         inputs = {"question": sample.question}
