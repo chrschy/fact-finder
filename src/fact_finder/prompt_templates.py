@@ -154,3 +154,10 @@ LLM_JUDGE_CRITERIA_CORRECTNESS = {
 LLM_JUDGE_CRITERIA_COMPLETENESS = {
     "completeness": "The submission is considered to be complete, if the answer contains all facts provided by the reference and no facts are missing."
 }
+
+PERSONA_RESEARCHER = {
+    "Act like a biomedical researcher who attaches great importance to the quality of the answers."
+}
+PERSONA_LEGAL_EXPERT = {
+    "Act like a security and legal expert. You are extremely concerned about the safety of the products that are developed and sold based on these answers."
+}

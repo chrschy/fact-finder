@@ -29,9 +29,10 @@ class LlmJudgeEvaluator:
         graph_chain: Chain = None,
         llm_chain_args: List[str] = [],
         graph_chain_args: List[str] = ["--normalized_graph", "--use_entity_detection_preprocessing"],
-        eval_path: str = "evaluation_samples.json",
-        limit_of_samples: int = 0,
+        limit_of_samples: int = None,
+        idx_list_of_samples: List[int] = None,
     ):
+        self.idx_list_of_samples = idx_list_of_samples
         if not chat_model:
             self.chat_model = load_chat_model()
         if not llm_chain:
@@ -40,7 +41,7 @@ class LlmJudgeEvaluator:
             self.graph_chain = graph_config.build_chain(
                 model=self.chat_model, combine_output_with_sematic_scholar=False, args=graph_chain_args
             )
-        self.eval_samples = self.eval_samples(file_path=eval_path, limit_of_samples=limit_of_samples)
+        self.eval_samples = self.eval_samples(limit_of_samples=limit_of_samples)
 
         self.evaluator_pairwise_correct = load_evaluator("labeled_pairwise_string", llm=self.chat_model, prompt=LLM_JUDGE_PAIRWISE_PROMPT, criteria=LLM_JUDGE_CRITERIA_CORRECTNESS)
         self.evaluator_pairwise_complete = load_evaluator("labeled_pairwise_string", llm=self.chat_model, prompt=LLM_JUDGE_PAIRWISE_PROMPT, criteria=LLM_JUDGE_CRITERIA_COMPLETENESS)
@@ -72,10 +73,9 @@ class LlmJudgeEvaluator:
                 input=sample.question,
                 reference=str(sample.nodes),
              )
-            print("\nLLM JUDGE PAIRWISE CORRECT")
-            print(llm_judge_pairwise_correct['reasoning'])
-            print(llm_judge_pairwise_correct['value'])
-            print(llm_judge_pairwise_correct['score'])
+            # print("\nLLM JUDGE PAIRWISE CORRECT")
+            # print(llm_judge_pairwise_correct['reasoning'])
+            # print(llm_judge_pairwise_correct['value'])
 
             llm_judge_pairwise_complete = self.evaluator_pairwise_complete.evaluate_string_pairs(
                 prediction=llm_result["text"],
@@ -83,10 +83,9 @@ class LlmJudgeEvaluator:
                 input=sample.question,
                 reference=str(sample.nodes),
              )
-            print("\nLLM JUDGE PAIRWISE COMPLETE")
-            print(llm_judge_pairwise_complete['reasoning'])
-            print(llm_judge_pairwise_complete['value'])
-            print(llm_judge_pairwise_complete['score'])
+            # print("\nLLM JUDGE PAIRWISE COMPLETE")
+            # print(llm_judge_pairwise_complete['reasoning'])
+            # print(llm_judge_pairwise_complete['value'])
 
             llm_judge_score_correct = self.evaluator_score_correct.evaluate_strings(
                 prediction=graph_result["graph_qa_output"].answer if "graph_qa_output" in graph_result else "",
@@ -94,9 +93,9 @@ class LlmJudgeEvaluator:
                 input=sample.question,
                 reference=str(sample.nodes),
              )
-            print("\nLLM JUDGE SCORE CORRECT")
-            print(llm_judge_score_correct['reasoning'])
-            print(llm_judge_score_correct['score'])
+            # print("\nLLM JUDGE SCORE CORRECT")
+            # print(llm_judge_score_correct['reasoning'])
+            # print(llm_judge_score_correct['score'])
 
             llm_judge_score_complete = self.evaluator_score_complete.evaluate_strings(
                 prediction=graph_result["graph_qa_output"].answer if "graph_qa_output" in graph_result else "",
@@ -104,9 +103,9 @@ class LlmJudgeEvaluator:
                 input=sample.question,
                 reference=str(sample.nodes),
              )
-            print("\nLLM JUDGE SCORE COMPLETE")
-            print(llm_judge_score_complete['reasoning'])
-            print(llm_judge_score_complete['score'])
+            # print("\nLLM JUDGE SCORE COMPLETE")
+            # print(llm_judge_score_complete['reasoning'])
+            # print(llm_judge_score_complete['score'])
 
 
             eval_result = {
@@ -147,12 +146,21 @@ class LlmJudgeEvaluator:
         save_pickle(results, cache_path)
         return results
 
-    def eval_samples(self, file_path: str, limit_of_samples: int = 0):
-        data = manual_samples
-        if limit_of_samples > 0:
-            data = data[:limit_of_samples]
-        eval_samples = [EvaluationSample(**d) for d in data]
+    def eval_samples(self, limit_of_samples: int = None):
+        eval_samples = []
+        samples = manual_samples
+        if self.idx_list_of_samples:
+            samples = [samples[i] for i in self.idx_list_of_samples]
+        for sample in samples[:limit_of_samples]:
+            eval_sample = EvaluationSample(
+                question=sample["question"],
+                cypher_query=sample["expected_cypher"] if "expected_cypher" in sample else "",
+                expected_answer=sample["expected_answer"],
+                nodes=sample["nodes"],
+            )
+            eval_samples.append(eval_sample)
         return eval_samples
+    
 
     def save_as_excel(self, results: Dict[str, list], path: str = "eval_results_llmjudge.xlsx"):
         concat_results = []
