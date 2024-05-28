@@ -63,7 +63,7 @@ def build_chain(model: BaseLanguageModel, combine_output_with_sematic_scholar: b
         cypher_prompt=cypher_prompt,
         answer_generation_prompt=answer_generation_prompt,
         cypher_query_preprocessors=cypher_preprocessors,
-        predicate_descriptions=PREDICATE_DESCRIPTIONS[:10],
+        predicate_descriptions=PREDICATE_DESCRIPTIONS[:11],
         return_intermediate_steps=True,
         use_entity_detection_preprocessing=parsed_args.use_entity_detection_preprocessing,
         entity_detection_preprocessor_type=partial(
@@ -71,6 +71,7 @@ def build_chain(model: BaseLanguageModel, combine_output_with_sematic_scholar: b
         ),
         entity_detector=EntityDetector() if parsed_args.use_entity_detection_preprocessing else None,
         allowed_types_and_description_templates=_get_primekg_entity_categories(),
+        skip_subgraph_generation=parsed_args.skip_subgraph_generation,
         use_subgraph_expansion=parsed_args.use_subgraph_expansion,
         combine_output_with_sematic_scholar=combine_output_with_sematic_scholar,
         semantic_scholar_keyword_prompt=KEYWORD_PROMPT,
@@ -124,6 +125,7 @@ def _get_graph_prompt_templates() -> Tuple[PromptTemplate, PromptTemplate]:
 def _parse_primekg_args(args: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--normalized_graph", action="store_true")
+    parser.add_argument("--skip_subgraph_generation", action="store_true")
     parser.add_argument("--use_subgraph_expansion", action="store_true")
     parser.add_argument("--use_entity_detection_preprocessing", action="store_true")
     parsed_args, _ = parser.parse_known_args(args)

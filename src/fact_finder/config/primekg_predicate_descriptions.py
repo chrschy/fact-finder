@@ -1,5 +1,11 @@
 PREDICATE_DESCRIPTIONS = [
     {
+        "predicate": "has",
+        "object": "approval_status",
+        "subject": "drug",
+        "definition": "Possible values for approval_status: approved, investigational, vet_approved, experimental, withdrawn, nutraceutical, illicit",
+    },
+    {
         "predicate": "synergistic_interaction",
         "object": "drug",
         "subject": "drug",
