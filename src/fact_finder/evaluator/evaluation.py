@@ -1,6 +1,8 @@
 import os.path
 from typing import Any, Dict, List, Union
 
+from langchain_openai import ChatOpenAI
+
 import fact_finder.config.primekg_config as graph_config
 import pandas as pd
 from fact_finder.evaluator.evaluation_sample import EvaluationSample
@@ -24,29 +26,33 @@ class Evaluation:
     def __init__(
         self,
         evaluators: List[Union[StringEvaluator, SetEvaluator]],
-        chat_model: BaseChatModel = None,
+        run_name: str,
+        model_name: str,
         chain: Chain = None,
-        chain_args: List[str] = [
-            "--skip_subgraph_generation",
-            "--normalized_graph",
-            "--use_entity_detection_preprocessing",
-        ],
+        chain_args: List[str] = None,
         scores: List[Score] = [BleuScore(), DifflibScore(), EmbeddingScore(), LevenshteinScore()],
         limit_of_samples: int = None,
         idx_list_of_samples: List[int] = None,
     ):
+        if chain_args is None:
+            chain_args = [
+                "--skip_subgraph_generation",
+                "--normalized_graph",
+                "--use_entity_detection_preprocessing",
+            ]
+        self.model_name = model_name
+        self.run_name = run_name
         self.idx_list_of_samples = idx_list_of_samples
-        if not chat_model:
-            self.chat_model = load_chat_model()
         if not chain:
             self.chain = graph_config.build_chain(
-                model=self.chat_model, combine_output_with_sematic_scholar=False, args=chain_args
+                model=self.load_model(), combine_output_with_sematic_scholar=False, args=chain_args
             )
         self.eval_samples = self.eval_samples(limit_of_samples=limit_of_samples)
         self.evaluators = evaluators
         self.scores = scores
 
-    def run(self, save_as_excel: bool = False, cache_path="cached_results/chain_results.pickle"):
+    def run(self, save_as_excel: bool = False):
+        cache_path = "cached_results/" + self.run_name + ".pickle"
         chain_results = self.run_chain(cache_path)
         results = self.evaluate(chain_results)
         if save_as_excel:
@@ -64,7 +70,7 @@ class Evaluation:
 
     def run_chain(self, cache_path: str):
         results = []
-        print("Running Chain...")
+        print("Running Chains...")
         if os.path.exists(cache_path):
             return load_pickle(cache_path)
         eval_samples = self.eval_samples
@@ -94,17 +100,40 @@ class Evaluation:
             eval_samples.append(eval_sample)
         return eval_samples
 
-    def save_as_excel(self, results: Dict[str, list], path: str = "eval_results.xlsx"):
+    def save_as_excel(self, results: Dict[str, list]):
         concat_results = []
         for i in results.values():
             concat_results += i
         df = pd.DataFrame(concat_results)
+        path = self.run_name + ".xlsx"
         df.to_excel(path)
+
+    def load_model(self):
+        OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+        return ChatOpenAI(model=self.model_name, streaming=False, temperature=0, api_key=OPENAI_API_KEY)
 
 
 if __name__ == "__main__":
     evaluators = [SetEvaluator()]
     scores = []
-    evaluation = Evaluation(evaluators=evaluators, scores=scores)
-    results = evaluation.run(save_as_excel=True, cache_path="cached_results/chain_results.pickle")
-    print(results)
+    models = ["gpt-4-turbo", "gpt-4o"]
+    flags = [
+        [
+            "--skip_subgraph_generation",
+            "--normalized_graph",
+            "--use_entity_detection_preprocessing",
+        ],
+        [
+            "--skip_subgraph_generation",
+            "--normalized_graph",
+        ],
+    ]
+    for model in models:
+        print(model)
+        for flag in flags:
+            print(flag)
+            run_name = model + "_".join(flag)
+            evaluation = Evaluation(
+                evaluators=evaluators, scores=scores, run_name=run_name, chain_args=flag, model_name=model
+            )
+            results = evaluation.run(save_as_excel=True)
