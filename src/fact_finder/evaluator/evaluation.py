@@ -25,12 +25,10 @@ class Evaluation:
 
     def __init__(
         self,
-        evaluators: List[Union[StringEvaluator, SetEvaluator]],
         run_name: str,
         model_name: str,
         chain: Chain = None,
         chain_args: List[str] = None,
-        scores: List[Score] = [BleuScore(), DifflibScore(), EmbeddingScore(), LevenshteinScore()],
         limit_of_samples: int = None,
         idx_list_of_samples: List[int] = None,
     ):
@@ -48,8 +46,6 @@ class Evaluation:
                 model=self.load_model(), combine_output_with_sematic_scholar=False, args=chain_args
             )
         self.eval_samples = self.eval_samples(limit_of_samples=limit_of_samples)
-        self.evaluators = evaluators
-        self.scores = scores
 
     def run(self, save_as_excel: bool = False):
         cache_path = "cached_results/" + self.run_name + ".pickle"
@@ -59,14 +55,11 @@ class Evaluation:
             self.save_as_excel(results)
         return results
 
-    def evaluate(self, chain_results) -> Dict[str, Any]:
-        evaluation = {}
+    def evaluate(self, chain_results: List) -> Dict[str, Any]:
         print("Evaluating...")
-        for evaluator in self.evaluators:
-            evaluation[evaluator.__class__.__name__] = evaluator.evaluate(
-                evaluation_samples=self.eval_samples, chain_results=chain_results, scores=self.scores
-            )
-        return evaluation
+        evaluator = SetEvaluator()
+        evaluation = evaluator.evaluate(evaluation_samples=self.eval_samples, chain_results=chain_results)
+        return {"set_evaluator": evaluation}
 
     def run_chain(self, cache_path: str):
         results = []
@@ -114,8 +107,6 @@ class Evaluation:
 
 
 if __name__ == "__main__":
-    evaluators = [SetEvaluator()]
-    scores = []
     models = ["gpt-4-turbo", "gpt-4o"]
     flags = [
         [
@@ -133,7 +124,6 @@ if __name__ == "__main__":
         for flag in flags:
             print(flag)
             run_name = model + "_".join(flag)
-            evaluation = Evaluation(
-                evaluators=evaluators, scores=scores, run_name=run_name, chain_args=flag, model_name=model
-            )
+            evaluation = Evaluation(run_name=run_name, chain_args=flag, model_name=model)
             results = evaluation.run(save_as_excel=True)
+            print(run_name)
