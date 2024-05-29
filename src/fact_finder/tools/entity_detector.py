@@ -23,10 +23,10 @@ class EntityDetector:
 
     def __init__(self, filenames: List[str] = _DEFAULT_ENTITY_FILENAMES):
         self.__possible_filenames = filenames
-        self.__url = "https://api2.linguist.skgt.int.bayer.com/linnaeusannotate"
+        self.__url = os.getenv("SYNONYM_API_URL")
         self.__api_key = os.getenv("SYNONYM_API_KEY")
-        if self.__api_key is None:
-            raise ValueError("For using EntityDetector, the env variable SYNONYM_API_KEY must be set.")
+        if self.__api_key is None or self.__url is None:
+            raise ValueError("For using EntityDetector, the env variable SYNONYM_API_KEY as well as SYNONYM_API_URL must be set.")
 
     def __call__(self, search_text: str) -> List[Dict[str, Any]]:
         filenames_as_single_string = ", ".join(self.__possible_filenames)
