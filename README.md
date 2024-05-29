@@ -1,6 +1,10 @@
 # Fact Finder
 
+<img src="img/Flowchart.png"><br><br>
+
 ## Getting Started
+
+Set up PrimeKG Neo4j Instance, see [here](neo4j_primekg/README.md)
 
 Install Dependencies:
 
@@ -8,12 +12,15 @@ Install Dependencies:
 pip install -e .
 ```
 
+Some features of FactFinder are based on external APIs. While an openai api key is required to run FactFinder, semantic scholar as well as Bayer's linnaeusannotate entity detection are optional. 
 Set environment variables:
 
 ```
-export LLM="gpt-4-turbo"            # "gpt-4" as an alternative
+export LLM="gpt-4o"                 # "gpt-4-turbo" as an alternative
 export SEMANTIC_SCHOLAR_KEY=""      # fill API key for semantic scholar
 export OPENAI_API_KEY=""            # fill opanAI api key
+export SYNONYM_API_KEY=""           # Bayer internal linnaeusannotate synonym API key
+export SYNONYM_API_URL=""           # Bayer internal linnaeusannotate synonym API url
 ```
 
 Run UI:
@@ -31,7 +38,7 @@ streamlit run src/fact_finder/app.py --browser.serverAddress localhost -- --norm
 
 The following flags are available:
 ```
---normalized_graph  =  Apply synonym replacement based on the normalized graph to the cypher queries before applying them to the graph. This requires the corresponding api key ($SYNONYM_API_KEY) to be set.
+--normalized_graph  =  Apply synonym replacement based on the normalized graph to the cypher queries before applying them to the graph.
 --use_entity_detection_preprocessing  =  Apply entity detection to the user question before generating the cypher query. The found entities will be replaced by their preferred terms and a string describing their category (e.g. "Psoriasis is a disease.") will be added to the query. This requires the corresponding api key ($SYNONYM_API_KEY) to be set. Also, the normalized graph should be used.
 --use_subgraph_expansion  =  The evidence graph gets expanded through the surrounding neighborhoods.
 ```
@@ -54,3 +61,9 @@ In case the model decides that the user question cannot be answered by a graph w
 4. With another language model call, the final natural language answer is generated from the result of querying the graph.
 
 5. Additionally, a subgraph is generated from the graph query and result. This serves as visual evidence for the user. The subgraph can either be generated via a rule based approach or also with help of the language model.
+
+
+## User Interface
+The following image shows the user interface of the application for the question *"Which drugs are used to treat ocular hypertension?"*. The answers of the standalone LLM and our graph-based hybrid system are compared as output. In addition, the relevant subgraph is displayed as evidence together with the generated Cypher query, the answer from the graph and the prompts used.
+
+<img src="img/screenshot.png"><br><br>

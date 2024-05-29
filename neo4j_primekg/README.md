@@ -10,6 +10,7 @@ docker build --pull --rm -f "neo4j_primekg/Dockerfile" -t neo4j_primekg:latest "
 ```
 
 Start up server:
+Note that this will take a while as the PrimeKG files are downloaded here.
 ```
 docker run -d --restart=always \
     --publish=7474:7474 --publish=7687:7687 \
