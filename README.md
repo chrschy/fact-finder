@@ -1,5 +1,7 @@
 # Fact Finder
 
+<img src="img/Flowchart.png"><br><br>
+
 ## Getting Started
 
 Set up PrimeKG Neo4j Instance, see [here](neo4j_primekg/README.md)
