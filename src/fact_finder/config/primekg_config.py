@@ -55,7 +55,7 @@ from langchain_core.prompts.prompt import PromptTemplate
 def build_chain(model: BaseLanguageModel, combine_output_with_sematic_scholar: bool, args: List[str] = []) -> Chain:
     parsed_args = _parse_primekg_args(args)
     graph = build_neo4j_graph()
-    cypher_preprocessors = _build_preprocessors(graph, parsed_args.normalized_graph)
+    cypher_preprocessors = _build_preprocessors(graph, parsed_args.normalized_graph, parsed_args.use_entity_detection_preprocessing)
     cypher_prompt, answer_generation_prompt = _get_graph_prompt_templates()
     config = GraphQAChainConfig(
         llm=model,
@@ -84,7 +84,7 @@ def build_chain_summary(model: BaseLanguageModel, args: List[str] = []) -> Chain
     return GraphSummaryChain(llm=model, graph_summary_template=SUBGRAPH_SUMMARY_PROMPT, return_intermediate_steps=True)
 
 
-def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool) -> List[CypherQueryPreprocessor]:
+def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool, use_entity_detection_preprocessing: bool) -> List[CypherQueryPreprocessor]:
     preprocs: List[CypherQueryPreprocessor] = []
     preprocs.append(FormatPreprocessor())
     preprocs.append(AlwaysDistinctCypherQueryPreprocessor())
@@ -92,23 +92,24 @@ def _build_preprocessors(graph: Neo4jGraph, using_normalized_graph: bool) -> Lis
     wikidata = WikiDataSynonymFinder()
     preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=wikidata, node_types="exposure"))
     if using_normalized_graph:
-        preprocs += _get_synonymized_graph_preprocessors(graph)
+        preprocs += _get_synonymized_graph_preprocessors(graph, use_entity_detection_preprocessing)
     preprocs.append(SizeToCountPreprocessor())
     preprocs.append(ChildToParentPreprocessor(graph, "parent_child", name_property="name"))
     preprocs.append(LowerCasePropertiesCypherQueryPreprocessor())
     return preprocs
 
 
-def _get_synonymized_graph_preprocessors(graph: Neo4jGraph) -> List[CypherQueryPreprocessor]:
+def _get_synonymized_graph_preprocessors(graph: Neo4jGraph, use_entity_detection_preprocessing: bool) -> List[CypherQueryPreprocessor]:
     preprocs: List[CypherQueryPreprocessor] = []
-    gene_ent = PreferredTermFinder(["gene"])
-    preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=gene_ent, node_types="gene_protein"))
-    drug_ent = PreferredTermFinder(["drug"])
-    preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=drug_ent, node_types="drug"))
-    disease_ent = PreferredTermFinder(["disease"])
-    preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=disease_ent, node_types="disease"))
-    anatomy_ent = PreferredTermFinder(["Organs"])
-    preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=anatomy_ent, node_types="anatomy"))
+    if use_entity_detection_preprocessing:
+        gene_ent = PreferredTermFinder(["gene"])
+        preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=gene_ent, node_types="gene_protein"))
+        drug_ent = PreferredTermFinder(["drug"])
+        preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=drug_ent, node_types="drug"))
+        disease_ent = PreferredTermFinder(["disease"])
+        preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=disease_ent, node_types="disease"))
+        anatomy_ent = PreferredTermFinder(["Organs"])
+        preprocs.append(SynonymCypherQueryPreprocessor(graph=graph, synonym_finder=anatomy_ent, node_types="anatomy"))
     state_synonyms = AggregateStateSynonymFinder()
     preprocs.append(
         SynonymCypherQueryPreprocessor(
