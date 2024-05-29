@@ -24,7 +24,7 @@ EXAMPLE_1 = "What are the phenotypes associated with cardioacrofacial dysplasia?
 EXAMPLE_2 = "What are the genes responsible for psoriasis?"
 EXAMPLE_3 = "Which diseases involve PINK1?"
 EXAMPLE_4 = "How many drugs against epilepsy are available?"
-EXAMPLE_5 = "Which drugs to treat ocular hypertension may cause the loss of eyelashes?"
+EXAMPLE_5 = "Which medications have more off-label uses than approved indications?"
 
 max_width_str = f"max-width: 65%;"
 style = "<style>mark.entity { display: inline-block }</style>"
