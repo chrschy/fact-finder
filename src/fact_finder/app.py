@@ -23,7 +23,7 @@ PLACEHOLDER_QUERY = "Please insert your query"
 EXAMPLE_1 = "What are the phenotypes associated with cardioacrofacial dysplasia?"
 EXAMPLE_2 = "What are the genes responsible for psoriasis?"
 EXAMPLE_3 = "Which diseases involve PINK1?"
-EXAMPLE_4 = "Which drugs could be promising candidates to treat Parkinson?"
+EXAMPLE_4 = "How many drugs against epilepsy are available?"
 EXAMPLE_5 = "Which drugs to treat ocular hypertension may cause the loss of eyelashes?"
 
 max_width_str = f"max-width: 65%;"
