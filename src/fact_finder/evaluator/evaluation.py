@@ -1,24 +1,15 @@
 import os.path
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
+import pandas as pd
 from langchain_openai import ChatOpenAI
+from tqdm import tqdm
 
 import fact_finder.config.primekg_config as graph_config
-import pandas as pd
 from fact_finder.evaluator.evaluation_sample import EvaluationSample
 from fact_finder.evaluator.evaluation_samples import manual_samples
-from fact_finder.evaluator.score.bleu_score import BleuScore
-from fact_finder.evaluator.score.difflib_score import DifflibScore
-from fact_finder.evaluator.score.embedding_score import EmbeddingScore
-from fact_finder.evaluator.score.levenshtein_score import LevenshteinScore
-from fact_finder.evaluator.score.score import Score
 from fact_finder.evaluator.set_evaluator.set_evaluator import SetEvaluator
-from fact_finder.evaluator.string_evaluator.string_evaluator import StringEvaluator
 from fact_finder.evaluator.util import load_pickle, save_pickle
-from fact_finder.utils import load_chat_model
-from langchain.chains.base import Chain
-from langchain_core.language_models import BaseChatModel
-from tqdm import tqdm
 
 
 class Evaluation:
@@ -27,10 +18,10 @@ class Evaluation:
         self,
         run_name: str,
         model_name: str,
-        chain: Chain = None,
         chain_args: List[str] = None,
         limit_of_samples: int = None,
         idx_list_of_samples: List[int] = None,
+        run_without_preprocessors: bool = False,
     ):
         if chain_args is None:
             chain_args = [
@@ -41,10 +32,11 @@ class Evaluation:
         self.model_name = model_name
         self.run_name = run_name
         self.idx_list_of_samples = idx_list_of_samples
-        if not chain:
-            self.chain = graph_config.build_chain(
-                model=self.load_model(), combine_output_with_sematic_scholar=False, args=chain_args
-            )
+        if run_without_preprocessors:
+            build_function = graph_config.build_chain_without_preprocessings_etc
+        else:
+            build_function = graph_config.build_chain
+        self.chain = build_function(model=self.load_model(), combine_output_with_sematic_scholar=False, args=chain_args)
         self.eval_samples = self.eval_samples(limit_of_samples=limit_of_samples)
 
     def run(self, save_as_excel: bool = False):
@@ -112,11 +104,6 @@ if __name__ == "__main__":
         [
             "--skip_subgraph_generation",
             "--normalized_graph",
-            "--use_entity_detection_preprocessing",
-        ],
-        [
-            "--skip_subgraph_generation",
-            "--normalized_graph",
         ],
     ]
     for model in models:
@@ -124,6 +111,8 @@ if __name__ == "__main__":
         for flag in flags:
             print(flag)
             run_name = model + "_".join(flag)
-            evaluation = Evaluation(run_name=run_name, chain_args=flag, model_name=model)
+            evaluation = Evaluation(
+                run_name=run_name, chain_args=flag, model_name=model, run_without_preprocessors=False
+            )
             results = evaluation.run(save_as_excel=True)
             print(run_name)
