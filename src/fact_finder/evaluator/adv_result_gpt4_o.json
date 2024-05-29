@@ -1,0 +1,347 @@
+[
+    {
+        "question": "Which medications have more off-label uses than approved indications?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which medications have more off-label uses than approved uses?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which diseases have only treatments that have no side effects at all?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "How does Asbestos interact with the human body?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which exposures are linked to more than 10 diseases?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs have pterygium as side effect?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which medicine may cause as sideeffect pterygium?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs have freckling as side effect?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which medicine may cause freckling?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs are used to treat ocular hypertension?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs to treat ocular hypertension may cause the loss of eyelashes?",
+        "answer": "The drugs used to treat ocular hypertension that may cause the loss of eyelashes include:\n\n1. **Latanoprost**: Latanoprost is a prodrug analog of prostaglandin F2 alpha that is used to treat elevated intraocular pressure (IOP). It was initially approved by the FDA in 1998. Latanoprost is the first topical prostaglandin F2 alpha analog used for glaucoma treatment. It has been found to be well-tolerated and its use does not normally result in systemic adverse effects like other drugs used to treat elevated intraocular pressure.\n\n2. **Bimatoprost**: Bimatoprost, also known as Latisse or Lumigan, belongs to a group of drugs called prostamides, which are synthetic structural analogs of prostaglandin. Bimatoprost, marketed by Allergan, is administered in both the ophthalmic solution and implant form. It has the ability to reduce ocular hypotension, proving effective in conditions such as ocular hypertension and glaucoma. Bimatoprost is also used to treat eyelash hypotrichosis, or sparse eyelash growth. It was initially approved by the FDA in 2001 for ocular hypertension and later approved for hypothrichosis in 2008, as eyelash growth became a desirable adverse effect for patients using this drug.\n\n3. **Travoprost**: Travoprost ophthalmic solution is a topical medication used for controlling the progression of glaucoma or ocular hypertension, by reducing intraocular pressure. It is a synthetic prostaglandin F2alpha analog. Having been a well-received therapeutic agent with demonstrated efficacy and safety, travoprost is currently approved by the US FDA as a first-line treatment for lowering intraocular pressure in patients with open-angle glaucoma or ocular hypotension. Furthermore, this approval also solidifies the medication as the first and only prostaglandin analog approved by the FDA for first-line treatment of glaucoma patients that does not contain the preservative benzalkonium chloride. Moreover, travoprost is also currently approved in the EU for the decrease of elevated intraocular pressure in paediatric patients aged 2 months to < 18 years with ocular hypertension or paediatric glaucoma.\n\n4. **Tafluprost**: Tafluprost is a novel prostaglandin analog with a high affinity for the fluoroprostaglandin (FP) receptor PGF2α. Tafluprost has an affinity for the FP receptor that is approximately 12 times higher than that of the carboxylic acid of latanoprost, but with almost no potential to bind to other receptors. Tafluprost is a prostaglandin analogue ester prodrug used topically (as eye drops) to control the progression of glaucoma and in the management of ocular hypertension. Chemically, tafluprost is a fluorinated analog of prostaglandin F2-alpha. Tafluprost was approved for use in the U.S. on February 10, 2012.",
+        "graph_response": true
+    },
+    {
+        "question": "Which disease does not show in cleft upper lip?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which diseases show in symptoms such as eczema, neutropenia and a high forehead?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which expressions are present for the gene/protein f2?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs are associated with epilepsy?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which genes can be novel targets in stickler syndrome?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "How many proteins are connected to rheumatoid arthritis?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Is there clinical evidence linking HGF to kidneys?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What issues are there with lamotrigine?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs against epilepsy have zero side effects?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Does lamotrigine have more side effects than primidone?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Is psoriasis related with atopic dermatitis?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What genes play a role in breast cancer?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs against epilepsy should not be used by patients with hypertension?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Can I use iboprofen in patients with addison disease?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which off label medicaments for epilepsie have a clogp value below 0?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which disease may a patient presented with fatigue, vomiting and abdominal pain have?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drug targeting cyb5a is a micro nutrient?",
+        "answer": "The drug targeting cyb5a that is a micronutrient is ammonia.",
+        "graph_response": true
+    },
+    {
+        "question": "How many drugs against epilepsy are available?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs against asthma are not pills?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs can I give my dog with influenza?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "How many experimental drugs against epilepsy are there?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drug against epilepsy has the lowest clogp value?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which genes influence the peripheral nervous system?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "How many drugs are gaseous?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "In which Anatomical regions is IRAK4 expressed?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What are the phenotypes associated with cardioacrofacial dysplasia?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What are the symptoms of cardioacrofacial dysplasia?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What pathways are involved in distal arthrogryposis?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What pathways are involved in Breast cancer?",
+        "answer": "Breast cancer involves pathways where the count of g is greater than 0.",
+        "graph_response": true
+    },
+    {
+        "question": "What genes play role in ovarian cancer?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which medications are currently available for treating Parkinson's disease?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What are the likely environmental causes of chronic kidney disease?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What are the likely genetic causes of chronic kidney disease?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What are symptoms of rheumatoid arthritis?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which biomarkers are associated with a diagnosis of Alport syndrome?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "How many biomarkers are associated with a diagnosis of Hereditary Nephritis?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Are there any genes associated with an increased risk of psoriasis?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Is cor pulmonale linked to Chronic congestive heart failure?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Is ADORA1 druggable?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "When the Lenvatinib is expected to be used?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What genes play role in development of sialuria?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What genes are promising targets for cardiomyopathy?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What are the side effects of spironolactone?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What genes play role in immunodeficiency?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Is PPARG a known target for heart failure?",
+        "answer": "Yes, PPARG is a known target for heart failure.",
+        "graph_response": true
+    },
+    {
+        "question": "What is cardiomyopathy?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What genes play role in prostate cancer?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "what are the symptoms of atopic dermatitis?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which biomarkers are associated with a diagnosis of atopic dermatitis?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What are the common treatments for moderate to severe psoriasis?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which proteins interact with PINK1?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Is right ventricle heart failure linked to Rheumatic tricuspid valve regurgitation?",
+        "answer": "Based on the information provided, I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "What genes play role in Alport syndrome?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs are used to treat Alzheimer and what do they act on?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Based on the topological polar surface area, can any of the medications against atopic dermatitis permate cell membranes?",
+        "answer": "I don't know the answer.",
+        "graph_response": false
+    },
+    {
+        "question": "Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which diseases are treated by drugs that have a counter indication against diseases caused by alcohol? Include the drug for each treated disease.",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    },
+    {
+        "question": "Which drugs used to treat diseases caused by alcohol may worsen the patient's Anaemia disease?",
+        "answer": "I don't know the answer.",
+        "graph_response": true
+    }
+]
