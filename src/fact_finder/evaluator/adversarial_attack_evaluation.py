@@ -208,5 +208,5 @@ if __name__ == "__main__":
             }
         )
 
-    with open("adv_result.json", "w", encoding="utf8") as w:
+    with open("adv_result_gpt4_turbo.json", "w", encoding="utf8") as w:
         json.dump(results, w, indent=4, ensure_ascii=False)
