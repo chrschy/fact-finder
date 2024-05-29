@@ -59,3 +59,9 @@ In case the model decides that the user question cannot be answered by a graph w
 4. With another language model call, the final natural language answer is generated from the result of querying the graph.
 
 5. Additionally, a subgraph is generated from the graph query and result. This serves as visual evidence for the user. The subgraph can either be generated via a rule based approach or also with help of the language model.
+
+
+## User Interface
+The following image shows the user interface of the application for the question *"Which drugs are used to treat ocular hypertension?"*. The answers of the standalone LLM and our graph-based hybrid system are compared as output. In addition, the relevant subgraph is displayed as evidence together with the generated Cypher query, the answer from the graph and the prompts used.
+
+<img src="img/screenshot.png"><br><br>

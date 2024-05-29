@@ -169,10 +169,7 @@ pipelines_selected = st.multiselect(
     ],
     default=[
         PipelineOptions.LLM.value,
-        PipelineOptions.GRAPH.value,
-        PipelineOptions.DOC.value,
-        PipelineOptions.GRAPH_DOC.value,
-        PipelineOptions.GRAPH_SUM.value,
+        PipelineOptions.GRAPH.value
     ],
 )
 
