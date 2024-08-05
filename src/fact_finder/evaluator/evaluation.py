@@ -99,7 +99,7 @@ class Evaluation:
 
 
 if __name__ == "__main__":
-    models = ["gpt-4-turbo", "gpt-4o"]
+    models = ["gpt-4o", "gpt-4-turbo"]
     flags = [
         [
             "--skip_subgraph_generation",
