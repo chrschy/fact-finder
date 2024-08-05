@@ -71,7 +71,7 @@ Question: {question}
 KEYWORD_PROMPT = PromptTemplate(input_variables=["question"], template=KEYWORD_PROMPT_TEMPLATE)
 
 
-RAG_PROMPT_TEMPLATE: str = """You are a helpful assistant. You get a user question in natural language. Given the following context, please answer the given question based only on the context. Do not hallucinate. If you cannot answer based on the context, say 'Dunno'.
+RAG_PROMPT_TEMPLATE: str = """You are a helpful assistant. You get a user question in natural language. Given the following context, please answer the given question based only on the context. Do not hallucinate. If you cannot answer based on the context, say 'The documents do not provide enough information to answer the question.'.
 Context: {context}, 
 Question: {question}
 """

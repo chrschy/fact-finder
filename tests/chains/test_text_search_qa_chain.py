@@ -55,7 +55,7 @@ def keyword_prompt_template() -> PromptTemplate:
 def rag_answer_generation_prompt_template() -> PromptTemplate:
     return PromptTemplate(
         input_variables=["context", "question"],
-        template="You are a helpful assistant. You get a user question in natural language. Given the following context, please answer the given question based only on the context. Do not hallucinate. If you cannot answer based on the context, say 'Dunno'. Context: {context}, Question: {question}",
+        template="You are a helpful assistant. You get a user question in natural language. Given the following context, please answer the given question based only on the context. Do not hallucinate. If you cannot answer based on the context, say 'The documents do not provide enough information to answer the question.'. Context: {context}, Question: {question}",
     )
 
 
